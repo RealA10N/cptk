@@ -15,3 +15,11 @@ class InvalidClone(cptkException):
     doesn't describe anything that can be cloned. """
 
     info: 'PageInfo'
+
+
+@dataclass(frozen=True)
+class UnknownWebsite(cptkException):
+    """ Raised when trying to fetch information from a website that is not
+    registed and can't be handled by cptk. """
+
+    domain: str
