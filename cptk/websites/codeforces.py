@@ -1,8 +1,8 @@
-from cptk import Website, Test
+from cptk import Website, Test, Contest
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import List
+    from typing import List, Optional
     from cptk import PageInfo
 
 
@@ -46,3 +46,39 @@ class Codeforces(Website):
         statement. """
         elem = info.data.find('div', {'class': 'problem-statement'})
         return elem is not None
+
+    @classmethod
+    def is_contest(cls, info: 'PageInfo') -> bool:
+        """ Returns True if the given 'PageInfo' instance contains information
+        of a contest. Note that the given page can also be a problem page that
+        has information about the contest that the problem is taken from in the
+        sidebar. """
+        return cls._contest_from_sidebar(info) is not None
+
+    @classmethod
+    def to_contest(cls, info: 'PageInfo') -> 'Optional[Contest]':
+        """ If possible, extracts information about the contest that is presented
+        in the given page. If the page doesn't contain a contest information,
+        returns 'None'. """
+        return cls._contest_from_sidebar(info)
+
+    @classmethod
+    def _contest_from_sidebar(cls, info: 'PageInfo') -> 'Optional[Contest]':
+        """ Tries to pull information about the current contest using the sidebar
+        information that is displayed on every page that is related to a contest.
+        If fails to locate the sidebar, returns None. """
+
+        tables = info.data.find_all('table', {'class': 'rtable'})
+        links = [table.find('a', href=True) for table in tables]
+
+        try:
+            link = next(link for link in links
+                        if 'contest' in link['href'].split('/'))
+        except StopIteration:
+            return None
+
+        return Contest(
+            website=cls,
+            uid=int(link['href'].split('/')[-1]),
+            name=link.text.strip(),
+        )
