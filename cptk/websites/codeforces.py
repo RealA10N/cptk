@@ -1,7 +1,8 @@
 from cptk import Website, Test
 
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import List
     from cptk import PageInfo
 
 
@@ -12,7 +13,7 @@ class Codeforces(Website):
         return 'Codeforces'
 
     @staticmethod
-    def domain() -> List[str]:
+    def domain() -> 'List[str]':
         return [
             'codeforces.com',
             'm1.codeforces.com',
@@ -21,7 +22,7 @@ class Codeforces(Website):
         ]
 
     @staticmethod
-    def _parse_tests(info: 'PageInfo') -> List[Test]:
+    def _parse_tests(info: 'PageInfo') -> 'List[Test]':
         """ Assumes that the given 'PageInfo' instance describes a Problem page,
         and parses all sample test cases in the page. """
 
