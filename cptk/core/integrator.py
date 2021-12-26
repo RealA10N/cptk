@@ -27,10 +27,10 @@ class Integrator:
         'InvalidClone' exception. """
 
         for w in self._websites:
-            if w.is_contest(info):
-                return self.clone_contest(w.to_contest(info))
-            elif w.is_problem(info):
+            if w.is_problem(info):
                 return self.clone_problem(w.to_problem(info))
+            elif w.is_contest(info):
+                return self.clone_contest(w.to_contest(info))
         raise InvalidClone(info)
 
     def clone_contest(self, contest: 'Contest') -> None:
