@@ -1,6 +1,7 @@
 import pkg_resources
+from urllib.parse import urlparse
 
-from cptk.exceptions import InvalidClone
+from cptk.exceptions import InvalidClone, UnknownWebsite
 
 from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -10,13 +11,22 @@ if TYPE_CHECKING:
 class Integrator:
 
     def __init__(self) -> None:
-        self._websites = self._load_websites()
+        self._load_websites()
 
     def _load_websites(self) -> List['Website']:
-        return [
+        self._websites = [
             point.load()
             for point in pkg_resources.iter_entry_points('cptk_sites')
         ]
+
+        self._domain_to_website = dict()
+        for website in self._websites:
+            domain = website.domain()
+            if isinstance(domain, str):
+                self._domain_to_website[domain] = website
+            else:
+                for cur in domain:
+                    self._domain_to_website[cur] = website
 
     # --------------------------------------------------------------- Clone -- #
 
@@ -26,11 +36,18 @@ class Integrator:
         doesn't find a way to parse the given webpage, it raises the
         'InvalidClone' exception. """
 
-        for w in self._websites:
-            if w.is_problem(info):
-                return self.clone_problem(w.to_problem(info))
-            elif w.is_contest(info):
-                return self.clone_contest(w.to_contest(info))
+        domain = urlparse(info.url).netloc
+        website = self._domain_to_website.get(domain)
+
+        if website is None:
+            raise UnknownWebsite(domain)
+
+        elif website.is_problem(info):
+            return self.clone_problem(website.to_problem(info))
+
+        elif website.is_contest(info):
+            return self.clone_contest(website.to_contest(info))
+
         raise InvalidClone(info)
 
     def clone_contest(self, contest: 'Contest') -> None:
