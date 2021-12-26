@@ -15,7 +15,7 @@ class Integrator:
     def _load_websites(self) -> List['Website']:
         return [
             point.load()
-            for point in pkg_resources.iter_entry_points('cptk-sites')
+            for point in pkg_resources.iter_entry_points('cptk_sites')
         ]
 
     # --------------------------------------------------------------- Clone -- #
