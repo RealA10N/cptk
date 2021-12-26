@@ -15,15 +15,13 @@ class Problem:
     tests: List['Test']
 
     # additional metadata
-    section: Optional[str]
-    time_limit: Optional[float]     # in Seconds
-    memory_limit: Optional[float]   # in MB
+    level: str = None
+    time_limit: float = None     # in Seconds
+    memory_limit: float = None   # in MB
 
 
 @dataclass(frozen=True)
 class Test:
-    problem: 'Problem'
-
     input: str
     expected: str
 
