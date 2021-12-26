@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from typing import Optional, List, TYPE_CHECKING, Type
 if TYPE_CHECKING:
@@ -7,17 +7,17 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class Problem:
-    website: Type['Website']
+    website: Type['Website'] = field(compare=True)
 
     # required metadata
-    uid: int
-    name: str
-    tests: List['Test']
+    uid: int = field(compare=True)
+    name: str = field(compare=False)
+    tests: List['Test'] = field(compare=False)
 
     # additional metadata
-    level: str = None
-    time_limit: float = None     # in Seconds
-    memory_limit: float = None   # in MB
+    level: str = field(default=None, compare=False)
+    time_limit: float = field(default=None, compare=False)     # in Seconds
+    memory_limit: float = field(default=None, compare=False)   # in MB
 
 
 @dataclass(frozen=True)
@@ -28,6 +28,6 @@ class Test:
 
 @dataclass(frozen=True)
 class Contest:
-    website: Type['Website']
-    uid: int
-    name: str
+    website: Type['Website'] = field(compare=True)
+    uid: int = field(compare=True)
+    name: str = field(compare=False)
