@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING, Optional, Union, List
 if TYPE_CHECKING:
@@ -7,14 +7,14 @@ if TYPE_CHECKING:
     from bs4 import BeautifulSoup
 
 
-@dataclass
+@dataclass(frozen=True)
 class PageInfo:
     """ A simple dataclass that contains all information about a webpage that
     is required by the 'Website' classes to preform their actions and queries.
     """
 
     url: str
-    data: 'BeautifulSoup'
+    data: 'BeautifulSoup' = field(repr=False)
 
 
 class Website(ABC):
