@@ -1,4 +1,4 @@
-from cptk import Website, Test, Contest
+from cptk import Website, Test, Contest, Problem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -46,6 +46,42 @@ class Codeforces(Website):
         statement. """
         elem = info.data.find('div', {'class': 'problem-statement'})
         return elem is not None
+
+    @classmethod
+    def to_problem(cls, info: 'PageInfo') -> 'Optional[Problem]':
+        """ Assumes that the given 'PageInfo' instance contains a problem
+        statement and returns a 'Problem' instance that describes the problem.
+        """
+
+        header_soup = info.data.find('div', {'class': 'header'})
+
+        title = header_soup.find('div', {'class': 'title'}).text
+        level, name = [i.strip() for i in title.split('.')]
+
+        contest = cls.to_contest(info)
+
+        time_limit_soup = header_soup.find('div', {'class': 'time-limit'})
+        time_limit = next(
+            int(word) for word in time_limit_soup.find(text=True, recursive=False).split()
+            if word.strip().isnumeric()
+        )
+
+        memory_limit_soup = header_soup.find('div', {'class': 'memory-limit'})
+        memory_limit = next(
+            int(word) for word in memory_limit_soup.find(text=True, recursive=False).split()
+            if word.strip().isnumeric()
+        )
+
+        return Problem(
+            website=cls,
+            uid=(contest.uid, level),
+            name=name,
+            tests=cls._parse_tests(info),
+            contest=contest,
+            level=level,
+            time_limit=time_limit,
+            memory_limit=memory_limit,
+        )
 
     @classmethod
     def is_contest(cls, info: 'PageInfo') -> bool:
