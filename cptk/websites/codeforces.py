@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 class Codeforces(Website):
 
     @staticmethod
-    def name():
-        return 'Codeforces'
+    def name() -> str:
+        return 'codeforces'
 
     @staticmethod
     def domain() -> 'List[str]':
