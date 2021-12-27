@@ -1,5 +1,4 @@
 import re
-from types import ClassMethodDescriptorType
 from urllib.parse import urlparse
 from cptk import Website, Contest, Problem, Test
 
