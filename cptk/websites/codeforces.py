@@ -22,7 +22,11 @@ class Codeforces(Website):
         ]
 
     @staticmethod
-    def _parse_tests(info: 'PageInfo') -> 'List[Test]':
+    def _parse_code_text(soup: 'BeautifulSoup') -> None:
+        return soup.text.replace('<br>', '\n').replace('\r', '').strip() + '\n'
+
+    @classmethod
+    def _parse_tests(cls, info: 'PageInfo') -> 'List[Test]':
         """ Assumes that the given 'PageInfo' instance describes a Problem page,
         and parses all sample test cases in the page. """
 
@@ -35,9 +39,9 @@ class Codeforces(Website):
 
         return [
             Test(
-                input=input.find('pre').text,
-                expected=output.find('pre').text
-            ) for input, output in zip(inputs_soup, outputs_soup)
+                input=cls._parse_code_text(in_soup.find('pre')),
+                expected=cls._parse_code_text(ex_soup.find('pre')),
+            ) for in_soup, ex_soup in zip(inputs_soup, outputs_soup)
         ]
 
     @staticmethod
