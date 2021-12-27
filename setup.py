@@ -17,8 +17,13 @@ setup(
     author_email="downtown2u@gmail.com",
     packages=find_packages(),
     install_requires=DEPENDENCIES,
-    entry_points={"cptk_sites": [
-        "codeforces=cptk.websites:Codeforces",
-        "csesfi=cptk.websites:CsesFi",
-    ]},
+    entry_points={
+        "cptk_sites": [
+            "codeforces=cptk.websites:Codeforces",
+            "csesfi=cptk.websites:CsesFi",
+        ],
+        "console_scripts": [
+            "cptk=cptk.__main__:cli",
+        ]
+    },
 )

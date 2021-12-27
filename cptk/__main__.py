@@ -16,8 +16,8 @@ def cli():
     default='.',
 )
 def init(location: str):
-    """ Initializes a new cptk project directory. """
-    raise NotImplementedError
+    """ Initialize a new cptk project directory. """
+    raise NotImplementedError  # TODO: implement cli init function
 
 
 if __name__ == '__main__':
