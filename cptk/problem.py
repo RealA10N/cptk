@@ -18,6 +18,7 @@ class Problem:
     # additional metadata
     contest: 'Contest' = field(default=None, compare=False)
     level: str = field(default=None, compare=False)
+    section: str = field(default=None, compare=False)
     time_limit: float = field(default=None, compare=False)     # in Seconds
     memory_limit: float = field(default=None, compare=False)   # in MB
 
