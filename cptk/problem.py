@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import List, Type
+    from typing import List, Type, Any
     from cptk import Website
 
 
@@ -11,7 +11,7 @@ class Problem:
     website: 'Type[Website]' = field(compare=True)
 
     # required metadata
-    uid: int = field(compare=True)
+    uid: 'Any' = field(compare=True)
     name: str = field(compare=False)
     tests: 'List[Test]' = field(compare=False)
 
@@ -31,5 +31,5 @@ class Test:
 @dataclass(frozen=True)
 class Contest:
     website: 'Type[Website]' = field(compare=True)
-    uid: int = field(compare=True)
+    uid: 'Any' = field(compare=True)
     name: str = field(compare=False)
