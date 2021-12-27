@@ -62,13 +62,13 @@ class Codeforces(Website):
 
         time_limit_soup = header_soup.find('div', {'class': 'time-limit'})
         time_limit = next(
-            int(word) for word in time_limit_soup.find(text=True, recursive=False).split()
+            float(word) for word in time_limit_soup.find(text=True, recursive=False).split()
             if word.strip().isnumeric()
         )
 
         memory_limit_soup = header_soup.find('div', {'class': 'memory-limit'})
         memory_limit = next(
-            int(word) for word in memory_limit_soup.find(text=True, recursive=False).split()
+            float(word) for word in memory_limit_soup.find(text=True, recursive=False).split()
             if word.strip().isnumeric()
         )
 
