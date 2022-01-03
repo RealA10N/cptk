@@ -48,13 +48,13 @@ def cases_generator() -> 'Iterator[PageTestCase]':
         for case_config in glob(pattern, recursive=True):
 
             # Load test case configuration from json
-            with open(case_config, 'r') as f:
+            with open(case_config, mode='r', encoding='utf8') as f:
                 case = load(f)
 
             # Load html page file that is relevant to the current case
             base_path = path.dirname(case_config)
             data_path = path.join(base_path, case['info']['data'])
-            with open(data_path, 'r') as f:
+            with open(data_path, mode='r', encoding='utf8') as f:
                 data = f.read()
 
             info = PageInfo(
