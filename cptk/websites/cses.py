@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from bs4 import BeautifulSoup
 
 
-class CsesFi(Website):
+class Cses(Website):
 
     @staticmethod
     def name() -> str:
-        return 'cses.fi'
+        return 'cses'
 
     @staticmethod
     def domain() -> str:

@@ -1,2 +1,2 @@
 from .codeforces import Codeforces
-from .csesfi import CsesFi
+from .cses import Cses
