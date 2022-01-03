@@ -1,0 +1,33 @@
+{
+    "info": {
+        "url": "https://cses.fi/251/task/A",
+        "data": "hiit2019a.html"
+    },
+    "expected": {
+        "contest": {
+            "uid": "251",
+            "name": "HIIT Open 2019"
+        },
+        "problem": {
+            "uid": [
+                "251",
+                1775
+            ],
+            "name": "Alien Invasion II",
+            "tests": [
+                {
+                    "input": "17\n",
+                    "expected": "5617\n41 137\n"
+                }
+            ],
+            "contest": {
+                "uid": "251",
+                "name": "HIIT Open 2019"
+            },
+            "level": "A",
+            "section": null,
+            "time_limit": 1,
+            "memory_limit": 512
+        }
+    }
+}

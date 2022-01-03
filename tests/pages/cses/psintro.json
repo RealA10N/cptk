@@ -1,0 +1,12 @@
+{
+    "info": {
+        "url": "https://cses.fi/problemset/text/2433",
+        "data": "psintro.html"
+    },
+    "expected": {
+        "contest": {
+            "uid": "problemset",
+            "name": "CSES Problem Set"
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "info": {
+        "url": "https://cses.fi/251/task/L",
+        "data": "hiit2019l.html"
+    },
+    "expected": {
+        "contest": {
+            "uid": "251",
+            "name": "HIIT Open 2019"
+        },
+        "problem": {
+            "uid": [
+                "251",
+                1783
+            ],
+            "name": "L-Trominos",
+            "tests": [
+                {
+                    "input": "4 6\n",
+                    "expected": "AADDBB\nACCDEB\nBCAEEC\nBBAACC\n"
+                },
+                {
+                    "input": "4 7\n",
+                    "expected": "IMPOSSIBLE\n"
+                }
+            ],
+            "contest": {
+                "uid": "251",
+                "name": "HIIT Open 2019"
+            },
+            "level": "L",
+            "section": null,
+            "time_limit": 1,
+            "memory_limit": 512
+        }
+    }
+}

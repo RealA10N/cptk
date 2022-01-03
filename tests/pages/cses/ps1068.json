@@ -1,0 +1,33 @@
+{
+    "info": {
+        "url": "https://cses.fi/problemset/task/1068",
+        "data": "ps1068.html"
+    },
+    "expected": {
+        "contest": {
+            "uid": "problemset",
+            "name": "CSES Problem Set"
+        },
+        "problem": {
+            "uid": [
+                "problemset",
+                1068
+            ],
+            "name": "Weird Algorithm",
+            "tests": [
+                {
+                    "input": "3\n",
+                    "expected": "3 10 5 16 8 4 2 1\n"
+                }
+            ],
+            "contest": {
+                "uid": "problemset",
+                "name": "CSES Problem Set"
+            },
+            "level": null,
+            "section": "Introductory Problems",
+            "time_limit": 1,
+            "memory_limit": 512
+        }
+    }
+}

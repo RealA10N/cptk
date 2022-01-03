@@ -1,0 +1,180 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet " type="text/css" href="/cses.css?2" id="styles">
+  <link rel="stylesheet alternate" type="text/css" href="/cses-dark.css?2" id="styles-dark">
+  <meta name="theme-color" content="white" id="theme-color">
+  <script type="application/json" id="darkmode-enabled">false</script>
+  <script src="/ui.js"></script>
+  <link rel="stylesheet" type="text/css" href="/lib/fontawesome/css/all.min.css">
+</head>
+<body class="with-sidebar ">
+  <div class="header">
+    <div>
+      <a href="/" class="logo"><img src="/logo.png?1" alt="CSES"></a>
+      <a class="menu-toggle" onclick="document.body.classList.toggle('menu-open');">
+        <i class="fas fa-bars"></i>
+      </a>
+      <div class="controls">
+                <a class="account" href="/login">Login</a>
+        <span>&mdash;</span>
+                        <a href="/darkmode" title="Toggle dark mode" onclick="return toggle_theme()"><i class="fas fa-adjust"></i><span>Dark mode</span></a>
+              </div>
+    </div>
+  </div>
+  <div class="skeleton">
+  <div class="navigation">
+    <div class="title-block">
+      <h3>
+        <a href="/251/list/">HIIT Open 2019</a>
+        <a href="/251/messages/"><span id="messages"></span><i class="far fa-envelope"></i></a>
+      </h3>
+      <h1>L-Trominos</h1>
+<ul class="nav">
+<li><a href="/251/task/L/" class="current">Task</a></li>
+</ul>
+    </div>
+    <div class="sidebar">
+      <ul class="contest-time">
+        <li><b>Start:</b> <span>2019-05-25 11:00:00</span></li>
+        <li><b>End:</b> <span>2019-05-25 16:00:00</span></li>
+        <li><b id="info_caption"></b> <span id="info_text"></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="content">
+
+<script>
+var contest_start = 1558771200;
+var contest_end = 1558789200;
+var server_time = 1641205378;
+var script_start = parseInt(new Date().getTime()/1000);
+var waiting = false;
+var allzero = false;
+var virtual = 0;
+
+function format(x) {
+    if (x < 10) return "0"+x;
+    else return x;
+}
+
+function time_left(x) {
+    if (x < 0) x = 0;
+    return parseInt(x/3600) + ":" + format(parseInt(x/60)%60) + ":" + format(x%60);
+}
+
+function update_info() {
+    var info_caption = document.getElementById("info_caption");
+    var info_text = document.getElementById("info_text");
+    var current_time = parseInt(new Date().getTime()/1000);
+    var contest_time = server_time+current_time-script_start;
+    if (contest_time >= contest_start && waiting) {
+        waiting = false;
+        allzero = true;
+        setTimeout(function(){ document.location.reload(true); }, 1000);
+    }
+    info_caption.innerText = "";
+    if (virtual) {
+        info_text.innerText = "Contest not started yet";
+        return;
+    }
+    if (allzero) {
+        info_caption.innerText = "Starting in:";
+        info_text.innerText = "0:00:00";
+        return;
+    }
+    if (contest_time < contest_start) {
+        info_caption.innerText = "Starting in:";
+        info_text.innerText = time_left(contest_start-contest_time);
+    } else if (contest_time < contest_end) {
+        info_caption.innerText = "Time left:";
+        info_text.innerText = time_left(contest_end-contest_time);
+    } else {
+        info_text.innerText = "Contest has ended";
+    }
+}
+update_info();
+setInterval("update_info()",200);
+</script>
+<script>
+function check_messages() {
+    var x = new XMLHttpRequest();
+    x.onreadystatechange = function() {
+        if (x.readyState == 4 && x.status == 200) {
+            var count = parseInt(x.responseText);
+            var text = "";
+            if (count > 0) text = count.toString();
+            var element = document.getElementById("messages");
+            element.innerHTML = text;
+            element.title = text + " new message" + (count > 1 ? "s" : "");
+        }
+    }
+    x.open("GET", "/contest/messages_get.php?id=251", true);
+    x.send();
+}
+
+check_messages();
+window.setInterval(check_messages, 60000);
+</script>
+<title>CSES - HIIT Open 2019 - L-Trominos</title><script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+  "HTML-CSS": {
+    scale: 90,
+    preferredFont: "TeX",
+    availableFonts: ["TeX"],
+  },
+  MathMenu: {
+    showLocale: false,
+  },
+});
+</script>
+<script type="text/javascript"
+  src="/lib/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script src="/lib/google-code-prettify/run_prettify.js"></script>
+<ul class="task-constraints">
+<li><b>Time limit:</b> 1.00 s</li>
+<li><b>Memory limit:</b> 512 MB</li>
+</ul>
+<input type="hidden" name="course" value="">
+<input type="hidden" name="task" value="1783">
+Your task is to fill an $n \times m$ grid using L-trominos (three squares that have an L-shape). For example, here is one way to fill a $4 \times 6$ grid:<br />
+<p><center><img src="/file/da3ce928fcf66fd793d582a1a5ad7f7f9cc37e68aa2aadacee90f99bc4271692"></center></p>
+<b id="input">Input</b><br />
+<br />
+The only input line has two integers $n$ and $m$.<br />
+<br />
+<b id="output">Output</b><br />
+<br />
+Print $n$ lines that each contain $m$ letters between A–Z. Adjacent squares must have the same letter exactly when they belong to the same tromino.<br />
+<br />
+You can print any valid solution. If there are no solutions, only print &quot;IMPOSSIBLE&quot;.<br />
+<br />
+<b id="constraints">Constraints</b><br />
+<ul>
+<li>$1 \le n,m \le 100$<br />
+</ul>
+<b id="example1">Example 1</b><br />
+<br />
+Input:<br />
+<code>4 6</code><br />
+<br />
+Output:<br />
+<code>AADDBB<br />
+ACCDEB<br />
+BCAEEC<br />
+BBAACC</code><br />
+<br />
+<b id="example2">Example 2</b><br />
+<br />
+Input:<br />
+<code>4 7</code><br />
+<br />
+Output:<br />
+<code>IMPOSSIBLE</code>    </div>
+    <div class="nav sidebar">
+<h4>Tasks</h4><a  href="/251/task/A"><span><b>A</b> Alien Invasion II</span><span class="task-score icon"></span></a><a  href="/251/task/B"><span><b>B</b> Bit Strings</span><span class="task-score icon"></span></a><a  href="/251/task/C"><span><b>C</b> Coloring Grids</span><span class="task-score icon"></span></a><a  href="/251/task/D"><span><b>D</b> Differences</span><span class="task-score icon"></span></a><a  href="/251/task/E"><span><b>E</b> Epic Subset</span><span class="task-score icon"></span></a><a  href="/251/task/F"><span><b>F</b> Final Array</span><span class="task-score icon"></span></a><a  href="/251/task/G"><span><b>G</b> Grid Paths</span><span class="task-score icon"></span></a><a  href="/251/task/H"><span><b>H</b> HIIT Speedrun</span><span class="task-score icon"></span></a><a  href="/251/task/I"><span><b>I</b> Insert Whitespace</span><span class="task-score icon"></span></a><a  href="/251/task/J"><span><b>J</b> Just Solve It</span><span class="task-score icon"></span></a><a  href="/251/task/K"><span><b>K</b> Keeping Distance</span><span class="task-score icon"></span></a><a class="current" href="/251/task/L"><span><b>L</b> L-Trominos</span><span class="task-score icon"></span></a><a  href="/251/task/M"><span><b>M</b> Many Cycles</span><span class="task-score icon"></span></a><hr />
