@@ -1,0 +1,12 @@
+{
+    "info": {
+        "url": "https://codeforces.com/contest/1234",
+        "data": "1234.html"
+    },
+    "expected": {
+        "contest": {
+            "uid": 1234,
+            "name": "Codeforces Round #590 (Div. 3)"
+        }
+    }
+}
