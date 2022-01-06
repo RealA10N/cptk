@@ -1,6 +1,6 @@
 from cptk.utils import cptkException
 
-from cptk.core.integrator import (
+from cptk.core.fetcher import (
     InvalidClone,
     UnknownWebsite,
 )

@@ -1,10 +1,12 @@
 import pkg_resources
 from urllib.parse import urlparse
+from cptk import website
 
 from cptk.utils import cptkException
 
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import Type, List, Optional
     from cptk import Website, PageInfo, Contest, Problem
 
 
@@ -26,12 +28,12 @@ class UnknownWebsite(cptkException):
         super().__init__(f"We don't know how to handle data from {domain!r}")
 
 
-class Integrator:
+class Fetcher:
 
     def __init__(self) -> None:
         self._load_websites()
 
-    def _load_websites(self) -> List['Website']:
+    def _load_websites(self) -> 'List[Type[Website]]':
         self._websites = [
             point.load()
             for point in pkg_resources.iter_entry_points('cptk_sites')
@@ -46,32 +48,30 @@ class Integrator:
                 for cur in domain:
                     self._domain_to_website[cur] = website
 
-    # --------------------------------------------------------------- Clone -- #
+    def _url_to_website(self, url: str) -> 'Type[Website]':
+        """ Tries to convert the given url into a Website object.
+        Raises an error if the URL doesn't match with any registered website."""
 
-    def clone_webpage(self, info: 'PageInfo') -> None:
-        """ Recives an arbitrary page info instance and tries to match it with
-        a Website class that knows how to handle this specific website. If cptk
-        doesn't find a way to parse the given webpage, it raises the
-        'InvalidClone' exception. """
-
-        domain = urlparse(info.url).netloc
+        domain = urlparse(url).netloc
         website = self._domain_to_website.get(domain)
 
         if website is None:
             raise UnknownWebsite(domain)
 
-        elif website.is_problem(info):
-            return self.clone_problem(website.to_problem(info))
+        return website
 
-        elif website.is_contest(info):
-            return self.clone_contest(website.to_contest(info))
+    def to_model(self, info: 'PageInfo') -> None:
+        """ Recives an arbitrary page info instance and tries to match it with
+        a Website class that knows how to handle this specific website. If cptk
+        doesn't find a way to parse the given webpage, it raises the
+        'InvalidClone' exception. """
+
+        website = self._url_to_website(info.url)
+
+        if website.is_problem(info):
+            return website.to_problem(info)
+
+        if website.is_contest(info):
+            return website.to_contest(info)
 
         raise InvalidClone(info)
-
-    def clone_contest(self, contest: 'Contest') -> None:
-        """ Clones the given contest and every problem in to. """
-        raise NotImplementedError  # TODO implement clone_contest method
-
-    def clone_problem(self, problem: 'Problem') -> None:
-        """ Clones the given problem. """
-        raise NotImplementedError  # TODO implement clone_problem method
