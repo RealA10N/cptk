@@ -1,7 +1,7 @@
 import pkg_resources
 from urllib.parse import urlparse
 
-from cptk.exceptions import cptkException
+from cptk.utils import cptkException
 
 from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:

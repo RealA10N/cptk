@@ -1,18 +1,26 @@
-class cptkException(Exception):
-    """ Base cptk exception. All exceptions raised and created by cptk should
-    inherent from this one. """
+from cptk.utils import cptkException
 
-# fmt: off
+from cptk.core.integrator import (
+    InvalidClone,
+    UnknownWebsite,
+)
 
-# Those imports should be placed below cptkException to avoid circular import
-# errors
-
-from cptk.core.integrator import InvalidClone, UnknownWebsite
-
-# fmt: on
+from cptk.core.config import (
+    ConfigFileError,
+    ConfigFileNotFound,
+    ConfigFileValueError,
+)
 
 __all__ = [
+    # cptk.utils
     'cptkException',
+
+    # cptk.core.integrator
     'InvalidClone',
     'UnknownWebsite',
+
+    # cptk.core.config
+    'ConfigFileError',
+    'ConfigFileNotFound',
+    'ConfigFileValueError',
 ]
