@@ -1,7 +1,6 @@
 import pkg_resources
 from urllib.parse import urlparse
 
-from dataclasses import dataclass
 from cptk.exceptions import cptkException
 
 from typing import List, TYPE_CHECKING
@@ -9,20 +8,22 @@ if TYPE_CHECKING:
     from cptk import Website, PageInfo, Contest, Problem
 
 
-@dataclass
 class InvalidClone(cptkException):
     """ Raised when the clone command is called with a 'PageInfo' instance that
     doesn't describe anything that can be cloned. """
 
-    info: 'PageInfo'
+    def __init__(self, info: 'PageInfo') -> None:
+        self.info = info
+        super().__init__(f"We don't know how to handle data from {info.url!r}")
 
 
-@dataclass
 class UnknownWebsite(cptkException):
     """ Raised when trying to fetch information from a website that is not
     registed and can't be handled by cptk. """
 
-    domain: str
+    def __init__(self, domain: str) -> None:
+        self.domain = domain
+        super().__init__(f"We don't know how to handle data from {domain!r}")
 
 
 class Integrator:
