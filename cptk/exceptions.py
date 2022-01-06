@@ -8,6 +8,7 @@ from cptk.core.integrator import (
 from cptk.core.config import (
     ConfigFileError,
     ConfigFileNotFound,
+    ConfigFileParsingError,
     ConfigFileValueError,
 )
 
@@ -22,5 +23,6 @@ __all__ = [
     # cptk.core.config
     'ConfigFileError',
     'ConfigFileNotFound',
+    'ConfigFileParsingError',
     'ConfigFileValueError',
 ]

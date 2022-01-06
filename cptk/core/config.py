@@ -1,12 +1,12 @@
 from pydantic.error_wrappers import ValidationError
-from yaml import safe_load
+from yaml import safe_load, YAMLError
 
 from cptk.utils import cptkException
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, TypeVar
+    from typing import Type, TypeVar, Tuple
     from pydantic import BaseModel
 
     T = TypeVar('T', BaseModel)
@@ -41,6 +41,23 @@ class ConfigFileValueError(ConfigFileError, ValueError):
         return s
 
 
+class ConfigFileParsingError(ConfigFileError):
+    def __init__(self,
+                 path: str,
+                 error: str,
+                 position: 'Tuple[int, int]' = None,
+                 ) -> None:
+        self.path = path
+        self.error = error
+        self.position = position
+        super().__init__(self.__generate_error_message())
+
+    def __generate_error_message(self) -> str:
+        s = f"Error while parsing {self.path!r}\n"
+        s += f"Under line {self.position[0]}: {self.error}"
+        return s
+
+
 def load_config_file(path: str, Model: 'Type[T]') -> 'T':
     """ Load information from a YAML configuration file and dump it into a
     pydantic Model. Raises relevent expections if the given file path isn't
@@ -53,6 +70,12 @@ def load_config_file(path: str, Model: 'Type[T]') -> 'T':
 
     except FileNotFoundError:
         raise ConfigFileNotFound(path)
+
+    except YAMLError as err:
+        # pylint: disable=no-member
+        mark = err.problem_mark
+        pos = (mark.line + 1, mark.column + 1)
+        raise ConfigFileParsingError(path, err.problem, pos)
 
     if not isinstance(data, dict):
         raise ConfigFileValueError(
