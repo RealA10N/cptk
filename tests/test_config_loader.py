@@ -5,7 +5,7 @@ import pytest
 from cptk.core import load_config_file
 
 from pydantic import BaseModel
-from typing import Literal, Union
+from typing import Optional
 
 
 from cptk.exceptions import ConfigFileNotFound, ConfigFileValueError, ConfigFileParsingError
@@ -14,7 +14,7 @@ from cptk.exceptions import ConfigFileNotFound, ConfigFileValueError, ConfigFile
 class Pet(BaseModel):
     name: str
     age: int
-    type: Union[Literal['Dog'], Literal['Cat']]
+    type: Optional[str]
 
 
 class TestConfigLoader:
@@ -34,9 +34,8 @@ class TestConfigLoader:
             """
             name: Milky
             age: 8.17
-            type: Cat
             """,
-            {'name': 'Milky', 'age': 8, 'type': 'Cat'},
+            {'name': 'Milky', 'age': 8, 'type': None},
         ),
     ))
     def test_valids(self, yaml, expected, tempdir) -> None:
@@ -62,7 +61,7 @@ class TestConfigLoader:
         type: Dog
         """,
         """
-        name: Mooooo
+        name: null
         age: 123
         type: Cow
         """,
