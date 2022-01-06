@@ -20,7 +20,7 @@ setup(
     entry_points={
         "cptk_sites": [
             "codeforces=cptk.websites:Codeforces",
-            "csesfi=cptk.websites:CsesFi",
+            "csesfi=cptk.websites:Cses",
         ],
         "console_scripts": [
             "cptk=cptk.__main__:cli",
