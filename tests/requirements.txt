@@ -1,1 +1,2 @@
 pytest>=6.2, <7
+python-slugify>=5.0, <6
