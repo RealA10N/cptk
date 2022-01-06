@@ -1,4 +1,5 @@
 import os
+from pydantic.config import Extra
 import pytest
 
 from cptk.core import load_config_file
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 from typing import Literal, Union
 
 
-from cptk.exceptions import ConfigFileNotFound
+from cptk.exceptions import ConfigFileNotFound, ConfigFileValueError, ConfigFileParsingError
 
 
 class Pet(BaseModel):
@@ -20,7 +21,7 @@ class TestConfigLoader:
     """ Tests the 'load_config_file' function location in
     'cptk.core.config'. """
 
-    @pytest.mark.parametrize('case', (
+    @pytest.mark.parametrize('yaml, expected', (
         (
             """
             name: Shocko
@@ -32,14 +33,13 @@ class TestConfigLoader:
         (
             """
             name: Milky
-            age: 8
+            age: 8.17
             type: Cat
             """,
             {'name': 'Milky', 'age': 8, 'type': 'Cat'},
         ),
     ))
-    def test_valids(self, case, tempdir) -> None:
-        yaml, expected = case
+    def test_valids(self, yaml, expected, tempdir) -> None:
         path = tempdir.create('pet.yaml', yaml)
 
         data = load_config_file(path, Pet)
@@ -50,5 +50,42 @@ class TestConfigLoader:
         path = tempdir.join('config.yaml')
         assert not os.path.exists(path)
 
-        with pytest.raises(ConfigFileNotFound):
+        with pytest.raises(ConfigFileNotFound) as err:
+            load_config_file(path, Pet)
+
+        assert err.value.path == path
+
+    @pytest.mark.parametrize('yaml', (
+        "",
+        """
+        name: Haribo
+        type: Dog
+        """,
+        """
+        name: Mooooo
+        age: 123
+        type: Cow
+        """,
+        """
+        name: Mooooo
+        age: NaN
+        type: Cow
+        """,
+    ))
+    def test_value_errors(self, tempdir, yaml) -> None:
+        path = tempdir.create('pet.yaml', yaml)
+
+        with pytest.raises(ConfigFileValueError) as err:
+            load_config_file(path, Pet)
+
+    @pytest.mark.parametrize('yaml', (
+        """
+        name: doggo
+        type: -: -:
+        """,
+    ))
+    def test_yaml_parse_error(self, tempdir, yaml) -> None:
+        path = tempdir.create('broken.yaml', yaml)
+
+        with pytest.raises(ConfigFileParsingError):
             load_config_file(path, Pet)
