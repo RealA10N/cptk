@@ -15,3 +15,6 @@ class EasyDirectory:
             file.write(data)
 
         return path
+
+    def join(self, *path: str) -> str:
+        return os.path.join(self.path, *path)

@@ -1,9 +1,13 @@
+import os
 import pytest
 
 from cptk.core import load_config_file
 
 from pydantic import BaseModel
 from typing import Literal, Union
+
+
+from cptk.exceptions import ConfigFileNotFound
 
 
 class Pet(BaseModel):
@@ -41,3 +45,10 @@ class TestConfigLoader:
         data = load_config_file(path, Pet)
         assert isinstance(data, Pet)
         assert data.dict() == expected
+
+    def test_file_not_found(self, tempdir) -> None:
+        path = tempdir.join('config.yaml')
+        assert not os.path.exists(path)
+
+        with pytest.raises(ConfigFileNotFound):
+            load_config_file(path, Pet)
