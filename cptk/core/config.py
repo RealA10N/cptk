@@ -32,11 +32,11 @@ class ConfigFileValueError(ConfigFileError, ValueError):
 
     def __generate_error_message(self) -> str:
         er = 'error' if len(self.errors) == 1 else f'{len(self.errors)} errors'
-        s = f"{er} found in {self.path!r}:\n"
+        s = f"{er} found in {self.path!r}:"
 
         for error in self.errors:
             path = '.'.join(error['loc']) if error['loc'] else '.'
-            s += f"Under {path!r}: {error['msg']}"
+            s += f"\nUnder {path!r}: {error['msg']}"
 
         return s
 
