@@ -27,16 +27,19 @@ def validate_url(_, __, value):
 )
 @click.option(
     '--template',
-    required=False,
     type=click.Choice([
         temp.uid
         for temp in DEFAULT_TEMPLATES
-    ])
+    ]),
 )
-def init(location: str, template: str = None):
+@click.option('--git', is_flag=True)
+def init(location: str,
+         template: str,
+         git: bool,
+         ) -> None:
     """ Initialize a new cptk project directory. """
 
-    LocalProject.init(location=location, template=template)
+    LocalProject.init(location=location, template=template, git=git)
 
 
 @cli.command('show')

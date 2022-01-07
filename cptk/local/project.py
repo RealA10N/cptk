@@ -2,19 +2,20 @@ import os
 from shutil import copytree, rmtree
 
 from cptk.utils import cached_property
-from cptk.core import Configuration
+from cptk.core import Configuration, System
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import (
     PROJECT_FILE,
     DEFAULT_TEMPLATE_FOLDER,
 )
 
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Optional
 T = TypeVar('T')
 
 
 class ProjectConfig(Configuration):
     template: str
+    git: Optional[bool] = False
 
 
 class LocalProject:
@@ -30,14 +31,30 @@ class LocalProject:
             rmtree(dst)
         copytree(src=template.path, dst=dst)
 
+    @staticmethod
+    def _init_git(location: str) -> None:
+        """ Initialized a new git repository in the given location. """
+
+        # According to the git documentation (https://tinyurl.com/y3njm4n8):
+        # "running 'git init' in an existing repository is safe", and thus,
+        # we call it anyway!
+
+        System.run(f'git init {location}')
+
     @classmethod
-    def init(cls: Type[T], location: str, template: str = None) -> T:
+    def init(cls: Type[T],
+             location: str,
+             git: bool,
+             template: str,
+             ) -> T:
         """ Initialize an empty local project in the given location with the
         given properties and settings. Returns the newly created project as a
         LocalProject instance. """
 
         # Create the directory if it doesn't exist
         os.makedirs(location, exist_ok=True)
+        if git:
+            cls._init_git(location)
 
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER
@@ -55,7 +72,7 @@ class LocalProject:
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.
-        config = ProjectConfig(template=template)
+        config = ProjectConfig(template=template, git=git)
         config_path = os.path.join(location, PROJECT_FILE)
         config.dump(config_path)
 
