@@ -17,7 +17,7 @@ class Pet(Configuration):
     type: Optional[str]
 
 
-class TestConfigLoader:
+class TestConfiguration:
     """ Tests the 'load' classmethod of all Configuration models. """
 
     @pytest.mark.parametrize('yaml, expected', (
@@ -87,3 +87,17 @@ class TestConfigLoader:
 
         with pytest.raises(ConfigFileParsingError):
             Pet.load(path)
+
+    @pytest.mark.parametrize('pet', (
+        Pet(name='Boogo', age=123, type='Dog'),
+        Pet(name='Lora', age=1),
+    ))
+    def test_dump(self, tempdir, pet: Pet) -> None:
+        path = tempdir.join('pet.yaml')
+
+        assert not os.path.isfile(path)
+        pet.dump(path)
+        assert os.path.isfile(path)
+
+        newpet = Pet.load(path)
+        assert pet == newpet
