@@ -1,0 +1,5 @@
+bake: |
+  g++ {HERE}/solution.cpp -o {HERE}/solution.out
+
+serve: |
+  {HERE}/solution.out

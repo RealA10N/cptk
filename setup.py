@@ -9,14 +9,21 @@ with open("requirements.txt", mode="r", encoding="utf8") as f:
 setup(
     name="cptk",
     version="0.1.0",
-    description="Your personal assistant for everything competitive programming related!",
+    description="Your personal assistant for everything competitive programming related.",
+
     python_requires=">=3.6,<4",
+    install_requires=DEPENDENCIES,
+
     long_description=README,
     long_description_content_type="text/markdown",
+
     author="Alon Krymgand Osovsky",
     author_email="downtown2u@gmail.com",
+
     packages=find_packages(),
-    install_requires=DEPENDENCIES,
+    package_dir={'cptk': 'cptk'},
+    package_data={'cptk': ['templates/*']},
+
     entry_points={
         "cptk_sites": [
             "codeforces=cptk.websites:Codeforces",

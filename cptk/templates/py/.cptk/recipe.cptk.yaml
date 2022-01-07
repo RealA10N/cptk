@@ -1,0 +1,1 @@
+serve: python3 {HERE}/solution.py
