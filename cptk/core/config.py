@@ -1,5 +1,6 @@
-from yaml import safe_load, YAMLError, dump
+import os
 
+from yaml import safe_load, YAMLError, dump
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
 
@@ -96,5 +97,6 @@ class Configuration(BaseModel):
     def dump(self, path: str) -> None:
         """ Dumps the pydantic model into the given file in YAML format. """
 
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w', encoding='utf8') as file:
             file.write(self.yaml())
