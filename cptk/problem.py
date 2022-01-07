@@ -30,7 +30,7 @@ class Problem(Element):
 @dataclass
 class Test(Element):
     input: str
-    expected: str
+    expected: str = None
 
 
 @dataclass
