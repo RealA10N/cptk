@@ -31,8 +31,13 @@ def validate_url(_, __, value):
         temp.uid
         for temp in DEFAULT_TEMPLATES
     ]),
+    help='Initialize the project with a predefined template matching the '
+    'selected language and platfrom.',
 )
-@click.option('--git', is_flag=True)
+@click.option(
+    '--git', is_flag=True,
+    help='Initialize the project with a git repository.',
+)
 def init(location: str,
          template: str,
          git: bool,
