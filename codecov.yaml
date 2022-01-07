@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      default:
+        
+        # right now, cptk is under active and beta development.
+        # Watching red marks and fails on commits on the main branch can be
+        # quite annoying, so for now the target is %0.
+        # TODO: set target to 'auto' when v1.0 is released.
+        
+        target: 0%    # the required coverage value
+        threshold: 1%  # the leniency in hitting the target
