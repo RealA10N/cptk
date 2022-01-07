@@ -1,8 +1,8 @@
-from os import get_terminal_size
-import os
+from os import path
 import pytest
 
 from cptk.templates import Template, DEFAULT_TEMPLATES
+from cptk.constants import CPTK_FOLDER_NAME, RECIPE_NAME
 
 
 class TestTemplates:
@@ -20,5 +20,8 @@ class TestTemplates:
             assert isinstance(val, str)
             assert len(val) > 0
 
-        assert os.path.exists(template.path)
-        assert os.path.isdir(template.path)
+        assert path.isdir(template.path)
+
+        cptk_dir = path.join(template.path, CPTK_FOLDER_NAME)
+        assert path.isdir(cptk_dir)
+        assert path.isfile(path.join(cptk_dir, RECIPE_NAME))
