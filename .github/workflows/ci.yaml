@@ -1,0 +1,64 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: ✔️ Test
+
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        os: [ubuntu-latest, windows-latest]
+    
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Clone 👀
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python-version }} 🐍
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install module 🏗️
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r tests/requirements.txt
+          python -m pip install .
+
+      - name: Test 🎯
+        run: python -m pytest .
+
+      # TODO: add flake8 test
+      # TODO: add coverage test
+
+  coverage:
+    name: 📝 Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone 👀
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python-version }} 🐍
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install module 🏗️
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r tests/requirements.txt
+          python -m pip install .
+
+      - name: Cover 👨‍💻
+        run: python -m pytest . --cov cptk/ --cov-report xml --cov-report term
+
+      - name: Upload report 🌍️
+        uses: codecov/codecov-action@v2
+        if: ${{ always() }}
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
