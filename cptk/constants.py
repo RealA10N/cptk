@@ -1,6 +1,5 @@
-CPTK_FOLDER_NAME = '.cptk'
-RECIPE_NAME = 'recipe.cptk.yaml'
-PROJECT_CONFIG_NAME = 'project.cptk.yaml'
-TESTS_FOLDER_NAME = 'tests'
+RECIPE_FILE = '.cptk/recipe.cptk.yaml'
+PROJECT_FILE = '.cptk/project.cptk.yaml'
 
 DEFAULT_TEMPLATE_FOLDER = '.cptk/template'
+DEFAULT_TESTS_FOLDER = '.cptk/tests'

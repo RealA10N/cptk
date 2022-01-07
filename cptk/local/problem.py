@@ -5,7 +5,7 @@ from pydantic import validator
 from typing import List
 
 from cptk import Test
-from cptk.constants import RECIPE_NAME, CPTK_FOLDER_NAME, TESTS_FOLDER_NAME
+from cptk.constants import RECIPE_FILE, DEFAULT_TESTS_FOLDER
 from cptk.utils import cached_property
 from cptk.core import Configuration
 
@@ -29,12 +29,12 @@ class LocalProblem:
 
     @cached_property
     def recipe(self) -> Recipe:
-        p = path.join(self.location, CPTK_FOLDER_NAME, RECIPE_NAME)
+        p = path.join(self.location, RECIPE_FILE)
         return Recipe.load(p)
 
     @cached_property
     def tests(self) -> List[Test]:
-        base = path.join(self.location, CPTK_FOLDER_NAME, TESTS_FOLDER_NAME)
+        base = path.join(self.location, DEFAULT_TESTS_FOLDER)
 
         l = list()
         inputs = glob(path.join(base, '*.in'))

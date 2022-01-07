@@ -5,8 +5,7 @@ from cptk.utils import cached_property
 from cptk.core import Configuration
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.constants import (
-    CPTK_FOLDER_NAME,
-    PROJECT_CONFIG_NAME,
+    PROJECT_FILE,
     DEFAULT_TEMPLATE_FOLDER,
 )
 
@@ -45,17 +44,12 @@ class LocalProject:
             copytree(src, dst)
 
         config = ProjectConfig(template=template)
-
-        cptk_folder = os.path.join(location, CPTK_FOLDER_NAME)
-        os.makedirs(cptk_folder, exist_ok=True)
-
-        config_path = os.path.join(cptk_folder, PROJECT_CONFIG_NAME)
-        with open(config_path, 'w', encoding='utf8') as file:
-            file.write(config.yaml())
+        config_path = os.path.join(location, PROJECT_FILE)
+        config.dump(config_path)
 
         return cls(location)
 
     @cached_property
     def config(self) -> ProjectConfig:
-        p = os.path.join(self.location, CPTK_FOLDER_NAME, PROJECT_CONFIG_NAME)
+        p = os.path.join(self.location, PROJECT_FILE)
         return ProjectConfig.load(p)
