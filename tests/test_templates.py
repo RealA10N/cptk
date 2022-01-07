@@ -4,6 +4,9 @@ import pytest
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import CPTK_FOLDER_NAME, RECIPE_NAME
 
+from cptk.local.problem import Recipe
+from cptk.core import load_config_file
+
 
 class TestTemplates:
 
@@ -24,4 +27,9 @@ class TestTemplates:
 
         cptk_dir = path.join(template.path, CPTK_FOLDER_NAME)
         assert path.isdir(cptk_dir)
-        assert path.isfile(path.join(cptk_dir, RECIPE_NAME))
+
+        recipe_path = path.join(cptk_dir, RECIPE_NAME)
+        assert path.isfile(recipe_path)
+
+        # Assert that loads recipe config file without exceptions
+        load_config_file(recipe_path, Recipe)
