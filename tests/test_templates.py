@@ -1,11 +1,11 @@
 from os import path
+import re
+
 import pytest
 
+from cptk.local.problem import Recipe
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import CPTK_FOLDER_NAME, RECIPE_NAME
-
-from cptk.local.problem import Recipe
-from cptk.core import load_config_file
 
 
 class TestTemplates:
@@ -23,6 +23,8 @@ class TestTemplates:
             assert isinstance(val, str)
             assert len(val) > 0
 
+        assert re.fullmatch(r'[a-z0-9\-_+*]+', template.uid)
+
         assert path.isdir(template.path)
 
         cptk_dir = path.join(template.path, CPTK_FOLDER_NAME)
@@ -32,4 +34,4 @@ class TestTemplates:
         assert path.isfile(recipe_path)
 
         # Assert that loads recipe config file without exceptions
-        load_config_file(recipe_path, Recipe)
+        Recipe.load(recipe_path)

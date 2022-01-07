@@ -8,16 +8,8 @@ from cptk.utils import cptkException
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type, TypeVar, Tuple
-    from pydantic import BaseModel
 
-    T = TypeVar('T', BaseModel)
-
-
-class Configuration(BaseModel):
-
-    def yaml(self) -> str:
-        """ Converts the object into a YAML string. """
-        return dump(self.dict())
+    T = TypeVar('T')
 
 
 class ConfigFileError(cptkException):
@@ -66,30 +58,43 @@ class ConfigFileParsingError(ConfigFileError):
         return s
 
 
-def load_config_file(path: str, Model: 'Type[T]') -> 'T':
-    """ Load information from a YAML configuration file and dump it into a
-    pydantic Model. Raises relevent expections if the given file path isn't
-    found, the YAML file can't be parsed, or the data doesn't match the pydantic
-    model. """
+class Configuration(BaseModel):
 
-    try:
-        with open(path, 'r', encoding='utf8') as file:
-            data = safe_load(file)
+    @classmethod
+    def load(cls: 'Type[T]', path: str) -> 'T':
+        """ Load information from a YAML configuration file and dump it into a
+        pydantic model. Raises relevent expections if the given file path isn't
+        found, the YAML file can't be parsed, or the data doesn't match the
+        pydantic model. """
 
-    except FileNotFoundError:
-        raise ConfigFileNotFound(path)
+        try:
+            with open(path, 'r', encoding='utf8') as file:
+                data = safe_load(file)
 
-    except YAMLError as err:
-        # pylint: disable=no-member
-        mark = err.problem_mark
-        pos = (mark.line + 1, mark.column + 1)
-        raise ConfigFileParsingError(path, err.problem, pos)
+        except FileNotFoundError:
+            raise ConfigFileNotFound(path)
 
-    if not isinstance(data, dict):
-        raise ConfigFileValueError(
-            path, [{'loc': (), 'msg': "file isn't in dictionary format"}])
+        except YAMLError as err:
+            # pylint: disable=no-member
+            mark = err.problem_mark
+            pos = (mark.line + 1, mark.column + 1)
+            raise ConfigFileParsingError(path, err.problem, pos)
 
-    try:
-        return Model(**data)
-    except ValidationError as e:
-        raise ConfigFileValueError(path, e.errors()) from e
+        if not isinstance(data, dict):
+            raise ConfigFileValueError(
+                path, [{'loc': (), 'msg': "file isn't in dictionary format"}])
+
+        try:
+            return cls(**data)
+        except ValidationError as e:
+            raise ConfigFileValueError(path, e.errors()) from e
+
+    def yaml(self) -> str:
+        """ Converts the object into a YAML string. """
+        return dump(self.dict())
+
+    def dump(self, path: str) -> None:
+        """ Dumps the pydantic model into the given file in YAML format. """
+
+        with open(path, 'w', encoding='utf8') as file:
+            file.write(self.yaml())

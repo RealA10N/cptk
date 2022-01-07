@@ -7,7 +7,7 @@ from typing import List
 from cptk import Test
 from cptk.constants import RECIPE_NAME, CPTK_FOLDER_NAME, TESTS_FOLDER_NAME
 from cptk.utils import cached_property
-from cptk.core import Configuration, load_config_file
+from cptk.core import Configuration
 
 
 class Recipe(Configuration):
@@ -30,7 +30,7 @@ class LocalProblem:
     @cached_property
     def recipe(self) -> Recipe:
         p = path.join(self.location, CPTK_FOLDER_NAME, RECIPE_NAME)
-        return load_config_file(p, Recipe)
+        return Recipe.load(p)
 
     @cached_property
     def tests(self) -> List[Test]:

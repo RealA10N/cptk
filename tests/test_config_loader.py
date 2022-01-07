@@ -1,25 +1,24 @@
 import os
-from pydantic.config import Extra
 import pytest
 
-from cptk.core import load_config_file
+from cptk.core import Configuration
+from cptk.exceptions import (
+    ConfigFileNotFound,
+    ConfigFileValueError,
+    ConfigFileParsingError,
+)
 
-from pydantic import BaseModel
 from typing import Optional
 
 
-from cptk.exceptions import ConfigFileNotFound, ConfigFileValueError, ConfigFileParsingError
-
-
-class Pet(BaseModel):
+class Pet(Configuration):
     name: str
     age: int
     type: Optional[str]
 
 
 class TestConfigLoader:
-    """ Tests the 'load_config_file' function location in
-    'cptk.core.config'. """
+    """ Tests the 'load' classmethod of all Configuration models. """
 
     @pytest.mark.parametrize('yaml, expected', (
         (
@@ -41,7 +40,7 @@ class TestConfigLoader:
     def test_valids(self, yaml, expected, tempdir) -> None:
         path = tempdir.create('pet.yaml', yaml)
 
-        data = load_config_file(path, Pet)
+        data = Pet.load(path)
         assert isinstance(data, Pet)
         assert data.dict() == expected
 
@@ -50,7 +49,7 @@ class TestConfigLoader:
         assert not os.path.exists(path)
 
         with pytest.raises(ConfigFileNotFound) as err:
-            load_config_file(path, Pet)
+            Pet.load(path)
 
         assert err.value.path == path
 
@@ -75,7 +74,7 @@ class TestConfigLoader:
         path = tempdir.create('pet.yaml', yaml)
 
         with pytest.raises(ConfigFileValueError) as err:
-            load_config_file(path, Pet)
+            Pet.load(path)
 
     @pytest.mark.parametrize('yaml', (
         """
@@ -87,4 +86,4 @@ class TestConfigLoader:
         path = tempdir.create('broken.yaml', yaml)
 
         with pytest.raises(ConfigFileParsingError):
-            load_config_file(path, Pet)
+            Pet.load(path)

@@ -1,7 +1,7 @@
 import os
 
 from cptk.utils import cached_property
-from cptk.core import Configuration, load_config_file
+from cptk.core import Configuration
 from cptk.constants import (
     CPTK_FOLDER_NAME,
     PROJECT_CONFIG_NAME,
@@ -38,6 +38,6 @@ class LocalProject:
         return cls(location)
 
     @cached_property
-    def home(self) -> ProjectConfig:
+    def config(self) -> ProjectConfig:
         p = os.path.join(self.location, CPTK_FOLDER_NAME, PROJECT_CONFIG_NAME)
-        return load_config_file(p, ProjectConfig)
+        return ProjectConfig.load(p)
