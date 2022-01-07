@@ -16,7 +16,7 @@ def cached_property(f: Callable[..., T]) -> T:
     This is a simple implementation of the decortor that can be ran with older
     Python versions. https://tinyurl.com/smhlght """
 
-    return property(lru_cache(f))
+    return property(lru_cache(None)(f))
 
 
 def valid_url(url) -> bool:
