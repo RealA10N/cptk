@@ -6,8 +6,12 @@ if TYPE_CHECKING:
     from cptk import Website
 
 
-@dataclass(frozen=True)
-class Problem:
+class Element:
+    pass
+
+
+@dataclass
+class Problem(Element):
     website: 'Type[Website]' = field(compare=True)
 
     # required metadata
@@ -23,14 +27,14 @@ class Problem:
     memory_limit: float = field(default=None, compare=False)   # in MB
 
 
-@dataclass(frozen=True)
-class Test:
+@dataclass
+class Test(Element):
     input: str
     expected: str
 
 
-@dataclass(frozen=True)
-class Contest:
+@dataclass
+class Contest(Element):
     website: 'Type[Website]' = field(compare=True)
     uid: 'Any' = field(compare=True)
     name: str = field(compare=False)

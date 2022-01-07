@@ -6,8 +6,8 @@ from cptk.utils import cptkException
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, List, Optional
-    from cptk import Website, PageInfo, Contest, Problem
+    from typing import Type, List
+    from cptk import Website, PageInfo, Element
 
 
 class InvalidClone(cptkException):
@@ -60,7 +60,7 @@ class Fetcher:
 
         return website
 
-    def to_model(self, info: 'PageInfo') -> None:
+    def to_model(self, info: 'PageInfo') -> 'Element':
         """ Recives an arbitrary page info instance and tries to match it with
         a Website class that knows how to handle this specific website. If cptk
         doesn't find a way to parse the given webpage, it raises the
