@@ -1,3 +1,4 @@
+import re
 from functools import lru_cache
 
 from typing import Callable, TypeVar
@@ -16,3 +17,15 @@ def cached_property(f: Callable[..., T]) -> T:
     Python versions. https://tinyurl.com/smhlght """
 
     return property(lru_cache(f))
+
+
+def valid_url(url) -> bool:
+    URL_REGEX = re.compile(
+        r"(\w+://)?"                # protocol (optional)
+        r"(\w+\.)?"                 # host (optional)
+        r"((\w+)\.(\w+))"           # domain
+        r"(\.\w+)*"                 # top-level domain (optional, can have > 1)
+        r"([\w\-\._\~/]*)*(?<!\.)"  # path, params, anchors, etc. (optional)
+    )
+
+    return bool(URL_REGEX.fullmatch(url))
