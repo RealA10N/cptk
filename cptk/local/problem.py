@@ -1,16 +1,16 @@
 from os import path
 from glob import glob
 
-from pydantic import BaseModel, validator
+from pydantic import validator
 from typing import List
 
 from cptk import Test
 from cptk.constants import RECIPE_NAME, CPTK_FOLDER_NAME, TESTS_FOLDER_NAME
 from cptk.utils import cached_property
-from cptk.core import load_config_file
+from cptk.core import Configuration, load_config_file
 
 
-class Recipe(BaseModel):
+class Recipe(Configuration):
 
     bake: List[str] = []
     serve: List[str]

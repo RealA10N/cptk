@@ -1,8 +1,9 @@
+from yaml import safe_load, YAMLError, dump
+
+from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
-from yaml import safe_load, YAMLError
 
 from cptk.utils import cptkException
-
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -10,6 +11,13 @@ if TYPE_CHECKING:
     from pydantic import BaseModel
 
     T = TypeVar('T', BaseModel)
+
+
+class Configuration(BaseModel):
+
+    def yaml(self) -> str:
+        """ Converts the object into a YAML string. """
+        return dump(self.dict())
 
 
 class ConfigFileError(cptkException):

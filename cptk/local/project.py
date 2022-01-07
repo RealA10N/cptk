@@ -1,32 +1,19 @@
-from os import path
-
-from pydantic import BaseModel, validator
+import os
 
 from cptk.utils import cached_property
-from cptk.templates import DEFAULT_TEMPLATES
-from cptk.constants import CPTK_FOLDER_NAME, PROJECT_CONFIG_NAME
-from cptk.core import load_config_file
+from cptk.core import Configuration, load_config_file
+from cptk.constants import (
+    CPTK_FOLDER_NAME,
+    PROJECT_CONFIG_NAME,
+    DEFAULT_TEMPLATE_FOLDER,
+)
+
+from typing import Type, TypeVar
+T = TypeVar('T')
 
 
-class Home(BaseModel):
+class ProjectConfig(Configuration):
     template: str
-
-    @validator('template')
-    @classmethod
-    def validate_template(cls, value: str) -> str:
-        """ Template can either a uid of one of the pre-defined templates
-        avaliable simply by installing cptk, or a path to a folder containing
-        a recipe configuration file. """
-
-        uid_to_template = {
-            template.uid: template
-            for template in DEFAULT_TEMPLATES
-        }
-
-        if value in uid_to_template:
-            return uid_to_template[value].path
-
-        return value
 
 
 class LocalProject:
@@ -34,7 +21,23 @@ class LocalProject:
     def __init__(self, location: str) -> None:
         self.location = location
 
+    @classmethod
+    def init(cls: Type[T], location: str, template: str = None) -> T:
+        if template is None:
+            template = DEFAULT_TEMPLATE_FOLDER
+
+        config = ProjectConfig(template=template)
+
+        cptk_folder = os.path.join(location, CPTK_FOLDER_NAME)
+        os.makedirs(cptk_folder, exist_ok=True)
+
+        config_path = os.path.join(cptk_folder, PROJECT_CONFIG_NAME)
+        with open(config_path, 'w', encoding='utf8') as file:
+            file.write(config.yaml())
+
+        return cls(location)
+
     @cached_property
-    def home(self) -> Home:
-        p = path.join(self.location, CPTK_FOLDER_NAME, PROJECT_CONFIG_NAME)
-        return load_config_file(p, Home)
+    def home(self) -> ProjectConfig:
+        p = os.path.join(self.location, CPTK_FOLDER_NAME, PROJECT_CONFIG_NAME)
+        return load_config_file(p, ProjectConfig)

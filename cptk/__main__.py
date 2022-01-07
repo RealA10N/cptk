@@ -1,6 +1,8 @@
 import click
 
 from cptk.utils import valid_url
+from cptk.templates import DEFAULT_TEMPLATES
+from cptk.local import LocalProject
 
 
 @click.group()
@@ -23,9 +25,18 @@ def validate_url(_, __, value):
     required=False,
     default='.',
 )
-def init(location: str):
+@click.option(
+    '--template',
+    required=False,
+    type=click.Choice([
+        temp.uid
+        for temp in DEFAULT_TEMPLATES
+    ])
+)
+def init(location: str, template: str = None):
     """ Initialize a new cptk project directory. """
-    raise NotImplementedError  # TODO: implement cli init function
+
+    LocalProject.init(location=location, template=template)
 
 
 @cli.command('show')
