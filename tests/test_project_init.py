@@ -1,3 +1,4 @@
+from _pytest.monkeypatch import resolve
 import pytest
 
 import os
@@ -74,6 +75,10 @@ class TestProjectInit:
         proj = LocalProject.init(tempdir.path, git=create_with_git)
         assert proj.config.git == create_with_git
 
+    @pytest.mark.skipif(
+        os.name == 'nt',
+        reason="chmod doesn't work property on Windows."
+    )
     @requires('git')
     def test_git_fail(self, tempdir: EasyDirectory) -> None:
         """ Tests that the currect errors are raised if the creating of a git
