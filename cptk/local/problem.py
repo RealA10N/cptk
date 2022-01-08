@@ -1,13 +1,20 @@
+import re
 from os import path
 from glob import glob
+from dataclasses import dataclass, field
 
 from pydantic import validator
 from typing import List
 
 from cptk import Test
-from cptk.constants import RECIPE_FILE, DEFAULT_TESTS_FOLDER
 from cptk.utils import cached_property
 from cptk.core import Configuration
+from cptk.constants import (
+    RECIPE_FILE,
+    DEFAULT_TESTS_FOLDER,
+    TEST_INPUT_FILE,
+    TEST_OUTPUT_FILE,
+)
 
 
 class Recipe(Configuration):
@@ -22,10 +29,9 @@ class Recipe(Configuration):
             return val.split('\n')
 
 
+@dataclass(unsafe_hash=True)
 class LocalProblem:
-
-    def __init__(self, location: str) -> None:
-        self.location = location
+    location: str = field(compare=True)
 
     @cached_property
     def recipe(self) -> Recipe:
@@ -37,17 +43,21 @@ class LocalProblem:
         base = path.join(self.location, DEFAULT_TESTS_FOLDER)
 
         l = list()
-        inputs = glob(path.join(base, '*.in'))
+        inputs = glob(path.join(base, '*'), recursive=True)
         for inp in inputs:
 
-            filename = path.basename(inp)
-            name = filename.split('.')[:-3]
-            out = path.join(base, f'{name}.out')
+            match = re.fullmatch(TEST_INPUT_FILE, inp)
+            if not match:
+                # If file doesn't match the TEST_INPUT_FILE regex, it is not
+                # a valid test input file and it should be ignored.
+                continue
 
-            # Load input and output files
-
+            # Load input file
             with open(inp, 'r', encoding='utf8') as file:
                 inp_data = file.read()
+
+            # Generate the expected output file path for the current input
+            out = match.expand(TEST_OUTPUT_FILE)
 
             try:
                 with open(out, mode='r', encoding='utf8') as file:
