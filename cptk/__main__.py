@@ -1,9 +1,39 @@
 import click
+import sys
 
-from cptk.utils import valid_url
+from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.local import LocalProject
 from cptk.core import System
+
+
+def print_exceptions(f):
+    """ A decorator that safely runs the function it wraps.
+    If the function throws any errors, they will be converted into system
+    messages and will be logged. """
+
+    def decorator(*args, **kwargs):
+        try:
+            f(*args, **kwargs)
+
+        except cptkException as err:
+            System.error(err)
+            sys.exit(1)
+
+        except Exception as err:
+            System.unexpected_error(err)
+            sys.exit(2)
+
+        else:
+            sys.exit(0)
+
+    return decorator
+
+
+def validate_url(_, __, value):
+    if not valid_url(value):
+        raise click.BadParameter(value)
+    return value
 
 
 @click.group()
@@ -15,18 +45,13 @@ def cli(verbose):
     System.set_verbosity(verbose)
 
 
-def validate_url(_, __, value):
-    if not valid_url(value):
-        raise click.BadParameter(value)
-    return value
-
-
 @cli.command('init')
 @click.argument(
     'location',
     type=click.Path(
         exists=True, file_okay=False, dir_okay=True,
-        writable=True, readable=True, resolve_path=True),
+        writable=True, readable=True, resolve_path=True,
+    ),
     required=False,
     default='.',
 )
@@ -43,6 +68,7 @@ def validate_url(_, __, value):
     '--git', is_flag=True,
     help='Initialize the project with a git repository.',
 )
+@print_exceptions
 def init(location: str,
          template: str,
          git: bool,
@@ -59,6 +85,7 @@ def init(location: str,
     callback=validate_url,
     required=True,
 )
+@print_exceptions
 def show(url: str):
     """ Show information about a specific problem or contest. """
     raise NotImplementedError  # TODO: implement cli show function
@@ -71,6 +98,7 @@ def show(url: str):
     callback=validate_url,
     required=True,
 )
+@print_exceptions
 def clone(url: str):
     """ Clone a problem into a local cptk project. """
     raise NotImplementedError  # TODO: implement cli clone function
