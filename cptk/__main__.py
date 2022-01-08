@@ -3,11 +3,16 @@ import click
 from cptk.utils import valid_url
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.local import LocalProject
+from cptk.core import System
 
 
 @click.group()
-def cli():
-    pass
+@click.option(
+    '-v', '--verbose',
+    is_flag=True, help='Print additional information.',
+)
+def cli(verbose):
+    System.set_verbosity(verbose)
 
 
 def validate_url(_, __, value):
