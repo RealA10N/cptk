@@ -47,7 +47,7 @@ def cli(verbose: bool = None):
     if verbose is None:
         proj = LocalProject.find(getcwd())
         if proj is not None:
-            verbose = proj.config.default_verbosity
+            verbose = proj.config.verbose
 
     System.set_verbosity(verbose)
 
