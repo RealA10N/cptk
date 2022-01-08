@@ -17,7 +17,7 @@ T = TypeVar('T')
 class ProjectConfig(Configuration):
     template: str
     git: Optional[bool] = False
-    default_verbosity: Optional[bool] = False
+    verbose: Optional[bool] = False
 
 
 @dataclass(unsafe_hash=True)
@@ -87,7 +87,7 @@ class LocalProject:
                 cls._init_git(location)
 
         if verbose is not None:
-            kwargs['default_verbosity'] = verbose
+            kwargs['verbose'] = verbose
 
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER
