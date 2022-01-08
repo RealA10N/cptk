@@ -101,7 +101,7 @@ class LocalProject:
 
         # Now 'template' actually has the path to the template folder.
         # Create the template folder if it doesn't exist yet
-        os.makedirs(template, exist_ok=True)
+        os.makedirs(os.path.join(location, template), exist_ok=True)
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.
