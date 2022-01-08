@@ -1,4 +1,3 @@
-from _pytest.monkeypatch import resolve
 import pytest
 
 import os
@@ -9,14 +8,34 @@ from .utils import run, requires, EasyDirectory
 
 from cptk.local import LocalProject
 from cptk.exceptions import SystemRunError
-from cptk.constants import DEFAULT_TEMPLATE_FOLDER
 from cptk.templates import DEFAULT_TEMPLATES
+from cptk.constants import (
+    DEFAULT_TEMPLATE_FOLDER,
+    PROJECT_FILE,
+)
 
 
 UID_TO_TEMPLATE = {t.uid: t for t in DEFAULT_TEMPLATES}
 
 
 class TestProjectInit:
+
+    def test_default_init(self, tempdir: EasyDirectory):
+        """ Tests expected behavior for init command with default arguments. """
+
+        # Assert that there is no other project that can break the test
+        assert not LocalProject.is_project(tempdir.path)
+        assert LocalProject.find(tempdir.path) is None
+
+        proj = LocalProject.init(tempdir.path)
+
+        # Assert that required files are created
+        assert os.path.isfile(tempdir.join(PROJECT_FILE))
+
+        # Assert that newly created project is identifiable by cptk itself
+        assert LocalProject.is_project(tempdir.path)
+        assert LocalProject.find(tempdir.path) == proj
+        assert LocalProject.find(tempdir.join('a/b/c')) == proj
 
     @pytest.mark.parametrize('old_template_uid, new_template_uid', (
         ('py', 'g++'),

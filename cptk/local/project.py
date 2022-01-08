@@ -1,5 +1,6 @@
 import os
 from shutil import copytree, rmtree
+from dataclasses import dataclass, field
 
 from cptk.utils import cached_property
 from cptk.core import Configuration, System
@@ -18,10 +19,29 @@ class ProjectConfig(Configuration):
     git: Optional[bool] = False
 
 
+@dataclass(unsafe_hash=True)
 class LocalProject:
+    location: str = field(compare=True)
 
     def __init__(self, location: str) -> None:
         self.location = location
+
+    @classmethod
+    def is_project(cls, location: str) -> bool:
+        """ Returns True if the given location is the root of a valid cptk
+        project. """
+        return os.path.isfile(os.path.join(location, PROJECT_FILE))
+
+    @classmethod
+    def find(cls: Type[T], location: str) -> Optional[T]:
+        """ Recursively searches if the given location is part of a cptk
+        project, and if so, returns an instance of the project. """
+
+        if cls.is_project(location):
+            return cls(location)
+
+        parent = os.path.dirname(location)
+        return cls.find(parent) if parent != location else None
 
     @staticmethod
     def _copy_template(template: Template, dst: str) -> None:
