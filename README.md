@@ -11,7 +11,7 @@ The _Competitive Programming Tool Kit_ (_cptk_ for short), is a command line and
 - Full git integration: commits and pushes solutions after you submit them
 - And much more!
 
-Are you using **cptk?** Show us love and display the [![cptk](https://img.shields.io/static/v1?label=using&message=cptk&color=ffbb00)](https://github.com/RealA10N/cptk) badge in your repository!
+**Are you using cptk?** Show us love and display the [![cptk](https://img.shields.io/static/v1?label=using&message=cptk&color=ffbb00)](https://github.com/RealA10N/cptk) badge in your repository!
 
 ## Getting started
 
