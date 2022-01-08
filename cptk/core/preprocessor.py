@@ -31,7 +31,7 @@ class Preprocessor:
         new = cls.parse_string(data, globals)
         if data != new:
             with open(path, 'w', encoding='utf8') as file:
-                file.write(data)
+                file.write(new)
 
     @classmethod
     def parse_directory(cls, path: str, globals: dict) -> None:

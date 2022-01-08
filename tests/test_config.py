@@ -38,7 +38,7 @@ class TestConfiguration:
         ),
     ))
     def test_valids(self, yaml, expected, tempdir) -> None:
-        path = tempdir.create('pet.yaml', yaml)
+        path = tempdir.create(yaml, 'pet.yaml')
 
         data = Pet.load(path)
         assert isinstance(data, Pet)
@@ -71,7 +71,7 @@ class TestConfiguration:
         """,
     ))
     def test_value_errors(self, tempdir, yaml) -> None:
-        path = tempdir.create('pet.yaml', yaml)
+        path = tempdir.create(yaml, 'pet.yaml')
 
         with pytest.raises(ConfigFileValueError) as err:
             Pet.load(path)
@@ -83,7 +83,7 @@ class TestConfiguration:
         """,
     ))
     def test_yaml_parse_error(self, tempdir, yaml) -> None:
-        path = tempdir.create('broken.yaml', yaml)
+        path = tempdir.create(yaml, 'broken.yaml')
 
         with pytest.raises(ConfigFileParsingError):
             Pet.load(path)
