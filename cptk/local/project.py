@@ -17,6 +17,7 @@ T = TypeVar('T')
 class ProjectConfig(Configuration):
     template: str
     git: Optional[bool] = False
+    default_verbosity: Optional[bool] = False
 
 
 @dataclass(unsafe_hash=True)
@@ -68,7 +69,8 @@ class LocalProject:
     def init(cls: Type[T],
              location: str,
              template: str = None,
-             git: bool = False,
+             git: bool = None,
+             verbose: bool = None,
              ) -> T:
         """ Initialize an empty local project in the given location with the
         given properties and settings. Returns the newly created project as a
@@ -78,9 +80,14 @@ class LocalProject:
 
         # Create the directory if it doesn't exist
         os.makedirs(location, exist_ok=True)
-        if git:
-            cls._init_git(location)
-            kwargs['git'] = True
+
+        if git is not None:
+            kwargs['git'] = git
+            if git:
+                cls._init_git(location)
+
+        if verbose is not None:
+            kwargs['default_verbosity'] = verbose
 
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER

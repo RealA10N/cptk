@@ -1,7 +1,7 @@
 import sys
 import subprocess
 
-from typing import Union
+from typing import Union, Optional
 
 from cptk.utils import cptkException
 
@@ -16,7 +16,7 @@ class System:
     ERROR = '\u001b[41;1m'  # red bg, bold
     RESET = '\u001b[0m'
 
-    _verbose = False  # not verbose by default
+    _verbose = None
 
     @classmethod
     def run(cls,
@@ -47,8 +47,13 @@ class System:
         return res
 
     @classmethod
-    def set_verbosity(cls, v: bool) -> None:
+    def set_verbosity(cls, v: Optional[bool]) -> None:
+        """ Verbosity can be True, False, or None (which means "defalt"). """
         cls._verbose = v
+
+    @classmethod
+    def get_verbosity(cls) -> Optional[bool]:
+        return cls._verbose
 
     @staticmethod
     def _expection_to_msg(error: Exception) -> str:

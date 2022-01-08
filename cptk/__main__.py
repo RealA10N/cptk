@@ -1,5 +1,6 @@
 import click
 import sys
+from os import getcwd
 
 from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
@@ -38,10 +39,16 @@ def validate_url(_, __, value):
 
 @click.group()
 @click.option(
-    '-v', '--verbose',
-    is_flag=True, help='Print additional information.',
+    '-v/-q', '--verbose/--quite', 'verbose',
+    default=None,
+    help='Print additional information.',
 )
-def cli(verbose):
+def cli(verbose: bool = None):
+    if verbose is None:
+        proj = LocalProject.find(getcwd())
+        if proj is not None:
+            verbose = proj.config.default_verbosity
+
     System.set_verbosity(verbose)
 
 
@@ -75,7 +82,12 @@ def init(location: str,
          ) -> None:
     """ Initialize a new cptk project directory. """
 
-    LocalProject.init(location=location, template=template, git=git)
+    LocalProject.init(
+        location=location,
+        template=template,
+        git=git,
+        verbose=System.get_verbosity(),
+    )
 
 
 @cli.command('show')
