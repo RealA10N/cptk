@@ -4,7 +4,7 @@ import subprocess
 
 class System:
 
-    GRAY = '\u001b[90m'
+    CMD = '\u001b[33m'
     RESET = '\u001b[0m'
 
     _verbose = False  # not verbose by default
@@ -13,7 +13,7 @@ class System:
     def run(cls, cmd: str) -> None:
 
         if cls._verbose:
-            print(cls.GRAY + cmd + cls.RESET)
+            print(cls.CMD + cmd + cls.RESET)
 
         subprocess.run(
             cmd.split(),
