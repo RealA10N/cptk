@@ -92,7 +92,8 @@ class Configuration(BaseModel):
 
     def yaml(self) -> str:
         """ Converts the object into a YAML string. """
-        return dump(self.dict())
+
+        return dump(self.dict(exclude_unset=True))
 
     def dump(self, path: str) -> None:
         """ Dumps the pydantic model into the given file in YAML format. """

@@ -51,10 +51,13 @@ class LocalProject:
         given properties and settings. Returns the newly created project as a
         LocalProject instance. """
 
+        kwargs = dict()
+
         # Create the directory if it doesn't exist
         os.makedirs(location, exist_ok=True)
         if git:
             cls._init_git(location)
+            kwargs['git'] = True
 
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER
@@ -72,7 +75,7 @@ class LocalProject:
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.
-        config = ProjectConfig(template=template, git=git)
+        config = ProjectConfig(template=template, **kwargs)
         config_path = os.path.join(location, PROJECT_FILE)
         config.dump(config_path)
 
