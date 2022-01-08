@@ -47,8 +47,8 @@ class LocalProject:
     @classmethod
     def init(cls: Type[T],
              location: str,
-             git: bool,
-             template: str,
+             template: str = None,
+             git: bool = False,
              ) -> T:
         """ Initialize an empty local project in the given location with the
         given properties and settings. Returns the newly created project as a
