@@ -4,7 +4,6 @@ from glob import glob
 from dataclasses import dataclass, field
 
 from pydantic import validator
-from typing import List
 
 from cptk import Test
 from cptk.utils import cached_property
@@ -12,9 +11,15 @@ from cptk.core import Configuration
 from cptk.constants import (
     RECIPE_FILE,
     DEFAULT_TESTS_FOLDER,
-    TEST_INPUT_FILE,
-    TEST_OUTPUT_FILE,
+    TEST_INPUT_FILE_PATTERN,
+    TEST_INPUT_FILE_STRUCTURE,
+    TEST_OUTPUT_FILE_STRUCTURE,
+    TEST_SAMPLE_NAME_STRUCTURE,
 )
+
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from cptk import Problem
 
 
 class Recipe(Configuration):
@@ -33,6 +38,31 @@ class Recipe(Configuration):
 class LocalProblem:
     location: str = field(compare=True)
 
+    def _dump_tests(self, tests: List[Test]) -> None:
+
+        base = path.join(self.location, DEFAULT_TESTS_FOLDER)
+
+        for test, number in tests, range(1, len(tests) + 1):
+            name = TEST_SAMPLE_NAME_STRUCTURE.format(num=number)
+
+            inp = TEST_INPUT_FILE_STRUCTURE.format(name=name)
+            inp_path = path.join(base, inp)
+
+            out = TEST_OUTPUT_FILE_STRUCTURE.format(name=name)
+            out_path = path.join(base, out)
+
+            with open(inp_path, 'w', encoding='utf8') as file:
+                file.write(test.input)
+
+            with open(out_path, 'w', encoding='utf8') as file:
+                file.write(test.expected)
+
+    def dump(self, problem: 'Problem') -> None:
+        """ Recives problem information and dumps it in the local location.
+        This includes dumping the example test cases. """
+
+        self._dump_tests(problem.tests)
+
     @cached_property
     def recipe(self) -> Recipe:
         p = path.join(self.location, RECIPE_FILE)
@@ -46,10 +76,10 @@ class LocalProblem:
         inputs = glob(path.join(base, '*'), recursive=True)
         for inp in inputs:
 
-            match = re.fullmatch(TEST_INPUT_FILE, inp)
+            match = re.fullmatch(TEST_INPUT_FILE_PATTERN, inp)
             if not match:
-                # If file doesn't match the TEST_INPUT_FILE regex, it is not
-                # a valid test input file and it should be ignored.
+                # If file doesn't match the TEST_INPUT_FILE_PATTERN regex,
+                # it is not a valid test input file and it should be ignored.
                 continue
 
             # Load input file
@@ -57,7 +87,7 @@ class LocalProblem:
                 inp_data = file.read()
 
             # Generate the expected output file path for the current input
-            out = match.expand(TEST_OUTPUT_FILE)
+            out = TEST_OUTPUT_FILE_STRUCTURE.format(**match.groupdict())
 
             try:
                 with open(out, mode='r', encoding='utf8') as file:
