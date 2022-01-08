@@ -1,5 +1,5 @@
 bake: |
-  g++ {HERE}/solution.cpp -o {HERE}/solution.out
+  g++ {here}/{slugify(problem.name)}.cpp -DLOCAL -O2 -o {here}/{slugify(problem.name)}.out
 
 serve: |
-  {HERE}/solution.out
+  {here}/{slugify(problem.name)}.out

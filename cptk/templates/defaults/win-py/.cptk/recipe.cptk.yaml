@@ -1,1 +1,2 @@
-serve: py {HERE}/solution.py
+serve: |
+  py {here}/{slugify(problem.name)}.py

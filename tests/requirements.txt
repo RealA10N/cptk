@@ -1,4 +1,3 @@
 pytest>=6.2, <7             # testing framework
 pytest-randomly>=3.9        # randomly order tests
 pytest-cov>=2.12.0          # generate coverage reports
-python-slugify>=5.0, <6     # convert test name to tempdir names
