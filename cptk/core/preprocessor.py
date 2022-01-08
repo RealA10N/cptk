@@ -9,7 +9,7 @@ from cptk.constants import PREPROCESSOR_PATTERN, PREPROCESSOR_INVALID
 class Preprocessor:
 
     @classmethod
-    def _replace_match(cls, match: re.Match, globals: dict) -> str:
+    def _replace_match(cls, match: 're.Match', globals: dict) -> str:
         code = match.group(1).strip()
         try:
             return eval(code, globals)
