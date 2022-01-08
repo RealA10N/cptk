@@ -80,7 +80,7 @@ class TestProjectInit:
         repository fails. """
 
         # mask out read and write owner permissions
-        mask = ~(stat.S_IRUSR | stat.S_IWUSR)
+        mask = ~(stat.S_IWRITE | stat.S_IREAD)
         mode = os.stat(tempdir.path).st_mode
         os.chmod(tempdir.path, mode=mode & mask)
 
