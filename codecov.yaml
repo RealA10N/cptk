@@ -1,6 +1,6 @@
 coverage:
   status:
-    project:
+    patch:
       default:
         
         # right now, cptk is under active and beta development.
