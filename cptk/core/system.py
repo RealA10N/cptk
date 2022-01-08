@@ -3,6 +3,12 @@ import subprocess
 
 from typing import Union
 
+from cptk.utils import cptkException
+
+
+class SystemRunError(cptkException):
+    """ Raised by System.run if something goes wrong. """
+
 
 class System:
 
@@ -13,16 +19,32 @@ class System:
     _verbose = False  # not verbose by default
 
     @classmethod
-    def run(cls, cmd: str) -> subprocess.CompletedProcess:
+    def run(cls,
+            cmd: str,
+            errormsg: str = None,
+            verbose: bool = None,
+            ) -> subprocess.CompletedProcess:
+        """ Runs the given command in the terminal. If 'errormsg' is provided,
+        asserts that the returncode from the process is zero, and if not, raises
+        an SystemRunError with the given message. If 'verbose' is provided, it
+        overwrites the classes verbosity setting. """
 
-        if cls._verbose:
+        if verbose is None:
+            verbose = cls._verbose
+
+        if verbose:
             print(cls.CMD + cmd + cls.RESET)
 
-        return subprocess.run(
+        res = subprocess.run(
             cmd.split(),
-            stdout=sys.stdout if cls._verbose else subprocess.PIPE,
-            stderr=sys.stderr if cls._verbose else subprocess.PIPE,
+            stdout=sys.stdout if verbose else subprocess.PIPE,
+            stderr=sys.stderr if verbose else subprocess.PIPE,
         )
+
+        if errormsg is not None and res.returncode != 0:
+            raise SystemRunError(errormsg)
+
+        return res
 
     @classmethod
     def set_verbosity(cls, v: bool) -> None:

@@ -12,6 +12,9 @@ from cptk.core.config import (
     ConfigFileValueError,
 )
 
+from cptk.core.system import SystemRunError
+
+
 __all__ = [
     # cptk.utils
     'cptkException',
@@ -25,4 +28,7 @@ __all__ = [
     'ConfigFileNotFound',
     'ConfigFileParsingError',
     'ConfigFileValueError',
+
+    # cptk.core.system
+    'SystemRunError',
 ]

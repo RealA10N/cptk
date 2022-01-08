@@ -39,7 +39,10 @@ class LocalProject:
         # "running 'git init' in an existing repository is safe", and thus,
         # we call it anyway!
 
-        System.run(f'git init {location}')
+        System.run(
+            f'git init {location}',
+            errormsg="Couldn't initialize git repository."
+        )
 
     @classmethod
     def init(cls: Type[T],
