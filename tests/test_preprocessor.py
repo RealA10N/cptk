@@ -13,6 +13,7 @@ class TestPreprocessor:
     @pytest.mark.parametrize('inp, out, data', (
         ('${{hello}}', 'hi', {'hello': 'hi'}),
         ('${{hello}} ${{who}}', 'hi alon', {'hello': 'hi', 'who': 'alon'}),
+        ('${{hello}} ${{missing}}', 'hi ?', {'hello': 'hi', 'who': 'alon'}),
         ('hello ${{ name }}!', 'hello Alon!', {'name': 'Alon'}),
         ('hello ${{ name.upper() }}!', 'hello ALON!', {'name': 'Alon'}),
         ('hello ${{ missing }}', 'hello ?', {}),
@@ -40,6 +41,17 @@ class TestPreprocessor:
             res = file.read()
 
         assert res == out
+
+    def test_file_no_changes(self, tempdir: 'EasyDirectory') -> None:
+        path = tempdir.create("no preprocessing here!", 'data.txt')
+        before = os.path.getmtime(path)
+        data = {'hello': 'there'}
+
+        Preprocessor.parse_file_contents(path, data)
+        Preprocessor.parse_directory(tempdir.path, data)
+
+        # Assert that the file hasn't been modified
+        assert os.path.getmtime(path) == before
 
     def test_directory(self, tempdir: 'EasyDirectory') -> None:
 

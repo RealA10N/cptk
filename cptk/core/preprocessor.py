@@ -3,6 +3,8 @@ import os
 
 from cptk.constants import PREPROCESSOR_PATTERN, PREPROCESSOR_INVALID
 
+from typing import Tuple
+
 # pylint: disable=redefined-builtin
 
 
@@ -17,19 +19,27 @@ class Preprocessor:
             return PREPROCESSOR_INVALID
 
     @classmethod
-    def parse_string(cls, string: str, globals: dict) -> str:
-        return re.sub(
+    def _parse_count_string(cls, string: str, globals: dict) -> Tuple[str, int]:
+        """ Parses the string and in addition returns the number of replacements
+        it has preformed. """
+        return re.subn(
             PREPROCESSOR_PATTERN,
             string=string,
             repl=lambda m: cls._replace_match(m, globals),
         )
 
     @classmethod
+    def parse_string(cls, string: str, globals: dict) -> str:
+        return cls._parse_count_string(string, globals)[0]
+
+    @classmethod
     def parse_file_contents(cls, path: str, globals: dict) -> None:
         with open(path, 'r', encoding='utf8') as file:
             data = file.read()
-        new = cls.parse_string(data, globals)
-        if data != new:
+
+        new, count = cls._parse_count_string(data, globals)
+
+        if count > 0:
             with open(path, 'w', encoding='utf8') as file:
                 file.write(new)
 
