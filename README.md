@@ -4,7 +4,7 @@
 [![PyPI](https://img.shields.io/pypi/v/cptk?logo=python&logoColor=white)](https://pypi.org/project/cptk)
 [![codecov](https://img.shields.io/codecov/c/github/reala10n/cptk?logo=codecov)](https://codecov.io/gh/RealA10N/cptk)
 
-**The Competitive Programming Tool Kit** (_cptk_ for short), is a command line interface (CLI) that aims to be your personal assistant for everything competitive-programming-related. Some of the main features of cptk are:
+**The Competitive Programming Tool Kit** (_cptk_ for short), is a command-line interface (CLI) that aims to be your personal assistant for everything competitive-programming-related. Some of the main features of cptk are:
 
 - Supports all large CP websites, like [codeforces.com](https://codeforces.com/) and [cses.fi](https://cses.fi/)
 - Automatically download and run example test cases
