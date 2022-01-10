@@ -1,6 +1,7 @@
 import click
 import sys
 from os import getcwd
+from functools import wraps
 
 from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
@@ -13,6 +14,7 @@ def print_exceptions(f):
     If the function throws any errors, they will be converted into system
     messages and will be logged. """
 
+    @wraps(f)
     def decorator(*args, **kwargs):
         try:
             f(*args, **kwargs)
