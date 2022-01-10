@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from cptk.local.problem import Recipe
+from cptk.local.problem import RecipeConfig
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import RECIPE_FILE
 
@@ -31,4 +31,4 @@ class TestTemplates:
         assert path.isfile(recipe_path)
 
         # Assert that loads recipe config file without exceptions
-        Recipe.load(recipe_path)
+        RecipeConfig.load(recipe_path)

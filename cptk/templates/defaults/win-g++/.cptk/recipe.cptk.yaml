@@ -1,5 +1,6 @@
-bake: |
-  g++ {here}/{slugify(problem.name)}.cpp -DLOCAL -O2 -o {here}/{slugify(problem.name)}.out
+solution:
+  bake: |
+    g++ {here}/{slugify(problem.name)}.cpp -DLOCAL -O2 -o {here}/{slugify(problem.name)}.out
 
-serve: |
-  {here}/{slugify(problem.name)}.exe
+  serve: |
+    {here}/{slugify(problem.name)}.exe

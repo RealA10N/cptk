@@ -3,7 +3,7 @@ from os import path
 from glob import glob
 from dataclasses import dataclass, field
 
-from pydantic import validator
+from pydantic import BaseModel, validator
 
 from cptk import Test
 from cptk.utils import cached_property
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from cptk import Problem
 
 
-class Recipe(Configuration):
+class Recipe(BaseModel):
 
     bake: List[str] = []
     serve: List[str]
@@ -32,6 +32,10 @@ class Recipe(Configuration):
     def string_to_commands(cls, val) -> List[str]:
         if isinstance(val, str):
             return val.split('\n')
+
+
+class RecipeConfig(Configuration):
+    solution: Recipe
 
 
 @dataclass(unsafe_hash=True)
@@ -64,9 +68,9 @@ class LocalProblem:
         self._dump_tests(problem.tests)
 
     @cached_property
-    def recipe(self) -> Recipe:
+    def recipe(self) -> RecipeConfig:
         p = path.join(self.location, RECIPE_FILE)
-        return Recipe.load(p)
+        return RecipeConfig.load(p)
 
     @cached_property
     def tests(self) -> List[Test]:
