@@ -1,6 +1,5 @@
 import pkg_resources
 from urllib.parse import urlparse
-from cptk.scrape import website
 
 from cptk.utils import cptkException
 
@@ -48,30 +47,16 @@ class Fetcher:
                 for cur in domain:
                     self._domain_to_website[cur] = website
 
-    def _url_to_website(self, url: str) -> 'Type[Website]':
-        """ Tries to convert the given url into a Website object.
-        Raises an error if the URL doesn't match with any registered website."""
-
-        domain = urlparse(url).netloc
-        website = self._domain_to_website.get(domain)
-
-        if website is None:
-            raise UnknownWebsite(domain)
-
-        return website
-
     def to_model(self, info: 'PageInfo') -> 'Element':
         """ Recives an arbitrary page info instance and tries to match it with
         a Website class that knows how to handle this specific website. If cptk
         doesn't find a way to parse the given webpage, it raises the
         'InvalidClone' exception. """
 
-        website = self._url_to_website(info.url)
-
-        if website.is_problem(info):
-            return website.to_problem(info)
-
-        if website.is_contest(info):
-            return website.to_contest(info)
+        for website in self._websites:
+            if website.is_problem(info):
+                return website.to_problem(info)
+            if website.is_contest(info):
+                return website.to_contest(info)
 
         raise InvalidClone(info)
