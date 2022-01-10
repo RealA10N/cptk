@@ -1,6 +1,6 @@
 solution:
   bake: |
-    g++ {here}/{slugify(problem.name)}.cpp -DLOCAL -O2 -o {here}/{slugify(problem.name)}
+    g++ ${{here}}/${{slugify(problem.name)}}.cpp -DLOCAL -O2 -o ${{here}}/${{slugify(problem.name)}}
 
   serve: |
-    {here}/{slugify(problem.name)}
+    ${{here}}/${{slugify(problem.name)}}

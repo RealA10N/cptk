@@ -1,3 +1,3 @@
 solution:
   serve: |
-    python3 {here}/{slugify(problem.name)}.py
+    python3 ${{here}}/${{slugify(problem.name)}}.py
