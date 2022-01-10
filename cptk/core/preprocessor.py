@@ -3,7 +3,7 @@ import os
 
 from cptk.constants import PREPROCESSOR_PATTERN, PREPROCESSOR_INVALID
 
-from typing import Tuple
+from typing import Tuple, Match
 
 # pylint: disable=redefined-builtin
 
@@ -11,7 +11,7 @@ from typing import Tuple
 class Preprocessor:
 
     @classmethod
-    def _replace_match(cls, match: 're.Match', globals: dict) -> str:
+    def _replace_match(cls, match: Match, globals: dict) -> str:
         code = match.group(1).strip()
         try:
             return eval(code, globals)
@@ -55,3 +55,27 @@ class Preprocessor:
 
             elif os.path.isfile(new):
                 cls.parse_file_contents(new, globals)
+
+    @classmethod
+    def load_file(cls, path: str, globals: dict = None) -> dict:
+        """ Recives a path to a Python file, excutes it and returns its globals.
+        If globals are given, the file is executed with the given globals
+        pre-defined. If the given file contains a '__all__' list, only objects
+        from the list will be returned. """
+
+        if globals is None:
+            globals = dict()
+
+        with open(path, 'r', encoding='utf8') as file:
+            code = file.read()
+
+        exec(code, globals)
+
+        if '__all__' in globals:
+            return {
+                name: g
+                for name, g in globals.items()
+                if name in globals['__all__']
+            }
+
+        return globals
