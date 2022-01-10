@@ -1,6 +1,6 @@
 import pkg_resources
 from urllib.parse import urlparse
-from cptk import website
+from cptk.scrape import website
 
 from cptk.utils import cptkException
 

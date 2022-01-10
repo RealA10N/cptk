@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING, Optional, Union, List
 if TYPE_CHECKING:
-    from cptk import Contest, Problem
+    from cptk.scrape import Contest, Problem
     from bs4 import BeautifulSoup
 
 

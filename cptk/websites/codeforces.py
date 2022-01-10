@@ -1,4 +1,4 @@
-from cptk import Website, Test, Contest, Problem
+from cptk.scrape import Website, Test, Contest, Problem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

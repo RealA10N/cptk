@@ -10,11 +10,10 @@ from bs4 import BeautifulSoup
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type, Iterator
-    from cptk.website import Website
-    from cptk.problem import Test
-    from cptk import Problem, Contest
+    from cptk.scrape import Website, Test, Problem, Contest
 
-from cptk import PageInfo
+
+from cptk.scrape import PageInfo
 from cptk.websites import (
     Codeforces,
     Cses,

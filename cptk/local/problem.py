@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from pydantic import BaseModel, validator
 
-from cptk import Test
+from cptk.scrape import Test
 from cptk.utils import cached_property
 from cptk.core import Configuration
 from cptk.constants import (
@@ -19,7 +19,7 @@ from cptk.constants import (
 
 from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
-    from cptk import Problem
+    from cptk.scrape import Problem
 
 
 class Recipe(BaseModel):

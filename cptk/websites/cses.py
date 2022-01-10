@@ -1,6 +1,6 @@
 import re
 from urllib.parse import urlparse
-from cptk import Website, Contest, Problem, Test
+from cptk.scrape import Website, Contest, Problem, Test
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
