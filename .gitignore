@@ -154,6 +154,3 @@ cython_debug/
 
 # Visual Studio Code
 .vscode/
-
-# cptk generated
-.cptk/
