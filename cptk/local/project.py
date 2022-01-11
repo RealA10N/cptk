@@ -2,6 +2,8 @@ import os
 from shutil import copytree, rmtree, copyfile
 from dataclasses import dataclass, field
 
+from pydantic import BaseModel
+
 from cptk.utils import cached_property
 from cptk.core import Configuration, System
 from cptk.core import DEFAULT_PREPROCESS
@@ -9,15 +11,26 @@ from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import (
     PROJECT_FILE,
     DEFAULT_TEMPLATE_FOLDER,
-    DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_DEST
+    DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_DEST,
+    DEFAULT_CLONE_PATH,
 )
 
 from typing import Type, TypeVar, Optional
 T = TypeVar('T')
 
 
+class CloneSettings(BaseModel):
+    path: str = DEFAULT_CLONE_PATH
+
+    def dict(self, **kwargs) -> dict:
+        kwargs.update({"exclude_unset": False})
+        return super().dict(**kwargs)
+
+
 class ProjectConfig(Configuration):
     template: str
+    clone: CloneSettings
+
     git: Optional[bool] = False
     verbose: Optional[bool] = False
     preprocess: Optional[str] = None
@@ -94,6 +107,9 @@ class LocalProject:
 
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER
+
+        # Create default clone settings
+        kwargs['clone'] = CloneSettings()
 
         # If the given template is actually one of the predefined template names
         temp_obj = {t.uid: t for t in DEFAULT_TEMPLATES}.get(template)
