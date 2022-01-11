@@ -1,4 +1,4 @@
 # Do not include files inside the 'tests' directory in the GitHub langauge
 # statistics. https://tinyurl.com/y4a7jtyw
 tests/** linguist-vendored
-cptk/templates/defaults/** linguist-vendored
+cptk/defaults/** linguist-vendored
