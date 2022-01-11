@@ -57,7 +57,7 @@ class System:
 
     @staticmethod
     def _expection_to_msg(error: Exception) -> str:
-        return ' '.join(error.args)
+        return ' '.join(str(a) for a in error.args)
 
     @classmethod
     def error(cls, error: Union[str, Exception]) -> None:
