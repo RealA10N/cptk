@@ -81,6 +81,7 @@ class Codeforces(Website):
             website=cls,
             uid=(contest.uid, level),
             name=name,
+            url=info.url,
             tests=cls._parse_tests(info),
             contest=contest,
             level=level,

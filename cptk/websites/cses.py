@@ -120,6 +120,7 @@ class Cses(Website):
             website=cls,
             uid=(contest.uid, uid),
             name=name,
+            url=info.url,
             tests=cls._parse_tests(info),
             contest=contest,
             level=level,

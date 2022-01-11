@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Type, Any
-    from cptk import Website
+    from cptk.scrape import Website
 
 
 class Element:
@@ -17,6 +17,7 @@ class Problem(Element):
     # required metadata
     uid: 'Any' = field(compare=True)
     name: str = field(compare=False)
+    url: str = field(compare=False)
     tests: 'List[Test]' = field(compare=False)
 
     # additional metadata
