@@ -8,6 +8,8 @@ from cptk.templates import DEFAULT_TEMPLATES
 from cptk.local import LocalProject
 from cptk.core import System
 
+from typing import Optional
+
 
 def print_exceptions(f):
     """ A decorator that safely runs the function it wraps.
@@ -74,13 +76,13 @@ def cli(verbose: bool = None):
     'selected language and platfrom.',
 )
 @click.option(
-    '--git', is_flag=True,
+    '--git/--no-git', is_flag=True, default=None,
     help='Initialize the project with a git repository.',
 )
 @print_exceptions
 def init(location: str,
-         template: str,
-         git: bool,
+         template: Optional[str],
+         git: Optional[bool],
          ) -> None:
     """ Initialize a new cptk project directory. """
 
