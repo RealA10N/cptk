@@ -7,6 +7,10 @@ from typing import Tuple, Match
 
 # pylint: disable=redefined-builtin
 
+HERE = os.path.dirname(__file__)
+DEFAULTS = os.path.join(HERE, '..', 'defaults')
+DEFAULT_PREPROCESS = os.path.join(DEFAULTS, 'preprocess', 'preprocess.py')
+
 
 class Preprocessor:
 

@@ -10,6 +10,7 @@ from cptk.local import LocalProject
 from cptk.exceptions import SystemRunError
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.constants import (
+    DEFAULT_PREPROCESS,
     DEFAULT_TEMPLATE_FOLDER,
     PROJECT_FILE,
 )
@@ -36,6 +37,10 @@ class TestProjectInit:
         assert LocalProject.is_project(tempdir.path)
         assert LocalProject.find(tempdir.path) == proj
         assert LocalProject.find(tempdir.join('a/b/c')) == proj
+
+        template = tempdir.join(DEFAULT_TEMPLATE_FOLDER)
+        assert os.path.isdir(template)
+        assert os.listdir(template) == []
 
     @pytest.mark.parametrize('old_template_uid, new_template_uid', (
         ('py', 'g++'),
@@ -113,3 +118,8 @@ class TestProjectInit:
 
         # Change permissions back to normal, avoid warnings and errors
         os.chmod(tempdir.path, mode)
+
+    def test_default_preprocess_creation(self, tempdir: 'EasyDirectory') -> None:
+        proj = LocalProject.init(tempdir.path)
+        assert proj.config.preprocess == DEFAULT_PREPROCESS
+        assert os.path.isfile(tempdir.join(DEFAULT_PREPROCESS))

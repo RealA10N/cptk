@@ -1,13 +1,15 @@
 import os
-from shutil import copytree, rmtree
+from shutil import copytree, rmtree, copyfile
 from dataclasses import dataclass, field
 
 from cptk.utils import cached_property
 from cptk.core import Configuration, System
+from cptk.core import DEFAULT_PREPROCESS
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import (
     PROJECT_FILE,
     DEFAULT_TEMPLATE_FOLDER,
+    DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_DEST
 )
 
 from typing import Type, TypeVar, Optional
@@ -18,6 +20,7 @@ class ProjectConfig(Configuration):
     template: str
     git: Optional[bool] = False
     verbose: Optional[bool] = False
+    preprocess: Optional[str] = None
 
 
 @dataclass(unsafe_hash=True)
@@ -102,6 +105,11 @@ class LocalProject:
         # Now 'template' actually has the path to the template folder.
         # Create the template folder if it doesn't exist yet
         os.makedirs(os.path.join(location, template), exist_ok=True)
+
+        # Copy default preprocess into project
+        copyfile(DEFAULT_PREPROCESS, os.path.join(
+            location, DEFAULT_PREPROCESS_DEST))
+        kwargs['preprocess'] = DEFAULT_PREPROCESS_DEST
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.

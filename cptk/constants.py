@@ -12,3 +12,4 @@ TEST_SAMPLE_NAME_STRUCTURE = r'sample{num:03}'
 
 PREPROCESSOR_PATTERN = r'\${{([^}]*)}}'
 PREPROCESSOR_INVALID = '?'
+DEFAULT_PREPROCESS = '.cptk/preprocess.py'
