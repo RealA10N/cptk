@@ -1,10 +1,10 @@
 import re
 import os
+from typing import Tuple, Match
 
 from cptk.constants import PREPROCESSOR_PATTERN, PREPROCESSOR_INVALID
 
-from typing import Tuple, Match
-
+# for readability, we redefine the global 'globals' variable
 # pylint: disable=redefined-builtin
 
 HERE = os.path.dirname(__file__)
@@ -18,8 +18,8 @@ class Preprocessor:
     def _replace_match(cls, match: Match, globals: dict) -> str:
         code = match.group(1).strip()
         try:
-            return eval(code, globals)
-        except Exception:
+            return eval(code, globals)  # pylint: disable=eval-used
+        except Exception:  # pylint: disable=broad-except
             return PREPROCESSOR_INVALID
 
     @classmethod
@@ -73,7 +73,7 @@ class Preprocessor:
         with open(path, 'r', encoding='utf8') as file:
             code = file.read()
 
-        exec(code, globals)
+        exec(code, globals)  # pylint: disable=exec-used
 
         if '__all__' in globals:
             return {
