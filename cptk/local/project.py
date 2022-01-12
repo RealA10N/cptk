@@ -1,5 +1,4 @@
 import os
-from re import template
 from shutil import copytree, rmtree, copyfile
 from dataclasses import dataclass, field
 
@@ -167,7 +166,15 @@ class LocalProject:
             src = os.path.join(self.location, src)
 
         if os.path.isdir(dst):
+            System.warn('Problem already exists locally')
+            ans = System.ask(
+                question="Are you sure you want to overwrite saved data? (y/n)",
+                options={'y': True, 'n': False},
+            )
+
+            if not ans: System.abort()
             rmtree(dst)
+
         copytree(src, dst)
         Preprocessor.parse_directory(dst, globals)
 

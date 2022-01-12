@@ -7,6 +7,7 @@ from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.local import LocalProject
 from cptk.core import System
+from cptk.exceptions import SystemAbort
 
 from typing import Optional
 
@@ -20,6 +21,9 @@ def print_exceptions(f):
     def decorator(*args, **kwargs):
         try:
             f(*args, **kwargs)
+
+        except SystemAbort:
+            raise click.Abort
 
         except cptkException as err:
             System.error(err)

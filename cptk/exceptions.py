@@ -12,7 +12,10 @@ from cptk.core.config import (
     ConfigFileValueError,
 )
 
-from cptk.core.system import SystemRunError
+from cptk.core.system import (
+    SystemRunError,
+    SystemAbort,
+)
 
 
 __all__ = [
@@ -31,4 +34,5 @@ __all__ = [
 
     # cptk.core.system
     'SystemRunError',
+    'SystemAbort',
 ]

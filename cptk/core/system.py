@@ -10,10 +10,15 @@ class SystemRunError(cptkException):
     """ Raised by System.run if something goes wrong. """
 
 
+class SystemAbort(cptkException):
+    """ Raised by the system if some internal process requests to abort. """
+
+
 class System:
 
     CMD = '\u001b[33m'      # yellow
     ERROR = '\u001b[41;1m'  # red bg, bold
+    WARN = '\u001b[43;30;1m'  # orange bg, black fg, bold
     RESET = '\u001b[0m'
 
     _verbose = None
@@ -78,3 +83,18 @@ class System:
 
             print(f'Inside {cls.CMD}{file}:{lineno}{cls.RESET}')
             tb = tb.tb_next
+
+    @classmethod
+    def warn(cls, msg: str) -> None:
+        print(f'{cls.WARN} WARNING {cls.RESET} {msg}')
+
+    @classmethod
+    def ask(cls, question: str, options: dict) -> bool:
+        res = input(f'{cls.CMD}{question}{cls.RESET} ').strip()
+        while res not in options:
+            res = input(f'{cls.CMD}{question}{cls.RESET} ').strip()
+        return options[res]
+
+    @classmethod
+    def abort(cls):
+        raise SystemAbort
