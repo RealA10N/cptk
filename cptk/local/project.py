@@ -1,12 +1,14 @@
 import os
+from re import template
 from shutil import copytree, rmtree, copyfile
 from dataclasses import dataclass, field
 
 from pydantic import BaseModel
+from cptk.core.preprocessor import Preprocessor
+from cptk.local.problem import LocalProblem
 
 from cptk.utils import cached_property
-from cptk.core import Configuration, System
-from cptk.core import DEFAULT_PREPROCESS
+from cptk.core import Configuration, System, Fetcher, DEFAULT_PREPROCESS
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import (
     PROJECT_FILE,
@@ -42,6 +44,7 @@ class LocalProject:
 
     def __init__(self, location: str) -> None:
         self.location = location
+        self.fetcher = Fetcher()
 
     @classmethod
     def is_project(cls, location: str) -> bool:
@@ -141,3 +144,31 @@ class LocalProject:
     def config(self) -> ProjectConfig:
         p = os.path.join(self.location, PROJECT_FILE)
         return ProjectConfig.load(p)
+
+    def clone(self, url: str) -> LocalProblem:
+        """ Clones the given URL as a probelm and stores as a local problem
+        inside the current cptk project. """
+
+        page = self.fetcher.to_page(url)
+        problem = self.fetcher.page_to_problem(page)
+
+        globals = {'problem': problem}
+        preprocess = self.config.preprocess
+        if not os.path.isabs(preprocess):
+            preprocess = os.path.join(self.location, preprocess)
+        globals.update(Preprocessor.load_file(preprocess, globals))
+
+        dst = Preprocessor.parse_string(self.config.clone.path, globals)
+        if not os.path.isabs(dst):
+            dst = os.path.join(self.location, dst)
+
+        src = self.config.template
+        if not os.path.isabs(src):
+            src = os.path.join(self.location, src)
+
+        if os.path.isdir(dst):
+            rmtree(dst)
+        copytree(src, dst)
+        Preprocessor.parse_directory(dst, globals)
+
+        return LocalProblem.init(dst, problem)

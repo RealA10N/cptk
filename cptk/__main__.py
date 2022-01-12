@@ -117,7 +117,9 @@ def show(url: str):
 @print_exceptions
 def clone(url: str):
     """ Clone a problem into a local cptk project. """
-    raise NotImplementedError  # TODO: implement cli clone function
+    proj = LocalProject.find(getcwd())
+    prob = proj.clone(url)
+    print(prob.location)
 
 
 if __name__ == '__main__':

@@ -48,7 +48,7 @@ class LocalProblem:
     @classmethod
     def init(cls: 'Type[T]', path: str, problem: 'Problem') -> 'T':
         cls._init_tests(
-            path=path.join(path, DEFAULT_TESTS_FOLDER),
+            path=os.path.join(path, DEFAULT_TESTS_FOLDER),
             tests=problem.tests,
         )
 
@@ -56,7 +56,7 @@ class LocalProblem:
 
     @staticmethod
     def _init_tests(path: str, tests: List[Test]) -> None:
-        for test, number in tests, range(1, len(tests) + 1):
+        for test, number in zip(tests, range(1, len(tests) + 1)):
             name = TEST_SAMPLE_NAME_STRUCTURE.format(num=number)
 
             inp = TEST_INPUT_FILE_STRUCTURE.format(name=name)
@@ -64,6 +64,8 @@ class LocalProblem:
 
             out = TEST_OUTPUT_FILE_STRUCTURE.format(name=name)
             out_path = os.path.join(path, out)
+
+            os.makedirs(path, exist_ok=True)
 
             with open(inp_path, 'w', encoding='utf8') as file:
                 file.write(test.input)

@@ -3,6 +3,7 @@ from requests import session
 from bs4 import BeautifulSoup
 
 from typing import Type, List
+from cptk.scrape.problem import Contest, Problem
 
 from cptk.utils import cptkException
 from cptk.scrape import Website, PageInfo, Element
@@ -47,30 +48,33 @@ class Fetcher:
                 for cur in domain:
                     self._domain_to_website[cur] = website
 
+    def page_to_problem(self, info: PageInfo) -> Problem:
+        for website in self._websites:
+            if website.is_problem(info):
+                return website.to_problem(info)
+        raise InvalidClone(info)
+
+    def page_to_contest(self, info: PageInfo) -> Contest:
+        for website in self._websites:
+            if website.is_contest(info):
+                return website.to_contest(info)
+        raise InvalidClone(info)
+
     def page_to_model(self, info: PageInfo) -> Element:
         """ Recives an arbitrary page info instance and tries to match it with
         a Website class that knows how to handle this specific website. If cptk
         doesn't find a way to parse the given webpage, it raises the
         'InvalidClone' exception. """
 
-        for website in self._websites:
-            if website.is_problem(info):
-                return website.to_problem(info)
-            if website.is_contest(info):
-                return website.to_contest(info)
-
-        raise InvalidClone(info)
+        try:
+            return self.page_to_problem(info)
+        except InvalidClone:
+            return self.page_to_contest(info)
 
     def to_page(self, url: str) -> PageInfo:
         """ Makes an get http/s request to the given URL and returns the result
         as a PageInfo instance. """
 
         res = self.session.get(url)
-        data = BeautifulSoup(res.content)
+        data = BeautifulSoup(res.content, 'lxml')
         return PageInfo(url, data)
-
-    def url_to_model(self, url: str) -> Element:
-        """ Makes a get http/s request to the given URL, scraps the information
-        in the page and load it as a Problem/Contest instance. Raises an error
-        if cptk and it's plugins doesn't find a way to parse the given page. """
-        return self.page_to_model(self.to_page(url))
