@@ -43,7 +43,7 @@ def validate_url(_, __, value):
 
 @click.group()
 @click.option(
-    '-v/-q', '--verbose/--quite', 'verbose',
+    '-v/-q', '--verbose/--quiet', 'verbose',
     default=None,
     help='Print additional information.',
 )
