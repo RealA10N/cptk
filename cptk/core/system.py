@@ -1,7 +1,8 @@
 import sys
 import subprocess
-
 from typing import Union, Optional
+
+from click import echo, prompt, style
 
 from cptk.utils import cptkException
 
@@ -16,10 +17,9 @@ class SystemAbort(cptkException):
 
 class System:
 
-    CMD = '\u001b[33m'      # yellow
-    ERROR = '\u001b[41;1m'  # red bg, bold
-    WARN = '\u001b[43;30;1m'  # orange bg, black fg, bold
-    RESET = '\u001b[0m'
+    CMD = lambda s: style(s, fg='yellow')
+    ERROR = lambda s: style(s, bg='red', bold=True)
+    WARN = lambda s: style(s, bg='yellow', fg='black', bold=True)
 
     _verbose = None
 
@@ -38,7 +38,7 @@ class System:
             verbose = cls._verbose
 
         if verbose:
-            print(cls.CMD + cmd + cls.RESET)
+            echo(cls.CMD(cmd))
 
         res = subprocess.run(
             cmd.split(),
@@ -68,31 +68,30 @@ class System:
     def error(cls, error: Union[str, Exception]) -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
-        print(f'{cls.ERROR} ERROR {cls.RESET} {error}')
+        echo(cls.ERROR(' ERROR ') + ' ' + error)
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
 
         msg = cls._expection_to_msg(error)
-        print(f'{cls.ERROR} UNEXPECTED ERROR {cls.RESET} {msg}')
+        echo(cls.ERROR(' UNEXPECTED ERROR ') + ' ' + msg)
 
         tb = error.__traceback__
         while tb is not None:
             file = tb.tb_frame.f_code.co_filename
             lineno = tb.tb_lineno
-
-            print(f'Inside {cls.CMD}{file}:{lineno}{cls.RESET}')
+            echo('Inside ' + cls.CMD(f'{file}:{lineno}'))
             tb = tb.tb_next
 
     @classmethod
     def warn(cls, msg: str) -> None:
-        print(f'{cls.WARN} WARNING {cls.RESET} {msg}')
+        echo(cls.WARN(' WARNING ') + ' ' + msg)
 
     @classmethod
     def ask(cls, question: str, options: dict) -> bool:
-        res = input(f'{cls.CMD}{question}{cls.RESET} ').strip()
+        res = prompt(cls.CMD(question)).strip()
         while res not in options:
-            res = input(f'{cls.CMD}{question}{cls.RESET} ').strip()
+            res = prompt(cls.CMD(question)).strip()
         return options[res]
 
     @classmethod

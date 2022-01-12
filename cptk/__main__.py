@@ -51,6 +51,7 @@ def validate_url(_, __, value):
     default=None,
     help='Print additional information.',
 )
+@print_exceptions
 def cli(verbose: bool = None):
     if verbose is None:
         proj = LocalProject.find(getcwd())
