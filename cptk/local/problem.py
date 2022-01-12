@@ -1,5 +1,5 @@
 import re
-from os import path
+import os
 from glob import glob
 from dataclasses import dataclass, field
 
@@ -20,6 +20,9 @@ from cptk.constants import (
 from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from cptk.scrape import Problem
+    from typing import TypeVar, Type
+
+    T = TypeVar("T")
 
 
 class Recipe(BaseModel):
@@ -42,18 +45,25 @@ class RecipeConfig(Configuration):
 class LocalProblem:
     location: str = field(compare=True)
 
-    def _dump_tests(self, tests: List[Test]) -> None:
+    @classmethod
+    def init(cls: 'Type[T]', path: str, problem: 'Problem') -> 'T':
+        cls._init_tests(
+            path=path.join(path, DEFAULT_TESTS_FOLDER),
+            tests=problem.tests,
+        )
 
-        base = path.join(self.location, DEFAULT_TESTS_FOLDER)
+        return cls(os.path.abspath(path))
 
+    @staticmethod
+    def _init_tests(path: str, tests: List[Test]) -> None:
         for test, number in tests, range(1, len(tests) + 1):
             name = TEST_SAMPLE_NAME_STRUCTURE.format(num=number)
 
             inp = TEST_INPUT_FILE_STRUCTURE.format(name=name)
-            inp_path = path.join(base, inp)
+            inp_path = os.path.join(path, inp)
 
             out = TEST_OUTPUT_FILE_STRUCTURE.format(name=name)
-            out_path = path.join(base, out)
+            out_path = os.path.join(path, out)
 
             with open(inp_path, 'w', encoding='utf8') as file:
                 file.write(test.input)
@@ -61,23 +71,17 @@ class LocalProblem:
             with open(out_path, 'w', encoding='utf8') as file:
                 file.write(test.expected)
 
-    def dump(self, problem: 'Problem') -> None:
-        """ Recives problem information and dumps it in the local location.
-        This includes dumping the example test cases. """
-
-        self._dump_tests(problem.tests)
-
     @cached_property
     def recipe(self) -> RecipeConfig:
-        p = path.join(self.location, RECIPE_FILE)
+        p = os.path.join(self.location, RECIPE_FILE)
         return RecipeConfig.load(p)
 
     @cached_property
     def tests(self) -> List[Test]:
-        base = path.join(self.location, DEFAULT_TESTS_FOLDER)
+        base = os.path.join(self.location, DEFAULT_TESTS_FOLDER)
 
         l = list()
-        inputs = glob(path.join(base, '*'), recursive=True)
+        inputs = glob(os.path.join(base, '*'), recursive=True)
         for inp in inputs:
 
             match = re.fullmatch(TEST_INPUT_FILE_PATTERN, inp)
