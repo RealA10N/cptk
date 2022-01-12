@@ -57,7 +57,7 @@ class System:
 
     @staticmethod
     def _expection_to_msg(error: Exception) -> str:
-        return ' '.join(str(a) for a in error.args)
+        return ', '.join(str(a) for a in error.args)
 
     @classmethod
     def error(cls, error: Union[str, Exception]) -> None:
@@ -66,7 +66,15 @@ class System:
         print(f'{cls.ERROR} ERROR {cls.RESET} {error}')
 
     @classmethod
-    def unexpected_error(cls, error: Union[str, Exception]) -> None:
-        if isinstance(error, Exception):
-            error = cls._expection_to_msg(error)
-        print(f'{cls.ERROR} UNEXPECTED ERROR {cls.RESET} {error}')
+    def unexpected_error(cls, error: Exception) -> None:
+
+        msg = cls._expection_to_msg(error)
+        print(f'{cls.ERROR} UNEXPECTED ERROR {cls.RESET} {msg}')
+
+        tb = error.__traceback__
+        while tb is not None:
+            file = tb.tb_frame.f_code.co_filename
+            lineno = tb.tb_lineno
+
+            print(f'Inside {cls.CMD}{file}:{lineno}{cls.RESET}')
+            tb = tb.tb_next
