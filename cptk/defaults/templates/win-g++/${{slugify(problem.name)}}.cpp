@@ -6,5 +6,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+using namespace std;
 
-int main() {}
+int main() {
+    { std::cin.tie(0)->sync_with_stdio(false); }
+}
