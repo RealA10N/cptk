@@ -2,8 +2,8 @@
 
 [![cptk](https://img.shields.io/static/v1?label=using&message=cptk&color=ffbb00)](https://github.com/RealA10N/cptk)
 [![PyPI](https://img.shields.io/pypi/v/cptk?logo=python&logoColor=white)](https://pypi.org/project/cptk)
-[![GitHub Workflow](https://img.shields.io/github/workflow/status/reala10n/cptk/CI/master)](https://github.com/RealA10N/cptk/actions/workflows/ci.yaml?query=branch%3Amaster)
-[![codecov](https://img.shields.io/codecov/c/github/reala10n/cptk?logo=codecov)](https://codecov.io/gh/RealA10N/cptk)
+[![GitHub Workflow](https://img.shields.io/github/workflow/status/reala10n/cptk/CI/master?logo=github&logoColor=white)](https://github.com/RealA10N/cptk/actions/workflows/ci.yaml?query=branch%3Amaster)
+[![codecov](https://img.shields.io/codecov/c/github/reala10n/cptk?logo=codecov&logoColor=white)](https://codecov.io/gh/RealA10N/cptk)
 
 **The Competitive Programming Tool Kit** (_cptk_ for short), is a command-line interface (CLI) that aims to be your personal assistant for everything competitive-programming-related. Some of the main features of cptk are:
 
