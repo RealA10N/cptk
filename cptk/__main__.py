@@ -12,33 +12,6 @@ from cptk.exceptions import SystemAbort, ProjectNotFound
 from typing import Optional
 
 
-def print_exceptions(f):
-    """ A decorator that safely runs the function it wraps.
-    If the function throws any errors, they will be converted into system
-    messages and will be logged. """
-
-    @wraps(f)
-    def decorator(*args, **kwargs):
-        try:
-            f(*args, **kwargs)
-
-        except SystemAbort:
-            raise click.Abort
-
-        except cptkException as err:
-            System.error(err)
-            sys.exit(1)
-
-        except Exception as err:
-            System.unexpected_error(err)
-            sys.exit(2)
-
-        else:
-            sys.exit(0)
-
-    return decorator
-
-
 def validate_url(_, __, value):
     if not valid_url(value):
         raise click.BadParameter(value)
@@ -84,7 +57,6 @@ def cli(verbose: bool = None):
     '--git/--no-git', is_flag=True, default=None,
     help='Initialize the project with a git repository.',
 )
-@print_exceptions
 def init(location: str,
          template: Optional[str],
          git: Optional[bool],
@@ -106,7 +78,6 @@ def init(location: str,
     callback=validate_url,
     required=True,
 )
-@print_exceptions
 def show(url: str):
     """ Show information about a specific problem or contest. """
     raise NotImplementedError  # TODO: implement cli show function
@@ -119,7 +90,6 @@ def show(url: str):
     callback=validate_url,
     required=True,
 )
-@print_exceptions
 def clone(url: str):
     """ Clone a problem into a local cptk project. """
     proj = LocalProject.find(getcwd())
@@ -127,5 +97,28 @@ def clone(url: str):
     click.echo(prob.location)
 
 
+def main():
+    """ The main function safely executes the click cli command group. If any
+    errors are thrown, they will be converted into system messages and will be
+    logged. """
+
+    try:
+        cli()
+
+    except SystemAbort:  # pylint: disable=raise-missing-from
+        raise click.Abort
+
+    except cptkException as err:
+        System.error(err)
+        sys.exit(1)
+
+    except Exception as err:  # pylint: disable=broad-except
+        System.unexpected_error(err)
+        sys.exit(2)
+
+    else:
+        sys.exit(0)
+
+
 if __name__ == '__main__':
-    cli()
+    main()

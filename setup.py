@@ -30,7 +30,7 @@ setup(
             "csesfi=cptk.websites:Cses",
         ],
         "console_scripts": [
-            "cptk=cptk.__main__:cli",
+            "cptk=cptk.__main__:main",
         ]
     },
 )
