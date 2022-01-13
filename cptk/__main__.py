@@ -7,7 +7,7 @@ from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.local import LocalProject
 from cptk.core import System
-from cptk.exceptions import SystemAbort
+from cptk.exceptions import SystemAbort, ProjectNotFound
 
 from typing import Optional
 
@@ -53,9 +53,10 @@ def validate_url(_, __, value):
 )
 def cli(verbose: bool = None):
     if verbose is None:
-        proj = LocalProject.find(getcwd())
-        if proj is not None:
-            verbose = proj.config.verbose
+        try:
+            verbose = LocalProject.find(getcwd()).config.verbose
+        except ProjectNotFound:
+            pass
 
     System.set_verbosity(verbose)
 
@@ -123,7 +124,7 @@ def clone(url: str):
     """ Clone a problem into a local cptk project. """
     proj = LocalProject.find(getcwd())
     prob = proj.clone(url)
-    print(prob.location)
+    click.echo(prob.location)
 
 
 if __name__ == '__main__':

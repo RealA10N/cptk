@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from cptk.core.preprocessor import Preprocessor
 from cptk.local.problem import LocalProblem
 
-from cptk.utils import cached_property
+from cptk.utils import cached_property, cptkException
 from cptk.core import Configuration, System, Fetcher, DEFAULT_PREPROCESS
 from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import (
@@ -18,6 +18,11 @@ from cptk.constants import (
 
 from typing import Type, TypeVar, Optional
 T = TypeVar('T')
+
+
+class ProjectNotFound(cptkException):
+    def __init__(self) -> None:
+        super().__init__("Couldn't find a cptk project recursively")
 
 
 class CloneSettings(BaseModel):
@@ -52,15 +57,19 @@ class LocalProject:
         return os.path.isfile(os.path.join(location, PROJECT_FILE))
 
     @classmethod
-    def find(cls: Type[T], location: str) -> Optional[T]:
+    def find(cls: Type[T], location: str) -> T:
         """ Recursively searches if the given location is part of a cptk
-        project, and if so, returns an instance of the project. """
+        project, and if so, returns an instance of the project. If a project
+        isn't found, an error is thrown. """
 
         if cls.is_project(location):
             return cls(location)
 
         parent = os.path.dirname(location)
-        return cls.find(parent) if parent != location else None
+        if parent == location:
+            raise ProjectNotFound()
+
+        return cls.find(parent)
 
     @staticmethod
     def _copy_template(template: Template, dst: str) -> None:

@@ -18,6 +18,10 @@ from cptk.core.system import (
 )
 
 
+from cptk.local.project import (
+    ProjectNotFound,
+)
+
 __all__ = [
     # cptk.utils
     'cptkException',
@@ -35,4 +39,7 @@ __all__ = [
     # cptk.core.system
     'SystemRunError',
     'SystemAbort',
+
+    # cptk.local.project
+    'ProjectNotFound',
 ]
