@@ -7,7 +7,7 @@ from filecmp import dircmp
 from .utils import run, requires, EasyDirectory
 
 from cptk.local import LocalProject
-from cptk.exceptions import SystemRunError
+from cptk.exceptions import SystemRunError, ProjectNotFound
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.constants import (
     DEFAULT_PREPROCESS,
@@ -26,7 +26,8 @@ class TestProjectInit:
 
         # Assert that there is no other project that can break the test
         assert not LocalProject.is_project(tempdir.path)
-        assert LocalProject.find(tempdir.path) is None
+        with pytest.raises(ProjectNotFound):
+            LocalProject.find(tempdir.path)
 
         proj = LocalProject.init(tempdir.path)
 
