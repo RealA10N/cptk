@@ -1,6 +1,6 @@
 solution:
   bake: |
-    g++ ${{here}}/${{slugify(problem.name)}}.cpp -DLOCAL -O2 -o ${{here}}/${{slugify(problem.name)}}
+    g++ ${{slugify(problem.name)}}.cpp -DLOCAL -O2 -o ${{slugify(problem.name)}}
 
   serve: |
-    ${{here}}/${{slugify(problem.name)}}.exe
+    ./${{slugify(problem.name)}}.exe

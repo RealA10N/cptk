@@ -10,14 +10,12 @@
 # to use in the templates.
 
 from os import getlogin
-from datetime import datetime
+from datetime import date, datetime
 from slugify import slugify
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from cptk.scrape import Problem
-
-    here: str = None
     problem: 'Problem' = None
 
 # Unpack important problem attributes
@@ -26,8 +24,8 @@ website = problem.website.name()
 domain = problem.website.domain()
 
 # Calculate constants
-ctime = datetime.now().ctime()
+now = datetime.now()
 user = getlogin()
 
 __all__ = ['problem', 'contest', 'website',
-           'domain', 'ctime', 'user', 'slugify']
+           'domain', 'now', 'user', 'slugify']
