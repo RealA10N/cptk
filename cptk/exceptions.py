@@ -14,7 +14,6 @@ from cptk.core.config import (
 
 from cptk.core.system import (
     SystemRunError,
-    SystemAbort,
 )
 
 
@@ -38,7 +37,6 @@ __all__ = [
 
     # cptk.core.system
     'SystemRunError',
-    'SystemAbort',
 
     # cptk.local.project
     'ProjectNotFound',

@@ -6,7 +6,7 @@ from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.local import LocalProject
 from cptk.core import System
-from cptk.exceptions import SystemAbort, ProjectNotFound
+from cptk.exceptions import ProjectNotFound
 
 from typing import Optional
 

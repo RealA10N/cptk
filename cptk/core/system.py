@@ -11,10 +11,6 @@ class SystemRunError(cptkException):
     """ Raised by System.run if something goes wrong. """
 
 
-class SystemAbort(cptkException):
-    """ Raised by the system if some internal process requests to abort. """
-
-
 class System:
 
     CMD = lambda s: style(s, fg='yellow')
