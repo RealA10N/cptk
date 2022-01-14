@@ -1,7 +1,6 @@
 import click
 import sys
 from os import getcwd
-from functools import wraps
 
 from cptk.utils import cptkException, valid_url
 from cptk.templates import DEFAULT_TEMPLATES
@@ -97,7 +96,7 @@ def clone(url: str):
     click.echo(prob.location)
 
 
-def main():
+def main() -> int:
     """ The main function safely executes the click cli command group. If any
     errors are thrown, they will be converted into system messages and will be
     logged. """
@@ -105,20 +104,19 @@ def main():
     try:
         cli()
 
-    except SystemAbort:  # pylint: disable=raise-missing-from
-        raise click.Abort
+    # return code 1 is used when click aborts.
 
     except cptkException as err:
         System.error(err)
-        sys.exit(1)
+        return 2
 
     except Exception as err:  # pylint: disable=broad-except
         System.unexpected_error(err)
-        sys.exit(2)
+        return 3
 
     else:
-        sys.exit(0)
+        return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

@@ -2,7 +2,7 @@ import sys
 import subprocess
 from typing import Union, Optional
 
-from click import echo, prompt, style
+from click import echo, prompt, style, Abort
 
 from cptk.utils import cptkException
 
@@ -96,4 +96,4 @@ class System:
 
     @classmethod
     def abort(cls):
-        raise SystemAbort
+        raise Abort
