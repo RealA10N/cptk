@@ -10,7 +10,7 @@
 # to use in the templates.
 
 from os import getlogin
-from datetime import date, datetime
+from datetime import datetime
 from slugify import slugify
 
 from typing import TYPE_CHECKING
