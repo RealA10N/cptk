@@ -78,11 +78,11 @@ class TestProblemClone:
         )
 
         proj.config.template = tempdir.join('template')
-        tempdir.create('${{name}}', 'template', 'temp.txt')
+        tempdir.create('${{name}}\n${{problem.name}}', 'template', 'temp.txt')
 
         prob = proj.clone_problem(problem)
 
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)
         with open(res, 'r') as file: data = file.read()
-        assert data == slugify(problem.name)
+        assert data == f'{slugify(problem.name)}\n{problem.name}'

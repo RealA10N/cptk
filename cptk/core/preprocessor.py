@@ -1,5 +1,6 @@
 import re
 import os
+from copy import copy
 from typing import Tuple, Match
 
 from cptk.constants import PREPROCESSOR_PATTERN, PREPROCESSOR_INVALID
@@ -69,6 +70,8 @@ class Preprocessor:
 
         if globals is None:
             globals = dict()
+
+        globals = copy(globals)
 
         with open(path, 'r', encoding='utf8') as file:
             code = file.read()
