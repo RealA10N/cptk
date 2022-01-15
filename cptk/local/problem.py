@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from pydantic import BaseModel, validator
 
 from cptk.scrape import Test
-from cptk.utils import cached_property
 from cptk.core import Configuration
 from cptk.constants import (
     RECIPE_FILE,
