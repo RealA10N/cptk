@@ -10,20 +10,18 @@ class Element:
     pass
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class Problem(Element):
     website: 'Type[Website]' = field(compare=True)
 
     # required metadata
-    uid: 'Any' = field(compare=True)
+    uid: 'Any' = field(compare=True, hash=True)
     name: str = field(compare=False)
     url: str = field(compare=False)
-    tests: 'List[Test]' = field(compare=False)
 
-    # additional metadata
     contest: 'Contest' = field(default=None, compare=False)
-    level: str = field(default=None, compare=False)
-    section: str = field(default=None, compare=False)
+
+    tests: 'List[Test]' = field(default_factory=list, compare=False)
     time_limit: float = field(default=None, compare=False)     # in Seconds
     memory_limit: float = field(default=None, compare=False)   # in MB
 
