@@ -10,7 +10,7 @@ class Element:
     pass
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Problem(Element):
     website: 'Type[Website]' = field(compare=True)
 
@@ -28,13 +28,13 @@ class Problem(Element):
     memory_limit: float = field(default=None, compare=False)   # in MB
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Test(Element):
     input: str
     expected: str = None
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Contest(Element):
     website: 'Type[Website]' = field(compare=True)
     uid: 'Any' = field(compare=True)

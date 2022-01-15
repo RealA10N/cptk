@@ -38,7 +38,7 @@ class TestProblemClone:
 
         assert len(test_files) == tests + \
             len([t for t in problem.tests if t.expected is not None])
-        assert prob.tests == problem.tests
+        assert set(prob.tests) == set(problem.tests)
 
         new_test = os.path.join(tests_dir, 'in-my.txt')
         assert not os.path.exists(new_test)
