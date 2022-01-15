@@ -5,6 +5,9 @@ PY ?= python3
 test:
 	$(PY) -m pytest tests/
 
+test-ci:
+	$(PY) -m pytest -vv tests/
+
 coverage:
 	$(PY) -m pytest . --cov cptk/ --cov-report xml --cov-report term
 

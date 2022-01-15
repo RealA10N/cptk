@@ -27,7 +27,7 @@ jobs:
         run: make install-ci
 
       - name: Test 🎯
-        run: make test
+        run: make test-ci
 
       # TODO: add flake8 test
 
