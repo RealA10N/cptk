@@ -2,7 +2,6 @@ import os
 from shutil import copytree, rmtree, copyfile
 from dataclasses import dataclass, field
 
-from slugify import slugify
 from pydantic import BaseModel
 
 from cptk.core.preprocessor import Preprocessor
@@ -164,7 +163,7 @@ class LocalProject:
         """ Executes the project's preprocessor and returns the avaliable
         globals dictionary. """
 
-        globals = {'problem': problem, 'slugify': slugify}
+        globals = {'problem': problem}
         preprocess = self.relative(self.config.preprocess)
 
         if preprocess is not None:

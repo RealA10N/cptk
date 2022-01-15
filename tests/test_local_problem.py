@@ -77,10 +77,16 @@ class TestProblemClone:
             'preprocess.py'
         )
 
+        proj.config.clone.path = '${{problem.website.name()}}/${{problem.name}}'
+
         proj.config.template = tempdir.join('template')
         tempdir.create('${{name}}\n${{problem.name}}', 'template', 'temp.txt')
 
         prob = proj.clone_problem(problem)
+
+        loc = os.path.join(prob.location, prob.location)
+        assert loc == os.path.join(
+            tempdir.path, problem.website.name(), problem.name)
 
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)
