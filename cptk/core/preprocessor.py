@@ -73,7 +73,10 @@ class Preprocessor:
         with open(path, 'r', encoding='utf8') as file:
             code = file.read()
 
-        exec(code, globals)  # pylint: disable=exec-used
+        try:
+            exec(code, globals)  # pylint: disable=exec-used
+        except Exception:  # pylint: disable=broad-except
+            pass  # TODO: print a warning
 
         if '__all__' in globals:
             return {
