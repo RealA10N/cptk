@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, Iterator
+    from typing import Iterator
     from cptk.scrape import Website, Test, Problem, Contest
 
 
@@ -19,10 +19,10 @@ from cptk.websites import (
     Cses,
 )
 
-WEBSITES = (
-    Codeforces,
-    Cses,
-)
+WEBSITES = {
+    'codeforces': Codeforces(),
+    'cses': Cses(),
+}
 
 
 HERE = path.dirname(__file__)
@@ -31,7 +31,7 @@ PAGES_BASEPATH = path.join(HERE, "pages")
 
 @dataclass
 class PageTestCase:
-    website: 'Type[Website]'
+    website: 'Website'
     info: PageInfo
     expected: dict
     configfile: str
@@ -41,8 +41,8 @@ def cases_generator() -> 'Iterator[PageTestCase]':
     """ A generator that yields 'PageTestCase' instances for all avaliable page
     test cases found in the 'pages' subdirectory. """
 
-    for website in WEBSITES:
-        pattern = f"{PAGES_BASEPATH}/{website.name()}/**/*.json"
+    for website_name, website_ins in WEBSITES.items():
+        pattern = f"{PAGES_BASEPATH}/{website_name}/**/*.json"
 
         for case_config in glob(pattern, recursive=True):
 
@@ -62,7 +62,7 @@ def cases_generator() -> 'Iterator[PageTestCase]':
             )
 
             yield PageTestCase(
-                website=website, info=info,
+                website=website_ins, info=info,
                 expected=case['expected'], configfile=case_config
             )
 

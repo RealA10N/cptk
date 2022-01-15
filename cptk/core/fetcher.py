@@ -35,13 +35,13 @@ class Fetcher:
 
     def _load_websites(self) -> List[Type[Website]]:
         self._websites = [
-            point.load()
+            point.load()()
             for point in pkg_resources.iter_entry_points('cptk_sites')
         ]
 
         self._domain_to_website = dict()
         for website in self._websites:
-            domain = website.domain()
+            domain = website.domain
             if isinstance(domain, str):
                 self._domain_to_website[domain] = website
             else:

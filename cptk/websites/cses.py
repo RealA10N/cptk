@@ -11,12 +11,12 @@ if TYPE_CHECKING:
 
 class Cses(Website):
 
-    @staticmethod
-    def name() -> str:
-        return 'cses'
+    @property
+    def name(self) -> str:
+        return 'Code Submission Evaluation System'
 
-    @staticmethod
-    def domain() -> str:
+    @property
+    def domain(self) -> str:
         return 'cses.fi'
 
     @classmethod

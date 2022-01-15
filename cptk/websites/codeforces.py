@@ -9,18 +9,13 @@ if TYPE_CHECKING:
 
 class Codeforces(Website):
 
-    @staticmethod
-    def name() -> str:
-        return 'codeforces'
+    @property
+    def name(self) -> str:
+        return 'Codeforces'
 
-    @staticmethod
-    def domain() -> 'List[str]':
-        return [
-            'codeforces.com',
-            'm1.codeforces.com',
-            'm2.codeforces.com',
-            'm3.codeforces.com',
-        ]
+    @property
+    def domain(self) -> str:
+        return 'codeforces.com'
 
     @staticmethod
     def _parse_code_text(soup: 'BeautifulSoup') -> None:

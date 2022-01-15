@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 
 # Unpack important problem attributes
 contest = problem.contest
-website = problem.website.name()
-domain = problem.website.domain()
+website = problem.website.name
+domain = problem.website.domain
 
 # Calculate constants
 now = datetime.now()
