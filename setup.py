@@ -22,7 +22,7 @@ setup(
 
     packages=find_packages(),
     package_dir={'cptk': 'cptk'},
-    package_data={'cptk': ['templates/*']},
+    package_data={'cptk': ['defaults/*']},
 
     entry_points={
         "cptk_sites": [
