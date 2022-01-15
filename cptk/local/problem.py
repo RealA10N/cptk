@@ -70,15 +70,16 @@ class LocalProblem:
             with open(inp_path, 'w', encoding='utf8') as file:
                 file.write(test.input)
 
-            with open(out_path, 'w', encoding='utf8') as file:
-                file.write(test.expected)
+            if test.expected is not None:
+                with open(out_path, 'w', encoding='utf8') as file:
+                    file.write(test.expected)
 
-    @cached_property
+    @property
     def recipe(self) -> RecipeConfig:
         p = os.path.join(self.location, RECIPE_FILE)
         return RecipeConfig.load(p)
 
-    @cached_property
+    @property
     def tests(self) -> List[Test]:
         base = os.path.join(self.location, DEFAULT_TESTS_FOLDER)
 
