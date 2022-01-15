@@ -8,7 +8,7 @@ from cptk.local.problem import LocalProblem
 
 from cptk.utils import cached_property, cptkException
 from cptk.core import Configuration, System, Fetcher, DEFAULT_PREPROCESS
-from cptk.templates import Template, DEFAULT_TEMPLATES
+from cptk.templates import DEFAULT_TEMPLATES
 from cptk.constants import (
     PROJECT_FILE,
     DEFAULT_TEMPLATE_FOLDER,
@@ -16,8 +16,14 @@ from cptk.constants import (
     DEFAULT_CLONE_PATH,
 )
 
-from typing import Type, TypeVar, Optional
-T = TypeVar('T')
+
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from typing import Type, TypeVar
+    from cptk.scrape import Problem
+    from cptk.templates import Template
+    T = TypeVar('T')
 
 
 class ProjectNotFound(cptkException):
@@ -57,7 +63,7 @@ class LocalProject:
         return os.path.isfile(os.path.join(location, PROJECT_FILE))
 
     @classmethod
-    def find(cls: Type[T], location: str) -> T:
+    def find(cls: 'Type[T]', location: str) -> 'T':
         """ Recursively searches if the given location is part of a cptk
         project, and if so, returns an instance of the project. If a project
         isn't found, an error is thrown. """
@@ -72,7 +78,7 @@ class LocalProject:
         return cls.find(parent)
 
     @staticmethod
-    def _copy_template(template: Template, dst: str) -> None:
+    def _copy_template(template: 'Template', dst: str) -> None:
         """ Copies the given template to the destination path. """
 
         if os.path.exists(dst):
@@ -93,12 +99,12 @@ class LocalProject:
         )
 
     @classmethod
-    def init(cls: Type[T],
+    def init(cls: 'Type[T]',
              location: str,
              template: str = None,
              git: bool = None,
              verbose: bool = None,
-             ) -> T:
+             ) -> 'T':
         """ Initialize an empty local project in the given location with the
         given properties and settings. Returns the newly created project as a
         LocalProject instance. """
@@ -153,26 +159,43 @@ class LocalProject:
         p = os.path.join(self.location, PROJECT_FILE)
         return ProjectConfig.load(p)
 
-    def clone(self, url: str) -> LocalProblem:
+    def load_preprocess_globals(self, problem: 'Problem') -> dict:
+        """ Executes the project's preprocessor and returns the avaliable
+        globals dictionary. """
+
+        globals = {'problem': problem}
+        preprocess = self.relative(self.config.preprocess)
+
+        if preprocess is not None:
+            globals.update(Preprocessor.load_file(preprocess, globals))
+
+        return globals
+
+    def relative(self, path: str) -> str:
+        """ If the given path is not absolute, returns the absolute path relative
+        to the project location. """
+
+        if path is not None and not os.path.isabs(path):
+            path = os.path.join(self.location, path)
+        return path
+
+    def clone_url(self, url: str) -> LocalProblem:
         """ Clones the given URL as a probelm and stores as a local problem
         inside the current cptk project. """
 
         page = self.fetcher.to_page(url)
         problem = self.fetcher.page_to_problem(page)
+        return self.clone_problem(problem)
 
-        globals = {'problem': problem}
-        preprocess = self.config.preprocess
-        if not os.path.isabs(preprocess):
-            preprocess = os.path.join(self.location, preprocess)
-        globals.update(Preprocessor.load_file(preprocess, globals))
+    def clone_problem(self, problem: 'Problem') -> LocalProblem:
+        """ Clones the given problem instance and stores a local problem inside
+        the current cptk project. """
 
-        dst = Preprocessor.parse_string(self.config.clone.path, globals)
-        if not os.path.isabs(dst):
-            dst = os.path.join(self.location, dst)
+        globals = self.load_preprocess_globals(problem)
 
-        src = self.config.template
-        if not os.path.isabs(src):
-            src = os.path.join(self.location, src)
+        src = self.relative(self.config.template)
+        dst = self.relative(Preprocessor.parse_string(
+            self.config.clone.path, globals))
 
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
