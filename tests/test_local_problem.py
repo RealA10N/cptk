@@ -1,11 +1,12 @@
 import pytest
 import os
+from textwrap import dedent
+from slugify import slugify
 
 from cptk.local import LocalProject
 from cptk.local.problem import LocalProblem
 from cptk import scrape
 from cptk.websites import Codeforces
-
 from cptk.constants import DEFAULT_TESTS_FOLDER
 
 from typing import TYPE_CHECKING
@@ -49,3 +50,39 @@ class TestProblemClone:
         prob = LocalProblem(prob.location)
         assert len(prob.tests) == tests + 1
         assert scrape.Test('hello!') in prob.tests
+
+    @pytest.mark.parametrize('problem', (
+        scrape.Problem(
+            url='https://codeforces.com/problemset/problem/1/A',
+            website=Codeforces, uid=1, name='Test Problem',
+            tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
+            contest=scrape.Contest(Codeforces, 1, 'Test Contest'),
+        ),
+    ))
+    def test_clone_preprocess(
+        self,
+        tempdir: 'EasyDirectory',
+        problem: 'scrape.Problem',
+    ):
+
+        proj = LocalProject.init(tempdir.path, template='g++')
+        proj.config.preprocess = tempdir.create(
+            dedent(
+                """
+                from slugify import slugify
+                name = slugify(problem.name)
+                __all__ = ['name']
+                """
+            ),
+            'preprocess.py'
+        )
+
+        proj.config.template = tempdir.join('template')
+        tempdir.create('${{name}}', 'template', 'temp.txt')
+
+        prob = proj.clone_problem(problem)
+
+        res = os.path.join(prob.location, 'temp.txt')
+        assert os.path.isfile(res)
+        with open(res, 'r') as file: data = file.read()
+        assert data == slugify(problem.name)
