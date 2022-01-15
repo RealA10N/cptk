@@ -14,12 +14,12 @@ install:
 
 install-dev:
 	$(PY) -m pip install --upgrade pip
-	$(PY) -m pip install tests/requirements.txt
+	$(PY) -m pip install -r tests/requirements.txt
 	$(PY) -m pip install -e .
 
 install-ci:
 	$(PY) -m pip install --upgrade pip
-	$(PY) -m pip install tests/requirements.txt
+	$(PY) -m pip install -r tests/requirements.txt
 	$(PY) -m pip install .
 
 # TODO: add 'build' and 'upload' tasks
