@@ -11,13 +11,31 @@ from cptk.exceptions import ProjectNotFound
 from typing import Optional
 
 
-def validate_url(_, __, value):
-    if not valid_url(value):
-        raise click.BadParameter(value)
-    return value
+class CatchAllExceptions(click.Group):
+
+    def __call__(self, *args, **kwargs):
+        """ The main function safely executes the click cli command group.
+        If any errors are thrown, they will be converted into system messages
+        and will be logged. """
+
+        try:
+            self.main(*args, **kwargs)
+
+        # return code 1 is used when click aborts.
+
+        except cptkException as err:
+            System.error(err)
+            sys.exit(2)
+
+        except Exception as err:  # pylint: disable=broad-except
+            System.unexpected_error(err)
+            sys.exit(3)
+
+        else:
+            sys.exit(0)
 
 
-@click.group()
+@click.group(cls=CatchAllExceptions)
 @click.option(
     '-v/-q', '--verbose/--quiet', 'verbose',
     default=None,
@@ -31,6 +49,12 @@ def cli(verbose: bool = None):
             pass
 
     System.set_verbosity(verbose)
+
+
+def validate_url(_, __, value):
+    if not valid_url(value):
+        raise click.BadParameter(value)
+    return value
 
 
 @cli.command('init')
@@ -96,27 +120,9 @@ def clone(url: str):
     click.echo(prob.location)
 
 
-def main() -> int:
-    """ The main function safely executes the click cli command group. If any
-    errors are thrown, they will be converted into system messages and will be
-    logged. """
-
-    try:
-        cli()
-
-    # return code 1 is used when click aborts.
-
-    except cptkException as err:
-        System.error(err)
-        return 2
-
-    except Exception as err:  # pylint: disable=broad-except
-        System.unexpected_error(err)
-        return 3
-
-    else:
-        return 0
+def main():
+    cli()
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    main()
