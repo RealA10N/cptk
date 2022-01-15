@@ -1,6 +1,7 @@
 import os
 import pytest
 from textwrap import dedent
+from copy import copy
 from dataclasses import is_dataclass
 
 from cptk.core import Preprocessor
@@ -173,3 +174,17 @@ class TestPreprocessor:
         assert isinstance(Hello, type)
         assert Hello(yuval).greet() == 'Hello Yuval!'
         assert Hello(talbi).greet() == 'Hello Ido Talbi!'
+
+    def test_fail_load_file(self, tempdir: 'EasyDirectory'):
+        src = 'syntax error, this is not a valid python script!'
+        path = tempdir.create(src, 'script.py')
+
+        glbs = {'x': 5, 'y': None}
+
+        data = {
+            key: value
+            for key, value in Preprocessor.load_file(path, copy(glbs)).items()
+            if not key.startswith('_')
+        }
+
+        assert data == glbs
