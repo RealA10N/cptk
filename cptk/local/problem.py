@@ -85,8 +85,9 @@ class LocalProblem:
         l = list()
         inputs = glob(os.path.join(base, '*'), recursive=True)
         for inp in inputs:
+            base, name = os.path.split(inp)
 
-            match = re.fullmatch(TEST_INPUT_FILE_PATTERN, inp)
+            match = re.fullmatch(re.compile(TEST_INPUT_FILE_PATTERN), name)
             if not match:
                 # If file doesn't match the TEST_INPUT_FILE_PATTERN regex,
                 # it is not a valid test input file and it should be ignored.
@@ -97,7 +98,8 @@ class LocalProblem:
                 inp_data = file.read()
 
             # Generate the expected output file path for the current input
-            out = TEST_OUTPUT_FILE_STRUCTURE.format(**match.groupdict())
+            out_name = TEST_OUTPUT_FILE_STRUCTURE.format(**match.groupdict())
+            out = os.path.join(base, out_name)
 
             try:
                 with open(out, mode='r', encoding='utf8') as file:
