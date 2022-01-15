@@ -3,7 +3,7 @@ import os
 
 from cptk.local import LocalProject
 from cptk.local.problem import LocalProblem
-from cptk.scrape import Problem, Test, Contest
+from cptk import scrape
 from cptk.websites import Codeforces
 
 from cptk.constants import DEFAULT_TESTS_FOLDER
@@ -16,14 +16,18 @@ if TYPE_CHECKING:
 class TestProblemClone:
 
     @pytest.mark.parametrize('problem', (
-        Problem(
+        scrape.Problem(
             url='https://codeforces.com/problemset/problem/1/A',
             website=Codeforces, uid=1, name='Test Problem',
-            tests=[Test('1 2', '1 2\n'), Test('1 4')],
-            contest=Contest(Codeforces, 1, 'Test Contest'),
+            tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
+            contest=scrape.Contest(Codeforces, 1, 'Test Contest'),
         ),
     ))
-    def test_add_custom_test(self, tempdir: 'EasyDirectory', problem: 'Problem'):
+    def test_add_custom_test(
+        self,
+        tempdir: 'EasyDirectory',
+        problem: 'scrape.Problem',
+    ):
 
         proj = LocalProject.init(tempdir.path, template='g++')
         prob = proj.clone_problem(problem)
@@ -44,4 +48,4 @@ class TestProblemClone:
 
         prob = LocalProblem(prob.location)
         assert len(prob.tests) == tests + 1
-        assert Test('hello!') in prob.tests
+        assert scrape.Test('hello!') in prob.tests

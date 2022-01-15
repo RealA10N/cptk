@@ -3,7 +3,7 @@ PY ?= python3
 .PHONY: test coverage install install-dev install-ci
 
 test:
-	$(PY) -m pytest .
+	$(PY) -m pytest tests/
 
 coverage:
 	$(PY) -m pytest . --cov cptk/ --cov-report xml --cov-report term
