@@ -1,4 +1,22 @@
 from .website import Website, PageInfo
-from .problem import Element, Contest, Problem, Test
+from .problem import (
+    Scraped,
+    Problem,
+    ContestProblem,
+    ProblemGroup,
+    Problemset,
+    Contest,
+    Test,
+)
 
-__all__ = ['Website', 'PageInfo', 'Element', 'Contest', 'Problem', 'Test']
+__all__ = [
+    'Website',
+    'PageInfo',
+    'Scraped',
+    'Problem',
+    'ContestProblem',
+    'ProblemGroup',
+    'Problemset',
+    'Contest',
+    'Test',
+]
