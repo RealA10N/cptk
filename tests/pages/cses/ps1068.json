@@ -4,12 +4,16 @@
         "data": "ps1068.html"
     },
     "expected": {
-        "contest": {
-            "uid": "problemset",
-            "name": "CSES Problem Set"
+        "group": {
+            "_uid": "problemset",
+            "name": "CSES Problem Set",
+            "website": "Code Submission Evaluation System",
+            "url": "https://cses.fi/problemset/list/"
         },
         "problem": {
-            "uid": [
+            "url": "https://cses.fi/problemset/task/1068",
+            "website": "Code Submission Evaluation System",
+            "_uid": [
                 "problemset",
                 1068
             ],
@@ -20,11 +24,12 @@
                     "expected": "3 10 5 16 8 4 2 1\n"
                 }
             ],
-            "contest": {
-                "uid": "problemset",
-                "name": "CSES Problem Set"
+            "group": {
+                "_uid": "problemset",
+                "name": "CSES Problem Set",
+                "website": "Code Submission Evaluation System",
+                "url": "https://cses.fi/problemset/list/"
             },
-            "level": null,
             "section": "Introductory Problems",
             "time_limit": 1,
             "memory_limit": 512

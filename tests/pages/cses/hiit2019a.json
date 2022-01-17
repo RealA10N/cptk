@@ -4,28 +4,33 @@
         "data": "hiit2019a.html"
     },
     "expected": {
-        "contest": {
-            "uid": "251",
-            "name": "HIIT Open 2019"
+        "group": {
+            "_uid": "251",
+            "name": "HIIT Open 2019",
+            "website": "Code Submission Evaluation System",
+            "url": "https://cses.fi/251/list/"
         },
         "problem": {
-            "uid": [
+            "_uid": [
                 "251",
                 1775
             ],
+            "website": "Code Submission Evaluation System",
             "name": "Alien Invasion II",
+            "url": "https://cses.fi/251/task/A",
             "tests": [
                 {
                     "input": "17\n",
                     "expected": "5617\n41 137\n"
                 }
             ],
-            "contest": {
-                "uid": "251",
-                "name": "HIIT Open 2019"
+            "group": {
+                "_uid": "251",
+                "name": "HIIT Open 2019",
+                "website": "Code Submission Evaluation System",
+                "url": "https://cses.fi/251/list/"
             },
-            "level": "A",
-            "section": null,
+            "mark": "A",
             "time_limit": 1,
             "memory_limit": 512
         }

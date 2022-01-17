@@ -4,15 +4,19 @@
         "data": "hiit2019l.html"
     },
     "expected": {
-        "contest": {
-            "uid": "251",
-            "name": "HIIT Open 2019"
+        "group": {
+            "_uid": "251",
+            "name": "HIIT Open 2019",
+            "website": "Code Submission Evaluation System",
+            "url": "https://cses.fi/251/list/"
         },
         "problem": {
-            "uid": [
+            "_uid": [
                 "251",
                 1783
             ],
+            "url": "https://cses.fi/251/task/L",
+            "website": "Code Submission Evaluation System",
             "name": "L-Trominos",
             "tests": [
                 {
@@ -24,12 +28,13 @@
                     "expected": "IMPOSSIBLE\n"
                 }
             ],
-            "contest": {
-                "uid": "251",
-                "name": "HIIT Open 2019"
+            "group": {
+                "_uid": "251",
+                "name": "HIIT Open 2019",
+                "website": "Code Submission Evaluation System",
+                "url": "https://cses.fi/251/list/"
             },
-            "level": "L",
-            "section": null,
+            "mark": "L",
             "time_limit": 1,
             "memory_limit": 512
         }
