@@ -4,8 +4,10 @@
         "data": "psintro.html"
     },
     "expected": {
-        "contest": {
-            "uid": "problemset",
+        "group": {
+            "_uid": "problemset",
+            "website": "Code Submission Evaluation System",
+            "url": "https://cses.fi/problemset/list/",
             "name": "CSES Problem Set"
         }
     }

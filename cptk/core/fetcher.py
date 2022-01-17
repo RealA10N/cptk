@@ -3,10 +3,13 @@ from requests import session
 from bs4 import BeautifulSoup
 
 from typing import Type, List
-from cptk.scrape.problem import Contest, Problem
 
 from cptk.utils import cptkException
-from cptk.scrape import Website, PageInfo, Element
+from cptk.scrape import Website, PageInfo, Contest, Problem
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from cptk.scrape import Scraped
 
 
 class InvalidClone(cptkException):
@@ -60,7 +63,7 @@ class Fetcher:
                 return website.to_contest(info)
         raise InvalidClone(info)
 
-    def page_to_model(self, info: PageInfo) -> Element:
+    def page_to_model(self, info: PageInfo) -> 'Scraped':
         """ Recives an arbitrary page info instance and tries to match it with
         a Website class that knows how to handle this specific website. If cptk
         doesn't find a way to parse the given webpage, it raises the

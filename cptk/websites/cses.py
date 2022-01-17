@@ -1,12 +1,24 @@
 import re
-from urllib.parse import urlparse
-from cptk.scrape import Website, Contest, Problem, Test
+from urllib.parse import urljoin, urlparse
+from dataclasses import dataclass, field
+
+from cptk.scrape import Website, ProblemGroup, Problem, Test
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Optional, List
     from cptk import PageInfo
     from bs4 import BeautifulSoup
+
+
+@dataclass(unsafe_hash=True)
+class CsesContestProblem(Problem):
+    mark: str = field(compare=False, default=None)
+
+
+@dataclass(unsafe_hash=True)
+class CsesProblemsetProblem(Problem):
+    section: str = field(compare=False, default=None)
 
 
 class Cses(Website):
@@ -19,16 +31,13 @@ class Cses(Website):
     def domain(self) -> str:
         return 'cses.fi'
 
-    @classmethod
-    def is_contest(cls, info: 'PageInfo') -> bool:
-        return cls._contest_from_titlebar(info) is not None
+    def is_group(self, info: 'PageInfo') -> bool:
+        return self._group_from_titlebar(info) is not None
 
-    @classmethod
-    def to_contest(cls, info: 'PageInfo') -> 'Optional[Contest]':
-        return cls._contest_from_titlebar(info)
+    def to_group(self, info: 'PageInfo') -> 'Optional[ProblemGroup]':
+        return self._group_from_titlebar(info)
 
-    @classmethod
-    def _contest_from_titlebar(cls, info: 'PageInfo') -> 'Optional[Contest]':
+    def _group_from_titlebar(self, info: 'PageInfo') -> 'Optional[ProblemGroup]':
         titlebar_soup = info.data.find('div', {'class': 'title-block'})
 
         url = urlparse(info.url)
@@ -42,11 +51,13 @@ class Cses(Website):
 
         try:
             title_soup = titlebar_soup.find('h3')
+            url = urljoin(info.url, title_soup.find('a')['href'])
 
-            return Contest(
-                website=cls,
-                uid=uid,
+            return ProblemGroup(
+                website=self,
+                _uid=uid,
                 name=title_soup.text.strip(),
+                url=url,
             )
 
         except (AttributeError, TypeError):
@@ -56,8 +67,7 @@ class Cses(Website):
     def _parse_code_text(soup: 'BeautifulSoup') -> None:
         return soup.text.replace('<br>', '\n').replace('\r', '').strip() + '\n'
 
-    @classmethod
-    def _parse_tests(cls, info: 'PageInfo') -> 'List[Test]':
+    def _parse_tests(self, info: 'PageInfo') -> 'List[Test]':
         content = info.data.find('div', {'class': 'content'})
 
         titles_soup = content.find_all(
@@ -71,20 +81,18 @@ class Cses(Website):
             expected_soup = input_soup.find_next_sibling('code')
 
             tests.append(Test(
-                input=cls._parse_code_text(input_soup),
-                expected=cls._parse_code_text(expected_soup),
+                input=self._parse_code_text(input_soup),
+                expected=self._parse_code_text(expected_soup),
             ))
 
         return tests
 
-    @classmethod
-    def is_problem(cls, info: 'PageInfo') -> bool:
+    def is_problem(self, info: 'PageInfo') -> bool:
         soup = info.data.find('ul', {'class': 'task-constraints'})
         return soup is not None
 
-    @classmethod
-    def to_problem(cls, info: 'PageInfo') -> 'Optional[Problem]':
-        contest = cls.to_contest(info)
+    def to_problem(self, info: 'PageInfo') -> 'Optional[Problem]':
+        group = self.to_group(info)
 
         title_soup = info.data.find('div', {'class': 'title-block'})
         content_soup = info.data.find('div', {'class': 'content'})
@@ -116,15 +124,28 @@ class Cses(Website):
             if word.strip().isnumeric()
         )
 
-        return Problem(
-            website=cls,
-            uid=(contest.uid, uid),
-            name=name,
-            url=info.url,
-            tests=cls._parse_tests(info),
-            contest=contest,
-            level=level,
-            section=section if level is None else None,
-            time_limit=time_limit,
-            memory_limit=memory_limit,
-        )
+        if level is not None:
+            return CsesContestProblem(
+                website=self,
+                _uid=[group._uid, uid],
+                name=name,
+                url=info.url,
+                tests=self._parse_tests(info),
+                group=group,
+                mark=level,
+                time_limit=time_limit,
+                memory_limit=memory_limit,
+            )
+
+        else:
+            return CsesProblemsetProblem(
+                website=self,
+                _uid=[group._uid, uid],
+                name=name,
+                url=info.url,
+                tests=self._parse_tests(info),
+                group=group,
+                section=section,
+                time_limit=time_limit,
+                memory_limit=memory_limit,
+            )

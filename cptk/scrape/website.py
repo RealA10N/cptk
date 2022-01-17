@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING, Optional, Union, List
 if TYPE_CHECKING:
-    from cptk.scrape import Contest, Problem
+    from cptk.scrape import Problem, ProblemGroup
     from bs4 import BeautifulSoup
 
 
@@ -34,12 +34,12 @@ class Website(ABC):
         class. """
 
     @abstractmethod
-    def is_contest(self, info: PageInfo) -> bool:
+    def is_group(self, info: PageInfo) -> bool:
         """ Returns True only if the given page information describes a page
         with a contest (a collection of multiple problems). """
 
     @abstractmethod
-    def to_contest(self, info: PageInfo) -> Optional['Contest']:
+    def to_group(self, info: PageInfo) -> Optional['ProblemGroup']:
         """ Constructs and a Contest instance that represents the contest that
         is displayed in the given page. If the given page doesn't display a
         contest information, returns None. """
