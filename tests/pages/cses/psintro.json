@@ -6,9 +6,9 @@
     "expected": {
         "group": {
             "_uid": "problemset",
-            "name": "CSES Problem Set",
             "website": "Code Submission Evaluation System",
-            "url": "https://cses.fi/problemset/list/"
+            "url": "https://cses.fi/problemset/list/",
+            "name": "CSES Problem Set"
         }
     }
 }
