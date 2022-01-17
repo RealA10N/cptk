@@ -25,23 +25,14 @@ class Problem(Scraped):
     own 'Problem' class which inherits from this one and can store additional
     information. """
 
+    group: 'ProblemGroup' = field(default=None, compare=False)
     tests: 'List[Test]' = field(default_factory=list, compare=False)
     time_limit: float = field(default=None, compare=False)     # in Seconds
     memory_limit: float = field(default=None, compare=False)   # in MB
 
 
-class ContestProblem(Problem):
-    mark: str = field(compare=False)
-    contest: 'Contest' = field(compare=False)
-
-
 @dataclass(unsafe_hash=True)
 class ProblemGroup(Scraped):
-    pass
-
-
-@dataclass(unsafe_hash=True)
-class Problemset(ProblemGroup):
     pass
 
 

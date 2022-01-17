@@ -19,9 +19,16 @@ class TestProblemClone:
     @pytest.mark.parametrize('problem', (
         scrape.Problem(
             url='https://codeforces.com/problemset/problem/1/A',
-            website=Codeforces, uid=1, name='Test Problem',
+            _uid=1,
+            name='Test Problem',
+            website=Codeforces,
             tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
-            contest=scrape.Contest(Codeforces, 1, 'Test Contest'),
+            group=scrape.ProblemGroup(
+                url='https://codeforces.com/problemset',
+                website=Codeforces,
+                _uid=1,
+                name='Test Contest',
+            ),
         ),
     ))
     def test_add_custom_test(
@@ -54,9 +61,16 @@ class TestProblemClone:
     @pytest.mark.parametrize('problem', (
         scrape.Problem(
             url='https://codeforces.com/problemset/problem/1/A',
-            website=Codeforces, uid=1, name='Test Problem',
+            _uid=1,
+            name='Test Problem',
+            website=Codeforces,
             tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
-            contest=scrape.Contest(Codeforces, 1, 'Test Contest'),
+            group=scrape.ProblemGroup(
+                url='https://codeforces.com/problemset',
+                website=Codeforces,
+                _uid=1,
+                name='Test Contest',
+            ),
         ),
     ))
     def test_clone_preprocess(
@@ -66,7 +80,7 @@ class TestProblemClone:
     ):
 
         proj = LocalProject.init(tempdir.path, template='g++')
-        proj.config.preprocess = tempdir.create(
+        proj.config.clone.preprocess = tempdir.create(
             dedent(
                 """
                 from slugify import slugify
@@ -77,16 +91,16 @@ class TestProblemClone:
             'preprocess.py'
         )
 
-        proj.config.clone.path = '${{problem.website.name()}}/${{problem.name}}'
+        proj.config.clone.path = '${{problem.website.name}}/${{problem.name}}'
 
-        proj.config.template = tempdir.join('template')
+        proj.config.clone.template = tempdir.join('template')
         tempdir.create('${{name}}\n${{problem.name}}', 'template', 'temp.txt')
 
         prob = proj.clone_problem(problem)
 
         loc = os.path.join(prob.location, prob.location)
         assert loc == os.path.join(
-            tempdir.path, problem.website.name(), problem.name)
+            tempdir.path, problem.website.name, problem.name)
 
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)

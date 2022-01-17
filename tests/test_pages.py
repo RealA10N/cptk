@@ -3,14 +3,14 @@ import pytest
 from os import path
 from glob import glob
 from json import load
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict, is_dataclass
 from bs4 import BeautifulSoup
 
+from cptk.scrape import Website
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterator
-    from cptk.scrape import Website, Test, Problem, Contest
 
 
 from cptk.scrape import PageInfo
@@ -81,48 +81,26 @@ class TestPages:
     def test_page(self, case: PageTestCase):
         site = case.website
         assert site.is_problem(case.info) == ('problem' in case.expected)
-        assert site.is_contest(case.info) == ('contest' in case.expected)
+        assert site.is_group(case.info) == ('group' in case.expected)
 
-        if 'contest' in case.expected:
-            self._test_contest(
-                contest=case.website.to_contest(case.info),
-                expected=case.expected['contest'],
-            )
+        if 'group' in case.expected:
+            self._compare(asdict(case.website.to_group(
+                case.info)), case.expected['group'])
 
         if 'problem' in case.expected:
-            self._test_problem(
-                problem=case.website.to_problem(case.info),
-                expected=case.expected['problem'],
-            )
+            self._compare(asdict(case.website.to_problem(
+                case.info)), case.expected['problem'])
 
-    def _test_contest(self, contest: 'Contest', expected: dict) -> None:
-        """ Asserts that the given 'Contest' instance matches the expected
-        values given via the 'expected' dictionary. """
-        assert contest.uid == expected['uid']
-        assert contest.name == expected['name']
-
-    def _test_problem(self, problem: 'Problem', expected: dict) -> None:
-        """ Assert that the given 'Problem' instance matches the expected
-        values given via the 'expected' dictionary. """
-
-        # Test metadata
-        assert problem.uid == tuple(expected['uid'])
-        assert problem.name == expected['name']
-        assert problem.level == expected['level']
-        assert problem.section == expected['section']
-        assert problem.time_limit == expected['time_limit']
-        assert problem.memory_limit == expected['memory_limit']
-
-        # Test example test cases
-        assert len(problem.tests) == len(expected['tests'])
-        for test, expected_test in zip(problem.tests, expected['tests']):
-            test: 'Test'
-            assert test.input == expected_test['input']
-            assert test.expected == expected_test['expected']
-
-        # Test parent contest
-        if problem.contest:
-            self._test_contest(
-                contest=problem.contest,
-                expected=expected['contest'],
-            )
+    @classmethod
+    def _compare(cls, obj: dict, expected: dict):
+        assert set(obj.keys()) == set(expected.keys())
+        for key in obj:
+            if is_dataclass(obj[key]):
+                cls._compare(asdict(obj[key]), expected[key])
+            elif isinstance(obj[key], dict):
+                cls._compare(obj[key], expected[key])
+            elif isinstance(obj[key], Website):
+                website: Website = obj[key]
+                assert expected[key] == website.name
+            else:
+                assert expected[key] == obj[key]
