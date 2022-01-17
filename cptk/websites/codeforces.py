@@ -1,10 +1,18 @@
-from cptk.scrape import Website, Test, Contest, Problem
+from dataclasses import dataclass, field
+from urllib import parse
+
+from cptk.scrape import Website, Test, ProblemGroup, Problem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Optional
-    from cptk import PageInfo
+    from cptk.scrape import PageInfo
     from bs4 import BeautifulSoup
+
+
+@dataclass(unsafe_hash=True)
+class CodeforecsProblem(Problem):
+    mark: str = field(compare=False, default=None)
 
 
 class Codeforces(Website):
@@ -40,15 +48,13 @@ class Codeforces(Website):
             ) for in_soup, ex_soup in zip(inputs_soup, outputs_soup)
         ]
 
-    @staticmethod
-    def is_problem(info: 'PageInfo') -> bool:
+    def is_problem(self, info: 'PageInfo') -> bool:
         """ Returns 'True' if the given 'PageInfo' instance contains a problem
         statement. """
         elem = info.data.find('div', {'class': 'problem-statement'})
         return elem is not None
 
-    @classmethod
-    def to_problem(cls, info: 'PageInfo') -> 'Optional[Problem]':
+    def to_problem(self, info: 'PageInfo') -> 'Optional[Problem]':
         """ Assumes that the given 'PageInfo' instance contains a problem
         statement and returns a 'Problem' instance that describes the problem.
         """
@@ -56,9 +62,9 @@ class Codeforces(Website):
         header_soup = info.data.find('div', {'class': 'header'})
 
         title = header_soup.find('div', {'class': 'title'}).text
-        level, name = [i.strip() for i in title.split('.')]
+        mark, name = [i.strip() for i in title.split('.')]
 
-        contest = cls.to_contest(info)
+        group = self.to_group(info)
 
         time_limit_soup = header_soup.find('div', {'class': 'time-limit'})
         time_limit = next(
@@ -72,35 +78,32 @@ class Codeforces(Website):
             if word.strip().isnumeric()
         )
 
-        return Problem(
-            website=cls,
-            uid=(contest.uid, level),
+        return CodeforecsProblem(
+            _uid=[group._uid, mark],
+            website=self,
             name=name,
+            mark=mark,
             url=info.url,
-            tests=cls._parse_tests(info),
-            contest=contest,
-            level=level,
+            group=group,
+            tests=self._parse_tests(info),
             time_limit=time_limit,
             memory_limit=memory_limit,
         )
 
-    @classmethod
-    def is_contest(cls, info: 'PageInfo') -> bool:
+    def is_group(self, info: 'PageInfo') -> bool:
         """ Returns True if the given 'PageInfo' instance contains information
         of a contest. Note that the given page can also be a problem page that
         has information about the contest that the problem is taken from in the
         sidebar. """
-        return cls._contest_from_sidebar(info) is not None
+        return self._contest_from_sidebar(info) is not None
 
-    @classmethod
-    def to_contest(cls, info: 'PageInfo') -> 'Optional[Contest]':
+    def to_group(self, info: 'PageInfo') -> 'Optional[ProblemGroup]':
         """ If possible, extracts information about the contest that is presented
         in the given page. If the page doesn't contain a contest information,
         returns 'None'. """
-        return cls._contest_from_sidebar(info)
+        return self._contest_from_sidebar(info)
 
-    @classmethod
-    def _contest_from_sidebar(cls, info: 'PageInfo') -> 'Optional[Contest]':
+    def _contest_from_sidebar(self, info: 'PageInfo') -> 'Optional[ProblemGroup]':
         """ Tries to pull information about the current contest using the sidebar
         information that is displayed on every page that is related to a contest.
         If fails to locate the sidebar, returns None. """
@@ -114,8 +117,9 @@ class Codeforces(Website):
         except StopIteration:
             return None
 
-        return Contest(
-            website=cls,
-            uid=int(link['href'].split('/')[-1]),
+        return ProblemGroup(
+            website=self,
+            _uid=int(link['href'].split('/')[-1]),
             name=link.text.strip(),
+            url=parse.urljoin(info.url, link['href']),
         )

@@ -4,16 +4,29 @@
         "data": "1234f.html"
     },
     "expected": {
-        "contest": {
-            "uid": 1234,
+        "group": {
+            "_uid": 1234,
+            "website": "Codeforces",
+            "url": "https://codeforces.com/contest/1234",
             "name": "Codeforces Round #590 (Div. 3)"
         },
         "problem": {
-            "uid": [
+            "_uid": [
                 1234,
                 "F"
             ],
+            "website": "Codeforces",
+            "url": "https://codeforces.com/contest/1234/problem/F",
             "name": "Yet Another Substring Reverse",
+            "mark": "F",
+            "time_limit": 2,
+            "memory_limit": 256,
+            "group": {
+                "_uid": 1234,
+                "website": "Codeforces",
+                "url": "https://codeforces.com/contest/1234",
+                "name": "Codeforces Round #590 (Div. 3)"
+            },
             "tests": [
                 {
                     "input": "abacaba\n",
@@ -31,15 +44,7 @@
                     "input": "abcdeefc\n",
                     "expected": "6\n"
                 }
-            ],
-            "contest": {
-                "uid": 1234,
-                "name": "Codeforces Round #590 (Div. 3)"
-            },
-            "level": "F",
-            "section": null,
-            "time_limit": 2,
-            "memory_limit": 256
+            ]
         }
     }
 }

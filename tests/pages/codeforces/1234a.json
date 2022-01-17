@@ -4,30 +4,35 @@
         "data": "1234a.html"
     },
     "expected": {
-        "contest": {
-            "uid": 1234,
+        "group": {
+            "_uid": 1234,
+            "website": "Codeforces",
+            "url": "https://codeforces.com/contest/1234",
             "name": "Codeforces Round #590 (Div. 3)"
         },
         "problem": {
-            "uid": [
+            "_uid": [
                 1234,
                 "A"
             ],
+            "website": "Codeforces",
+            "url": "https://codeforces.com/contest/1234/problem/A",
             "name": "Equalize Prices Again",
+            "mark": "A",
+            "time_limit": 1,
+            "memory_limit": 256,
+            "group": {
+                "_uid": 1234,
+                "website": "Codeforces",
+                "url": "https://codeforces.com/contest/1234",
+                "name": "Codeforces Round #590 (Div. 3)"
+            },
             "tests": [
                 {
                     "input": "3\n5\n1 2 3 4 5\n3\n1 2 2\n4\n1 1 1 1\n",
                     "expected": "3\n2\n1\n"
                 }
-            ],
-            "contest": {
-                "uid": 1234,
-                "name": "Codeforces Round #590 (Div. 3)"
-            },
-            "level": "A",
-            "section": null,
-            "time_limit": 1,
-            "memory_limit": 256
+            ]
         }
     }
 }
