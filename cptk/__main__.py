@@ -116,7 +116,7 @@ def show(url: str):
 def clone(url: str):
     """ Clone a problem into a local cptk project. """
     proj = LocalProject.find(getcwd())
-    prob = proj.clone(url)
+    prob = proj.clone_url(url)
     click.echo(prob.location)
 
 
