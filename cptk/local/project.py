@@ -32,7 +32,9 @@ class ProjectNotFound(cptkException):
 
 
 class CloneSettings(BaseModel):
+    template: str
     path: str = DEFAULT_CLONE_PATH
+    preprocess: Optional[str] = DEFAULT_PREPROCESS_DEST
 
     def dict(self, **kwargs) -> dict:
         kwargs.update({"exclude_unset": False})
@@ -40,12 +42,9 @@ class CloneSettings(BaseModel):
 
 
 class ProjectConfig(Configuration):
-    template: str
     clone: CloneSettings
-
     git: Optional[bool] = False
     verbose: Optional[bool] = False
-    preprocess: Optional[str] = None
 
 
 @dataclass(unsafe_hash=True)
@@ -125,9 +124,6 @@ class LocalProject:
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER
 
-        # Create default clone settings
-        kwargs['clone'] = CloneSettings()
-
         # If the given template is actually one of the predefined template names
         temp_obj = {t.uid: t for t in DEFAULT_TEMPLATES}.get(template)
         if temp_obj is not None:
@@ -142,11 +138,16 @@ class LocalProject:
         # Copy default preprocess into project
         copyfile(DEFAULT_PREPROCESS, os.path.join(
             location, DEFAULT_PREPROCESS_DEST))
-        kwargs['preprocess'] = DEFAULT_PREPROCESS_DEST
+
+        # Create default clone settings
+        kwargs['clone'] = CloneSettings(
+            template=template,
+            preprocess=DEFAULT_PREPROCESS_DEST,
+        )
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.
-        config = ProjectConfig(template=template, **kwargs)
+        config = ProjectConfig(**kwargs)
         config_path = os.path.join(location, PROJECT_FILE)
         config.dump(config_path)
 
@@ -164,7 +165,7 @@ class LocalProject:
         globals dictionary. """
 
         globals = {'problem': problem}
-        preprocess = self.relative(self.config.preprocess)
+        preprocess = self.relative(self.config.clone.preprocess)
 
         if preprocess is not None:
             globals.update(Preprocessor.load_file(preprocess, globals))
@@ -193,7 +194,7 @@ class LocalProject:
 
         globals = self.load_preprocess_globals(problem)
 
-        src = self.relative(self.config.template)
+        src = self.relative(self.config.clone.template)
         dst = self.relative(Preprocessor.parse_string(
             self.config.clone.path, globals))
 

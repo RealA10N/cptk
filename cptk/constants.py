@@ -14,4 +14,4 @@ PREPROCESSOR_PATTERN = r'\${{([^}]*)}}'
 PREPROCESSOR_INVALID = '?'
 DEFAULT_PREPROCESS = '.cptk/preprocess.py'
 
-DEFAULT_CLONE_PATH = "${{ slugify(website) }}/${{ slugify(contest.name) }}/${{ slugify(problem.level) + '-' if problem.level is not None else '' }}${{ slugify(problem.name) }}"
+DEFAULT_CLONE_PATH = "${{ slugify(website.name) }}/${{ slugify(group.name) + '/' if group is not None else '' }}${{ slugify(problem.name) }}"

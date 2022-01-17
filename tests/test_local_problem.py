@@ -14,23 +14,25 @@ if TYPE_CHECKING:
     from .utils import EasyDirectory
 
 
+WEBSITE = Codeforces()
+PROBLEM = scrape.Problem(
+    _uid=1,
+    website=WEBSITE,
+    url='https://codeforces.com/problemset/problem/1/A',
+    name='Test Problem',
+    tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
+    group=scrape.ProblemGroup(
+        _uid=1,
+        website=WEBSITE,
+        url='https://codeforces.com/problemset',
+        name='Test Contest',
+    ),
+)
+
+
 class TestProblemClone:
 
-    @pytest.mark.parametrize('problem', (
-        scrape.Problem(
-            url='https://codeforces.com/problemset/problem/1/A',
-            _uid=1,
-            name='Test Problem',
-            website=Codeforces,
-            tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
-            group=scrape.ProblemGroup(
-                url='https://codeforces.com/problemset',
-                website=Codeforces,
-                _uid=1,
-                name='Test Contest',
-            ),
-        ),
-    ))
+    @pytest.mark.parametrize('problem', (PROBLEM,))
     def test_add_custom_test(
         self,
         tempdir: 'EasyDirectory',
@@ -58,21 +60,7 @@ class TestProblemClone:
         assert len(prob.tests) == tests + 1
         assert scrape.Test('hello!') in prob.tests
 
-    @pytest.mark.parametrize('problem', (
-        scrape.Problem(
-            url='https://codeforces.com/problemset/problem/1/A',
-            _uid=1,
-            name='Test Problem',
-            website=Codeforces,
-            tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
-            group=scrape.ProblemGroup(
-                url='https://codeforces.com/problemset',
-                website=Codeforces,
-                _uid=1,
-                name='Test Contest',
-            ),
-        ),
-    ))
+    @pytest.mark.parametrize('problem', (PROBLEM,))
     def test_clone_preprocess(
         self,
         tempdir: 'EasyDirectory',

@@ -122,5 +122,5 @@ class TestProjectInit:
 
     def test_default_preprocess_creation(self, tempdir: 'EasyDirectory') -> None:
         proj = LocalProject.init(tempdir.path)
-        assert proj.config.preprocess == DEFAULT_PREPROCESS
+        assert proj.config.clone.preprocess == DEFAULT_PREPROCESS
         assert os.path.isfile(tempdir.join(DEFAULT_PREPROCESS))
