@@ -36,4 +36,4 @@ cptk --help
 ```
 
 If you are experiencing problems while installing cptk, check out the more
-detailed [Installation Guide](github.com/realA10N/cptk/wiki/installation).
+detailed [Installation Guide](https://github.com/RealA10N/cptk/wiki/Installation).
