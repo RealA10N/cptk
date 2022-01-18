@@ -1,0 +1,29 @@
+{
+    "info": {
+        "url": "https://open.kattis.com/problems/modulo",
+        "data": "modulo.html"
+    },
+    "expected": {
+        "_uid": "modulo",
+        "website": "Kattis",
+        "url": "https://open.kattis.com/problems/modulo",
+        "name": "Modulo",
+        "time_limit": 1,
+        "memory_limit": 1024,
+        "contest": null,
+        "tests": [
+            {
+                "input": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n",
+                "expected": "10\n"
+            },
+            {
+                "input": "42\n84\n252\n420\n840\n126\n42\n84\n420\n126\n",
+                "expected": "1\n"
+            },
+            {
+                "input": "39\n40\n41\n42\n43\n44\n82\n83\n84\n85\n",
+                "expected": "6\n"
+            }
+        ]
+    }
+}

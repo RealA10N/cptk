@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8" >
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modulo &ndash; Kattis, Kattis</title>
+
+    <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css" rel="stylesheet">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- Fonts/Icons -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,800,700italic,800italic%7CMerriweather:400,400italic,700" rel="stylesheet" type="text/css">
+
+    <!-- Bootstrap CSS -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap datetimepicker CSS-->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+    <!-- DateRangePicker CSS -->
+    <link href="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" rel="stylesheet">
+
+    <!-- Editable and Select2 -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.css" rel="stylesheet">
+
+    <link rel="shortcut icon" href="/favicon" />
+
+    <!-- Own CSS -->
+    <link rel="stylesheet" href="/css/system.css?03bf93=">
+    <style type="text/css">
+          .header {
+         background-color: rgb(240,176,52);
+     }
+     .header .main-nav > ul > li.current:before {
+         border-bottom-color: rgb(240,176,52);
+     }
+
+          div.page-content.clearfix.above-everything.alert.alert-danger { color: #31708f; background: #d9edf7; border-color: #bce8f1; }
+div.page-content.clearfix.above-everything.alert.alert-danger div.main-content { padding-bottom: 0; }
+
+         </style>
+
+    <script type="text/javascript">
+        window.page_loaded_at = new Date();
+        jQuery.noConflict();
+    </script>
+
+    <script type="text/javascript">
+    jQuery.ns = function (namespace) {
+        var parts = namespace.split('.');
+        var last = window;
+        for (var i = 0; i < parts.length; i++) {
+            last = last[parts[i]] || (last[parts[i]] = {});
+        }
+        return last;
+    };
+</script>
+    <script>
+jQuery.extend(jQuery.ns('Kattis.error'), (function () {
+    var messages = {"INTERNAL_SERVER_ERROR":"Internal server error.","ACCESS_DENIED":"Access denied.","NOT_AUTHENTICATED":"Not authenticated.","METHOD_NOT_ALLOWED":"Method not allowed.","INVALID_JSON":"JSON cannot be decoded or encoded data is deeper than the recursion limit.","BAD_CSRF_TOKEN":"Token does not match session's csrf_token","SESSION_NAME_EMPTY":"Session's name must be non empty.","SESSION_START_TIME_EMPTY":"Session's start time must be non empty.","SESSION_START_TIME_PASSED":"Session's start time has already passed.","SESSION_DURATION_EMPTY":"Session's duration must be non empty.","SESSION_DURATION_NEGATIVE":"Session's duration must be a positive number.","SESSION_DURATION_EXCEEDED":"Maximum duration for the session was exceeded.","SESSION_ALREADY_STARTED":"The session has already started.","SESSION_ALREADY_FINISHED":"The session is already finished.","USER_CREATED_SESSION_DURATION_EXCEEDED":"Contest cannot be longer than 168 hours.","INVALID_PROBLEM_SCORE":"Invalid problem score.","INVALID_SESSION_SHORTNAME":"Invalid shortname for the session.","INVALID_SESSION_CUTOFF":"Invalid cutoff for the session.","INVALID_USER_NAME":"Invalid username or email.","SESSION_NOT_FOUND":"No such session.","COURSE_NOT_FOUND":"No such course.","OFFERING_NOT_FOUND":"No such offering.","TEACHER_NOT_FOUND":"No such teacher.","TEACHER_CANNOT_REMOVE_SELF":"You may not remove yourself as a teacher unless you are an administrator.","AUTHOR_NOT_FOUND":"No such author.","JUDGE_NOT_FOUND":"No such judge.","JUDGE_ALREADY_EXIST":"The user is already a judge.","TEACHER_ALREADY_EXIST":"The user is already a teacher.","PROBLEM_NOT_FOUND":"No such problem.","TEAM_NOT_FOUND":"No such team.","SESSION_PROBLEM_ALREADY_EXIST":"The problem has been already added to the session.","SESSION_PROBLEM_DOES_NOT_EXIST":"The problem does not relate to the session.","PROBLEM_INDEX_NEGATIVE":"Problem index must be non negative.","AUTHOR_IS_CURRENT_TEAM_MEMBER":"The user you tried to add is already a member of the current team.","AUTHOR_IS_ANOTHER_TEAM_MEMBER":"The user you tried to add is already a member of another team in the current session.","AUTHOR_IS_JUDGE":"The user you tried to add is a judge.","AUTHOR_IS_NOT_TEAM_MEMBER":"The user you tried to remove is not a team member.","JUDGE_IS_TEAM_MEMBER":"The user you tried to add is a session team member or invitee.","SESSION_PUBLISHING_DENIED":"You do not have permission to publish this session.","CANNOT_PUBLISH_HISTORICAL_SESSION":"You cannot publish a session with a historical start time.","INVALID_TEAM_NAME_TOO_LONG":"The team name you are trying to add is too long","TEAM_NAME_IS_NOT_VISIBLE":"The team name you are trying to add is not visible"};
+
+    return {
+        get_msg: function (error_code) {
+            return messages[error_code];
+        },
+
+        show_msg: function (base_message, error_code) {
+            if (error_code) {
+                alert(base_message + ": " + this.get_msg(error_code));
+            } else {
+                alert(base_message);
+            }
+        },
+
+        show_xhr_msg: function (elem, jqXHR) {
+            var base_message = elem.data('fail-msg');
+            var code = jqXHR.responseJSON && jqXHR.responseJSON.error &&
+                       jqXHR.responseJSON.error.code;
+            this.show_msg(base_message, code);
+        }
+    }
+})());
+</script>
+
+
+    <meta name="robots" content="noindex">
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            ignoreClass: ".*",
+            inlineMath: [['$','$'], ['\\(','\\)']]
+        },
+        CommonHTML: {
+            linebreaks: {
+                automatic: false
+            }
+        },
+        SVG: {
+            linebreaks: {
+                automatic: false
+            }
+        },
+        "HTML-CSS": {
+            linebreaks: {
+                automatic: false
+            }
+        },
+        MMLorHTML: {
+            prefer: { Firefox: "HTML" }
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+    <script type="text/javascript">
+var rumMOKey="a854f3a6dd7ee5e3b7d1641570b79c34";
+(function(){
+if(window.performance && window.performance.timing && window.performance.navigation) {
+	var site24x7_rum_beacon=document.createElement('script');
+	site24x7_rum_beacon.async=true;
+	site24x7_rum_beacon.setAttribute('src','//static.site24x7rum.eu/beacon/site24x7rum-min.js?appKey='+rumMOKey);
+	document.getElementsByTagName('head')[0].appendChild(site24x7_rum_beacon);
+}
+})(window)
+</script>
+
+
+    <style type="text/css">
+        .header { margin-bottom: 0; }
+        .page-content.single { padding: 0; }
+        .problem-headline h1 { margin-top: 0; }
+    </style>
+
+</head>
+
+<body class="page-master-layout page-problem page-problem-layout">
+
+
+<div id="wrapper">
+    <header class="header">
+    <div class="background">
+
+        <div class="wrap">
+            <div class="fl">
+                                    <a href="/"><img class="logo logo-open" src="/images/site-logo" alt="" /></a>
+                                <div class="title-wrapper">
+                    <div class="header-title">Kattis</div>
+                    <nav class="main-nav">
+                        <ul>
+
+                                <li class=""><a href="/problems">Problems</a></li>
+
+                                <li class=""><a href="/contests">Contests</a></li>
+
+                                <li class=""><a href="/ranklist">Ranklists</a></li>
+
+                                <li class=""><a href="/jobs">Jobs</a></li>
+
+                                <li class=""><a href="/help">Help</a></li>
+
+                                                    </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-side fr">
+
+                <nav class="user-nav">
+                    <ul class="user-nav-ul">
+                                                    <li>
+                                <form action="/search" class="site-search" method="GET">
+                                    <input type="text" name="q" placeholder="Search Kattis" />
+                                    <a href="#">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                                </form>
+                            </li>
+
+                                                                                    <li><a class="btn dark-bg" href="/login">Log in</a></li>
+                                                                        </ul>
+
+                </nav>
+
+            </div>
+        </div>
+    </div>
+</header>
+
+    <!--[if IE]>    <div class="alert alert-warning" role="alert">
+        <strong>You are using an outdated browser!</strong> Some features might not look or work like expected. Kattis supports the last two versions of major browsers. Please consider upgrading to a recent version!    </div>
+    <![endif]-->
+
+
+
+
+
+
+    <div class="container" style="width: 1170px!important">
+
+
+
+
+
+
+
+
+
+        <div class="col-xs-9" style="padding: 0">
+            <div class="page-content single clearfix">
+                <section class="box clearfix main-content">
+
+
+
+<div class="problem-wrapper" data-copied-to-clipboard-text="Copied!">
+
+    <div class="problem-headline clearfix">
+        <div class="headline-wrapper"><h1>Modulo</h1></div>
+    </div>
+
+
+  <div class="problembody">
+    <p>Given two integers <span class="tex2jax_process">$A$</span>
+    and <span class="tex2jax_process">$B$</span>, <span class=
+    "tex2jax_process">$A$</span> modulo <span class=
+    "tex2jax_process">$B$</span> is the remainder when dividing
+    <span class="tex2jax_process">$A$</span> by <span class=
+    "tex2jax_process">$B$</span>. For example, the numbers
+    <span class="tex2jax_process">$7$</span>, <span class=
+    "tex2jax_process">$14$</span>, <span class=
+    "tex2jax_process">$27$</span> and <span class=
+    "tex2jax_process">$38$</span> become <span class=
+    "tex2jax_process">$1$</span>, <span class=
+    "tex2jax_process">$2$</span>, <span class=
+    "tex2jax_process">$0$</span> and <span class=
+    "tex2jax_process">$2$</span>, modulo <span class=
+    "tex2jax_process">$3$</span>. Write a program that accepts
+    <span class="tex2jax_process">$10$</span> numbers as input and
+    outputs the number of distinct numbers in the input, if the
+    numbers are considered modulo <span class=
+    "tex2jax_process">$42$</span>.</p>
+
+    <h2>Input</h2>
+
+    <p>The input will contain 10 non-negative integers, each
+    smaller than <span class="tex2jax_process">$1000$</span>, one
+    per line.</p>
+
+    <h2>Output</h2>
+
+    <p>Output the number of distinct values when considered modulo
+    <span class="tex2jax_process">$42$</span> on a single line.</p>
+
+    <h2>Explanation of Sample Inputs</h2>
+
+    <p>In sample input <span class="tex2jax_process">$1$</span>,
+    the numbers modulo <span class="tex2jax_process">$42$</span>
+    are <span class="tex2jax_process">$1, 2, 3, 4, 5, 6, 7, 8,
+    9$</span> and <span class="tex2jax_process">$10$</span>.</p>
+
+    <p>In sample input <span class="tex2jax_process">$2$</span>,
+    all numbers modulo <span class="tex2jax_process">$42$</span>
+    are <span class="tex2jax_process">$0$</span>.</p>
+
+    <p>In sample input <span class="tex2jax_process">$3$</span>,
+    the numbers modulo <span class="tex2jax_process">$42$</span>
+    are <span class="tex2jax_process">$39, 40, 41, 0, 1, 2, 40, 41,
+    0$</span> and <span class="tex2jax_process">$1$</span>. There
+    are <span class="tex2jax_process">$6$</span> distinct
+    numbers.</p>
+
+    <table class="sample" summary="sample data">
+      <tr>
+        <th>Sample Input 1</th>
+
+        <th>Sample Output 1</th>
+      </tr>
+
+      <tr>
+        <td>
+          <pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre>
+        </td>
+
+        <td>
+          <pre>10
+</pre>
+        </td>
+      </tr>
+    </table>
+
+    <table class="sample" summary="sample data">
+      <tr>
+        <th>Sample Input 2</th>
+
+        <th>Sample Output 2</th>
+      </tr>
+
+      <tr>
+        <td>
+          <pre>42
+84
+252
+420
+840
+126
+42
+84
+420
+126
+</pre>
+        </td>
+
+        <td>
+          <pre>1
+</pre>
+        </td>
+      </tr>
+    </table>
+
+    <table class="sample" summary="sample data">
+      <tr>
+        <th>Sample Input 3</th>
+
+        <th>Sample Output 3</th>
+      </tr>
+
+      <tr>
+        <td>
+          <pre>39
+40
+41
+42
+43
+44
+82
+83
+84
+85
+</pre>
+        </td>
+
+        <td>
+          <pre>6
+</pre>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+</div>
+
+
+                </section>
+            </div>
+        </div>
+        <div class="col-xs-3" style="padding-right: 0; width: 285px!important">
+
+<div class="page-content single clearfix">
+    <section class="box clearfix main-content" style="padding: 15px">
+        <div class="problem-sidebar sidebar-info"><div class="alt-buttons"><a style="width: 117px"href="/problems/modulo/submit"class="kat-button kat-primary small"data-toggle="tooltip"data-placement="top"title="Submit"><i class="fa fa-upload"></i> Submit</a><a style="width: 117px; margin-left: 5px" href="/problems/modulo/statistics"class="kat-button kat-info small"data-toggle="tooltip"data-placement="top"title="Problem statistics"><i class="fa fa-bar-chart-o"></i> Stats</a></div><div class="sidebar-info"><div class="problem-button-wrap"><div class="btn-group btn-group-sm btn-group-justified"></div></div></div><div class="sidebar-info"><p><strong>Problem ID: </strong> modulo</p><p><strong>CPU Time limit: </strong> 1 second</p><p><strong>Memory limit: </strong> 1024 MB</p><p><strong>Difficulty:  </strong><span>1.5</span></p><div class="problem-download"><p><strong>Download: </strong><br><a href="/problems/modulo/file/statement/samples.zip"download="modulo.zip"}>Sample data files</a><br></p></div></div></div>
+    </section>
+</div>
+
+<div class="page-content single clearfix" style="margin-top: -15px">
+    <section class="box clearfix main-content problem-sidebar" style="padding: 5px 15px">
+        <div class="sidebar-info">
+
+                            <p>
+                    <strong>Source:</strong>
+                                            <a href="/problem-sources/Croatian%20Open%20Competition%20in%20Informatics%202006/2007%2C%20contest%20%231">Croatian Open Competition in Informatics 2006/2007, contest #1</a>
+                                    </p>
+
+                            <p>
+                    <strong>License:</strong>
+                                                                For educational use only
+                                                        </p>
+
+
+
+                    </div>
+    </section>
+</div>
+
+
+        </div>
+    </div>
+
+
+</div>
+
+
+<div id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-info col-md-2 ">
+
+                            </div>
+            <div class="footer-powered col-md-8">
+                <h4>
+                                      <a href="/rss/new-problems"><i class="fa fa-rss-square" style="color: orange"></i>&nbsp;RSS feed for new problems</a> |
+                                    Powered by&nbsp;Kattis                                      | <a href="https://www.patreon.com/kattis">Support Kattis on Patreon!</a>
+                                  </h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.2.8/raphael.min.js"></script>
+<script src="/js/system.js?d86be2=" type="text/javascript"></script>
+
+
+
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v652eace1692a40cfa3763df669d7439c1639079717194" integrity="sha512-Gi7xpJR8tSkrpF7aordPZQlW2DLtzUlZcumS8dMQjwDHEnw9I7ZLyiOj/6tZStRBGtGgN6ceN6cMH8z7etPGlw==" data-cf-beacon='{"rayId":"6cfb599f8f9f4357","token":"6651308a007d4d459b12876077322bfb","version":"2021.12.0","si":100}' crossorigin="anonymous"></script>
+</body>
+</html>

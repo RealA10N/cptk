@@ -18,11 +18,13 @@ from cptk.scrape import PageInfo
 from cptk.websites import (
     Codeforces,
     Cses,
+    Kattis,
 )
 
 WEBSITES = {
     'codeforces': Codeforces(),
     'cses': Cses(),
+    'kattis': Kattis(),
 }
 
 

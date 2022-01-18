@@ -31,6 +31,7 @@ setup(
         "cptk_sites": [
             "codeforces=cptk.websites:Codeforces",
             "csesfi=cptk.websites:Cses",
+            "kattis=cptk.websites:Kattis",
         ],
         "console_scripts": [
             "cptk=cptk.__main__:main",
