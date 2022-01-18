@@ -19,6 +19,7 @@
             "url": "https://codeforces.com/contest/1234/problem/A",
             "name": "Equalize Prices Again",
             "mark": "A",
+            "gym": false,
             "time_limit": 1,
             "memory_limit": 256,
             "group": {

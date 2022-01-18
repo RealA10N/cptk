@@ -19,6 +19,7 @@
             "url": "https://codeforces.com/contest/1234/problem/F",
             "name": "Yet Another Substring Reverse",
             "mark": "F",
+            "gym": false,
             "time_limit": 2,
             "memory_limit": 256,
             "group": {

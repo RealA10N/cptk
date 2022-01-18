@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 @dataclass(unsafe_hash=True)
 class CodeforecsProblem(Problem):
     mark: str = field(compare=False, default=None)
+    gym: bool = field(compare=False, default=False)
 
 
 class Codeforces(Website):
@@ -27,7 +28,11 @@ class Codeforces(Website):
 
     @staticmethod
     def _parse_code_text(soup: 'BeautifulSoup') -> None:
-        return soup.text.replace('<br>', '\n').replace('\r', '').strip() + '\n'
+        text = soup.text.replace('<br>', '\n').replace('\r', '').strip()
+        return '\n'.join(
+            line.strip()
+            for line in text.splitlines(keepends=False)
+        ) + '\n'
 
     @classmethod
     def _parse_tests(cls, info: 'PageInfo') -> 'List[Test]':
@@ -66,6 +71,12 @@ class Codeforces(Website):
 
         group = self.to_group(info)
 
+        gym = next(
+            p.lower() == 'gym'
+            for p in parse.urlparse(info.url).path.split('/')
+            if p
+        )
+
         time_limit_soup = header_soup.find('div', {'class': 'time-limit'})
         time_limit = next(
             float(word) for word in time_limit_soup.find(text=True, recursive=False).split()
@@ -83,6 +94,7 @@ class Codeforces(Website):
             website=self,
             name=name,
             mark=mark,
+            gym=gym,
             url=info.url,
             group=group,
             tests=self._parse_tests(info),
@@ -113,7 +125,8 @@ class Codeforces(Website):
 
         try:
             link = next(link for link in links
-                        if 'contest' in link['href'].split('/'))
+                        if 'contest' or 'gym'
+                        in link['href'].split('/'))
         except StopIteration:
             return None
 
