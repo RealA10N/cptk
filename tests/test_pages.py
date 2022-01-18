@@ -81,7 +81,7 @@ class TestPages:
             ) for case in cases_generator()
         ),
     )
-    def test_page(self, case: PageTestCase):
+    def test_to_problem(self, case: PageTestCase):
         self._compare(
             asdict(case.website.to_problem(case.info)),
             case.expected
@@ -100,3 +100,17 @@ class TestPages:
                 assert expected[key] == website.name
             else:
                 assert expected[key] == obj[key]
+
+    @pytest.mark.parametrize(
+        'case',
+        (
+            pytest.param(
+                case,
+                id=path.relpath(case.configfile, PAGES_BASEPATH)
+            ) for case in cases_generator()
+        ),
+    )
+    def test_is_problem(self, case: PageTestCase):
+        assert case.website.is_problem(case.info)
+        for website in set(WEBSITES.values()) - {case.website}:
+            assert not website.is_problem(case.info)
