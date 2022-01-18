@@ -18,7 +18,7 @@ class PageInfo:
 
 
 class Website(ABC):
-    """ An abstract class that represents a website that is supported by cptk. 
+    """ An abstract class that represents a website that is supported by cptk.
     Has different methods that can fetch data and information from the website.
     """
 

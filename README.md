@@ -19,7 +19,7 @@
 
 ### Installation
 
-The Competitive Programming Tool Kit is implemented fully in Python and is 
+The Competitive Programming Tool Kit is implemented fully in Python and is
 distributed using the Python Package Index (PyPI).
 
 To use cptk make sure you have **CPython>=3.6** installed.

@@ -143,16 +143,16 @@ class TestPreprocessor:
             class Person:
                 name: str
                 age: Optional[int] = None
-            
+
             class Hello:
-                
+
                 def __init__(self, person: Person) -> None:
                     self.person = person
 
                 def greet(self):
                     return f'Hello {self.person.name}!'
 
-            __all__ = ['Person', 'Hello']       
+            __all__ = ['Person', 'Hello']
         """
 
         path = tempdir.create(dedent(source), 'script.py')
