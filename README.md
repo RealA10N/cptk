@@ -34,3 +34,6 @@ You can check that the installation went successfully by running:
 ```shell
 cptk --help
 ```
+
+If you are experiencing problems while installing cptk, check out the more
+detailed [Installation Guide](github.com/realA10N/cptk/wiki/installation).
