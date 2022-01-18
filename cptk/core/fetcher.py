@@ -52,27 +52,15 @@ class Fetcher:
                     self._domain_to_website[cur] = website
 
     def page_to_problem(self, info: PageInfo) -> Problem:
-        for website in self._websites:
-            if website.is_problem(info):
-                return website.to_problem(info)
-        raise InvalidClone(info)
-
-    def page_to_contest(self, info: PageInfo) -> Contest:
-        for website in self._websites:
-            if website.is_contest(info):
-                return website.to_contest(info)
-        raise InvalidClone(info)
-
-    def page_to_model(self, info: PageInfo) -> 'Scraped':
         """ Recives an arbitrary page info instance and tries to match it with
         a Website class that knows how to handle this specific website. If cptk
         doesn't find a way to parse the given webpage, it raises the
         'InvalidClone' exception. """
 
-        try:
-            return self.page_to_problem(info)
-        except InvalidClone:
-            return self.page_to_contest(info)
+        for website in self._websites:
+            if website.is_problem(info):
+                return website.to_problem(info)
+        raise InvalidClone(info)
 
     def to_page(self, url: str) -> PageInfo:
         """ Makes an get http/s request to the given URL and returns the result

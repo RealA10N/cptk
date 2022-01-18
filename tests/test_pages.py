@@ -79,17 +79,10 @@ class TestPages:
         ),
     )
     def test_page(self, case: PageTestCase):
-        site = case.website
-        assert site.is_problem(case.info) == ('problem' in case.expected)
-        assert site.is_group(case.info) == ('group' in case.expected)
-
-        if 'group' in case.expected:
-            self._compare(asdict(case.website.to_group(
-                case.info)), case.expected['group'])
-
-        if 'problem' in case.expected:
-            self._compare(asdict(case.website.to_problem(
-                case.info)), case.expected['problem'])
+        self._compare(
+            asdict(case.website.to_problem(case.info)),
+            case.expected
+        )
 
     @classmethod
     def _compare(cls, obj: dict, expected: dict):

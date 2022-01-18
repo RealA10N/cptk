@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from typing import TYPE_CHECKING, Optional, Union, List
 if TYPE_CHECKING:
-    from cptk.scrape import Problem, ProblemGroup
+    from cptk.scrape import Problem
     from bs4 import BeautifulSoup
 
 
@@ -32,17 +32,6 @@ class Website(ABC):
     def domain(self) -> Union[str, List[str]]:
         """ A single domain or a list of domains that are represented by this
         class. """
-
-    @abstractmethod
-    def is_group(self, info: PageInfo) -> bool:
-        """ Returns True only if the given page information describes a page
-        with a contest (a collection of multiple problems). """
-
-    @abstractmethod
-    def to_group(self, info: PageInfo) -> Optional['ProblemGroup']:
-        """ Constructs and a Contest instance that represents the contest that
-        is displayed in the given page. If the given page doesn't display a
-        contest information, returns None. """
 
     @abstractmethod
     def is_problem(self, info: PageInfo) -> bool:

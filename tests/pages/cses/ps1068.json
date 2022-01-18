@@ -4,35 +4,30 @@
         "data": "ps1068.html"
     },
     "expected": {
-        "group": {
+        "_uid": [
+            "problemset",
+            1068
+        ],
+        "website": "Code Submission Evaluation System",
+        "url": "https://cses.fi/problemset/task/1068",
+        "name": "Weird Algorithm",
+        "section": "Introductory Problems",
+        "time_limit": 1,
+        "memory_limit": 512,
+        "contest": {
             "_uid": "problemset",
+            "name": "CSES Problem Set",
             "website": "Code Submission Evaluation System",
             "url": "https://cses.fi/problemset/list/",
-            "name": "CSES Problem Set"
+            "active": null,
+            "start_time": null,
+            "end_time": null
         },
-        "problem": {
-            "_uid": [
-                "problemset",
-                1068
-            ],
-            "website": "Code Submission Evaluation System",
-            "url": "https://cses.fi/problemset/task/1068",
-            "name": "Weird Algorithm",
-            "section": "Introductory Problems",
-            "time_limit": 1,
-            "memory_limit": 512,
-            "group": {
-                "_uid": "problemset",
-                "name": "CSES Problem Set",
-                "website": "Code Submission Evaluation System",
-                "url": "https://cses.fi/problemset/list/"
-            },
-            "tests": [
-                {
-                    "input": "3\n",
-                    "expected": "3 10 5 16 8 4 2 1\n"
-                }
-            ]
-        }
+        "tests": [
+            {
+                "input": "3\n",
+                "expected": "3 10 5 16 8 4 2 1\n"
+            }
+        ]
     }
 }

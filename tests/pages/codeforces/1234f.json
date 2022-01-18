@@ -4,48 +4,43 @@
         "data": "1234f.html"
     },
     "expected": {
-        "group": {
+        "_uid": [
+            1234,
+            "F"
+        ],
+        "website": "Codeforces",
+        "url": "https://codeforces.com/contest/1234/problem/F",
+        "name": "Yet Another Substring Reverse",
+        "mark": "F",
+        "gym": false,
+        "time_limit": 2,
+        "memory_limit": 256,
+        "contest": {
             "_uid": 1234,
             "website": "Codeforces",
             "url": "https://codeforces.com/contest/1234",
-            "name": "Codeforces Round #590 (Div. 3)"
+            "name": "Codeforces Round #590 (Div. 3)",
+            "active": null,
+            "start_time": null,
+            "end_time": null
         },
-        "problem": {
-            "_uid": [
-                1234,
-                "F"
-            ],
-            "website": "Codeforces",
-            "url": "https://codeforces.com/contest/1234/problem/F",
-            "name": "Yet Another Substring Reverse",
-            "mark": "F",
-            "gym": false,
-            "time_limit": 2,
-            "memory_limit": 256,
-            "group": {
-                "_uid": 1234,
-                "website": "Codeforces",
-                "url": "https://codeforces.com/contest/1234",
-                "name": "Codeforces Round #590 (Div. 3)"
+        "tests": [
+            {
+                "input": "abacaba\n",
+                "expected": "3\n"
             },
-            "tests": [
-                {
-                    "input": "abacaba\n",
-                    "expected": "3\n"
-                },
-                {
-                    "input": "abcdecdf\n",
-                    "expected": "6\n"
-                },
-                {
-                    "input": "aabbcc\n",
-                    "expected": "3\n"
-                },
-                {
-                    "input": "abcdeefc\n",
-                    "expected": "6\n"
-                }
-            ]
-        }
+            {
+                "input": "abcdecdf\n",
+                "expected": "6\n"
+            },
+            {
+                "input": "aabbcc\n",
+                "expected": "3\n"
+            },
+            {
+                "input": "abcdeefc\n",
+                "expected": "6\n"
+            }
+        ]
     }
 }

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from urllib import parse
 
-from cptk.scrape import Website, Test, ProblemGroup, Problem
+from cptk.scrape import Website, Test, Contest, Problem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -14,6 +14,11 @@ if TYPE_CHECKING:
 class CodeforecsProblem(Problem):
     mark: str = field(compare=False, default=None)
     gym: bool = field(compare=False, default=False)
+
+
+@dataclass(unsafe_hash=True)
+class CodeforcesContest(Contest):
+    pass
 
 
 class Codeforces(Website):
@@ -59,7 +64,7 @@ class Codeforces(Website):
         elem = info.data.find('div', {'class': 'problem-statement'})
         return elem is not None
 
-    def to_problem(self, info: 'PageInfo') -> 'Optional[Problem]':
+    def to_problem(self, info: 'PageInfo') -> 'Optional[CodeforecsProblem]':
         """ Assumes that the given 'PageInfo' instance contains a problem
         statement and returns a 'Problem' instance that describes the problem.
         """
@@ -69,7 +74,7 @@ class Codeforces(Website):
         title = header_soup.find('div', {'class': 'title'}).text
         mark, name = [i.strip() for i in title.split('.')]
 
-        group = self.to_group(info)
+        contest = self._contest_from_sidebar(info)
 
         gym = next(
             p.lower() == 'gym'
@@ -90,32 +95,19 @@ class Codeforces(Website):
         )
 
         return CodeforecsProblem(
-            _uid=[group._uid, mark],
+            _uid=[contest._uid, mark],
             website=self,
             name=name,
             mark=mark,
             gym=gym,
             url=info.url,
-            group=group,
+            contest=contest,
             tests=self._parse_tests(info),
             time_limit=time_limit,
             memory_limit=memory_limit,
         )
 
-    def is_group(self, info: 'PageInfo') -> bool:
-        """ Returns True if the given 'PageInfo' instance contains information
-        of a contest. Note that the given page can also be a problem page that
-        has information about the contest that the problem is taken from in the
-        sidebar. """
-        return self._contest_from_sidebar(info) is not None
-
-    def to_group(self, info: 'PageInfo') -> 'Optional[ProblemGroup]':
-        """ If possible, extracts information about the contest that is presented
-        in the given page. If the page doesn't contain a contest information,
-        returns 'None'. """
-        return self._contest_from_sidebar(info)
-
-    def _contest_from_sidebar(self, info: 'PageInfo') -> 'Optional[ProblemGroup]':
+    def _contest_from_sidebar(self, info: 'PageInfo') -> 'Optional[CodeforcesContest]':
         """ Tries to pull information about the current contest using the sidebar
         information that is displayed on every page that is related to a contest.
         If fails to locate the sidebar, returns None. """
@@ -130,7 +122,7 @@ class Codeforces(Website):
         except StopIteration:
             return None
 
-        return ProblemGroup(
+        return CodeforcesContest(
             website=self,
             _uid=int(link['href'].split('/')[-1]),
             name=link.text.strip(),
