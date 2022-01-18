@@ -1,10 +1,15 @@
 import re
-from urllib.parse import urljoin, urlparse
-from dataclasses import dataclass, field
-
-from cptk.scrape import Website, Contest, Problem, Test
-
+from dataclasses import dataclass
+from dataclasses import field
 from typing import TYPE_CHECKING
+from urllib.parse import urljoin
+from urllib.parse import urlparse
+
+from cptk.scrape import Contest
+from cptk.scrape import Problem
+from cptk.scrape import Test
+from cptk.scrape import Website
+
 if TYPE_CHECKING:
     from typing import Optional, List
     from cptk import PageInfo

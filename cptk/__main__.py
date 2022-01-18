@@ -1,14 +1,15 @@
-import click
 import sys
 from os import getcwd
+from typing import Optional
 
-from cptk.utils import cptkException, valid_url
-from cptk.templates import DEFAULT_TEMPLATES
-from cptk.local import LocalProject
+import click
+
 from cptk.core import System
 from cptk.exceptions import ProjectNotFound
-
-from typing import Optional
+from cptk.local import LocalProject
+from cptk.templates import DEFAULT_TEMPLATES
+from cptk.utils import cptkException
+from cptk.utils import valid_url
 
 
 class CatchAllExceptions(click.Group):

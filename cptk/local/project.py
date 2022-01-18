@@ -1,23 +1,27 @@
 import os
-from shutil import copytree, rmtree, copyfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
+from shutil import copyfile
+from shutil import copytree
+from shutil import rmtree
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
+from cptk.constants import DEFAULT_CLONE_PATH
+from cptk.constants import DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_DEST
+from cptk.constants import DEFAULT_TEMPLATE_FOLDER
+from cptk.constants import PROJECT_FILE
+from cptk.core import Configuration
+from cptk.core import DEFAULT_PREPROCESS
+from cptk.core import Fetcher
+from cptk.core import System
 from cptk.core.preprocessor import Preprocessor
 from cptk.local.problem import LocalProblem
-from cptk.utils import cached_property, cptkException
-from cptk.core import Configuration, System, Fetcher, DEFAULT_PREPROCESS
 from cptk.templates import DEFAULT_TEMPLATES
-from cptk.constants import (
-    PROJECT_FILE,
-    DEFAULT_TEMPLATE_FOLDER,
-    DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_DEST,
-    DEFAULT_CLONE_PATH,
-)
-
-
-from typing import TYPE_CHECKING, Optional
+from cptk.utils import cached_property
+from cptk.utils import cptkException
 
 if TYPE_CHECKING:
     from typing import Type, TypeVar

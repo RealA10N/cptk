@@ -1,15 +1,16 @@
-import pytest
 import os
 from textwrap import dedent
+from typing import TYPE_CHECKING
+
+import pytest
 from slugify import slugify
 
+from cptk import scrape
+from cptk.constants import DEFAULT_TESTS_FOLDER
 from cptk.local import LocalProject
 from cptk.local.problem import LocalProblem
-from cptk import scrape
 from cptk.websites import Codeforces
-from cptk.constants import DEFAULT_TESTS_FOLDER
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .utils import EasyDirectory
 

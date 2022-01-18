@@ -1,19 +1,19 @@
-import pytest
-
 import os
 import stat
 from filecmp import dircmp
 
-from .utils import run, requires, EasyDirectory
+import pytest
 
+from .utils import EasyDirectory
+from .utils import requires
+from .utils import run
+from cptk.constants import DEFAULT_PREPROCESS
+from cptk.constants import DEFAULT_TEMPLATE_FOLDER
+from cptk.constants import PROJECT_FILE
+from cptk.exceptions import ProjectNotFound
+from cptk.exceptions import SystemRunError
 from cptk.local import LocalProject
-from cptk.exceptions import SystemRunError, ProjectNotFound
 from cptk.templates import DEFAULT_TEMPLATES
-from cptk.constants import (
-    DEFAULT_PREPROCESS,
-    DEFAULT_TEMPLATE_FOLDER,
-    PROJECT_FILE,
-)
 
 
 UID_TO_TEMPLATE = {t.uid: t for t in DEFAULT_TEMPLATES}

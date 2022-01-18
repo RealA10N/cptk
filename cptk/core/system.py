@@ -1,8 +1,12 @@
-import sys
 import subprocess
-from typing import Union, Optional
+import sys
+from typing import Optional
+from typing import Union
 
-from click import echo, prompt, style, Abort
+from click import Abort
+from click import echo
+from click import prompt
+from click import style
 
 from cptk.utils import cptkException
 

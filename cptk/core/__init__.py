@@ -1,7 +1,13 @@
 from .config import Configuration
-from .system import System
-from .preprocessor import Preprocessor, DEFAULT_PREPROCESS
 from .fetcher import Fetcher
+from .preprocessor import DEFAULT_PREPROCESS
+from .preprocessor import Preprocessor
+from .system import System
 
-__all__ = ['Configuration', 'System',
-           'Preprocessor', 'DEFAULT_PREPROCESS', 'Fetcher']
+__all__ = [
+    'Configuration',
+    'Fetcher',
+    'DEFAULT_PREPROCESS',
+    'Preprocessor',
+    'System',
+]

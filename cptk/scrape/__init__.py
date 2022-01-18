@@ -1,16 +1,15 @@
-from .website import Website, PageInfo
-from .problem import (
-    Scraped,
-    Problem,
-    Contest,
-    Test,
-)
+from .problem import Contest
+from .problem import Problem
+from .problem import Scraped
+from .problem import Test
+from .website import PageInfo
+from .website import Website
 
 __all__ = [
-    'Website',
-    'PageInfo',
-    'Scraped',
-    'Problem',
     'Contest',
+    'Problem',
+    'Scraped',
     'Test',
+    'PageInfo',
+    'Website',
 ]

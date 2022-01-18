@@ -1,11 +1,12 @@
-from os import path
 import re
+from os import path
 
 import pytest
 
-from cptk.local.problem import RecipeConfig
-from cptk.templates import Template, DEFAULT_TEMPLATES
 from cptk.constants import RECIPE_FILE
+from cptk.local.problem import RecipeConfig
+from cptk.templates import DEFAULT_TEMPLATES
+from cptk.templates import Template
 
 
 class TestTemplates:

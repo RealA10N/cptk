@@ -1,5 +1,6 @@
 import pytest
 from slugify import slugify
+
 from .utils import EasyDirectory
 
 

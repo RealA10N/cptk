@@ -1,12 +1,13 @@
 import os
+from typing import TYPE_CHECKING
 
-from yaml import safe_load, YAMLError, dump
 from pydantic import BaseModel
 from pydantic.error_wrappers import ValidationError
+from yaml import dump
+from yaml import safe_load
+from yaml import YAMLError
 
 from cptk.utils import cptkException
-
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type, TypeVar, Tuple
 

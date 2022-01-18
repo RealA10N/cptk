@@ -1,14 +1,15 @@
-import pytest
-
-from os import path
+from dataclasses import asdict
+from dataclasses import dataclass
+from dataclasses import is_dataclass
 from glob import glob
 from json import load
-from dataclasses import dataclass, asdict, is_dataclass
+from os import path
+from typing import TYPE_CHECKING
+
+import pytest
 from bs4 import BeautifulSoup
 
 from cptk.scrape import Website
-
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterator
 

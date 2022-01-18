@@ -1,7 +1,7 @@
 import re
 from functools import lru_cache
-
-from typing import Callable, TypeVar
+from typing import Callable
+from typing import TypeVar
 T = TypeVar('T')
 
 

@@ -1,3 +1,13 @@
+from datetime import datetime
+from os import getlogin
+from typing import TYPE_CHECKING
+
+from slugify import slugify
+
+if TYPE_CHECKING:
+    from cptk.scrape import Problem
+    problem: 'Problem' = None
+
 # This file contains executable python code.
 # This file will before cloning new problems, and the globals avaliable at
 # the end of the execution will be avaliable to use in your problem template
@@ -8,15 +18,6 @@
 # using ${{ hello.upper() }} for example will yield "THERE".
 # If an __all__ list is provided, only globals from the list will be avaliable
 # to use in the templates.
-
-from os import getlogin
-from datetime import datetime
-from slugify import slugify
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from cptk.scrape import Problem
-    problem: 'Problem' = None
 
 # Unpack important problem attributes
 contest = problem.contest

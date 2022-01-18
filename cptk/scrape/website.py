@@ -1,10 +1,13 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from abc import ABC
+from abc import abstractmethod
+from dataclasses import dataclass
+from dataclasses import field
+from typing import TYPE_CHECKING
 
-from typing import TYPE_CHECKING, Optional, Union, List
 if TYPE_CHECKING:
     from cptk.scrape import Problem
     from bs4 import BeautifulSoup
+    from typing import Union, Optional, List
 
 
 @dataclass(frozen=True)
@@ -29,7 +32,7 @@ class Website(ABC):
 
     @property
     @abstractmethod
-    def domain(self) -> Union[str, List[str]]:
+    def domain(self) -> 'Union[str, List[str]]':
         """ A single domain or a list of domains that are represented by this
         class. """
 
@@ -39,7 +42,7 @@ class Website(ABC):
         with a single problem. """
 
     @abstractmethod
-    def to_problem(self, info: PageInfo) -> Optional['Problem']:
+    def to_problem(self, info: PageInfo) -> 'Optional[Problem]':
         """ Constructs and a Problem instance that represents the problem that
         is displayed in the given page. If the given page doesn't display a
         single and unique problem, returns None. """

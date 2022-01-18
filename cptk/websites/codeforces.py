@@ -1,9 +1,13 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
+from typing import TYPE_CHECKING
 from urllib import parse
 
-from cptk.scrape import Website, Test, Contest, Problem
+from cptk.scrape import Contest
+from cptk.scrape import Problem
+from cptk.scrape import Test
+from cptk.scrape import Website
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Optional
     from cptk.scrape import PageInfo

@@ -1,26 +1,26 @@
-import re
 import os
+import re
+from dataclasses import dataclass
+from dataclasses import field
 from glob import glob
-from dataclasses import dataclass, field
+from typing import List
+from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+from pydantic import validator
 
-from cptk.scrape import Test
+from cptk.constants import DEFAULT_TESTS_FOLDER
+from cptk.constants import RECIPE_FILE
+from cptk.constants import TEST_INPUT_FILE_PATTERN
+from cptk.constants import TEST_INPUT_FILE_STRUCTURE
+from cptk.constants import TEST_OUTPUT_FILE_STRUCTURE
+from cptk.constants import TEST_SAMPLE_NAME_STRUCTURE
 from cptk.core import Configuration
-from cptk.constants import (
-    RECIPE_FILE,
-    DEFAULT_TESTS_FOLDER,
-    TEST_INPUT_FILE_PATTERN,
-    TEST_INPUT_FILE_STRUCTURE,
-    TEST_OUTPUT_FILE_STRUCTURE,
-    TEST_SAMPLE_NAME_STRUCTURE,
-)
+from cptk.scrape import Test
 
-from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from cptk.scrape import Problem
     from typing import TypeVar, Type
-
     T = TypeVar("T")
 
 

@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
-
+from dataclasses import dataclass
+from dataclasses import field
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import List, Any
     from cptk.scrape import Website

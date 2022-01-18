@@ -1,12 +1,12 @@
 import os
-import pytest
-from textwrap import dedent
 from copy import copy
 from dataclasses import is_dataclass
+from textwrap import dedent
+from typing import TYPE_CHECKING
+
+import pytest
 
 from cptk.core import Preprocessor
-
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .utils import EasyDirectory
 

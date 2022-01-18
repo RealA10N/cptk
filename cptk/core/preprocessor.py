@@ -1,9 +1,11 @@
-import re
 import os
+import re
 from copy import copy
-from typing import Tuple, Match
+from typing import Match
+from typing import Tuple
 
-from cptk.constants import PREPROCESSOR_PATTERN, PREPROCESSOR_INVALID
+from cptk.constants import PREPROCESSOR_INVALID
+from cptk.constants import PREPROCESSOR_PATTERN
 
 # for readability, we redefine the global 'globals' variable
 # pylint: disable=redefined-builtin

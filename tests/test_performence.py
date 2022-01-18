@@ -1,6 +1,8 @@
-import pytest
-from .utils import run
 from time import perf_counter
+
+import pytest
+
+from .utils import run
 
 
 class TestPerformance:
