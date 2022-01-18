@@ -19,12 +19,11 @@ if TYPE_CHECKING:
     problem: 'Problem' = None
 
 # Unpack important problem attributes
-group = problem.group
+contest = problem.contest
 website = problem.website
 
 # Calculate constants
 now = datetime.now()
 user = getlogin()
 
-__all__ = ['problem', 'group', 'website',
-           'now', 'user', 'slugify']
+__all__ = ['problem', 'contest', 'website', 'now', 'user', 'slugify']
