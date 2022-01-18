@@ -128,7 +128,8 @@ class LocalProject:
         if template is None:
             template = DEFAULT_TEMPLATE_FOLDER
 
-        # If the given template is actually one of the predefined template names
+        # If the given template is actually one of the predefined template
+        # names
         temp_obj = {t.uid: t for t in DEFAULT_TEMPLATES}.get(template)
         if temp_obj is not None:
             dst = os.path.join(location, DEFAULT_TEMPLATE_FOLDER)
@@ -156,7 +157,7 @@ class LocalProject:
         config.dump(config_path)
 
         # We have created and initialized everything that is required for a
-        # cptk project. Now we can create a LocalProject instance and return it.
+        # cptk project. Now we can create a LocalProject instance and return it
         return cls(location)
 
     @cached_property
@@ -205,8 +206,8 @@ class LocalProject:
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
             ans = System.ask(
-                question="Are you sure you want to overwrite saved data? (y/n)",
-                options={'y': True, 'n': False},
+                "Are you sure you want to overwrite saved data? (y/n)",
+                {'y': True, 'n': False},
             )
 
             if not ans: System.abort()

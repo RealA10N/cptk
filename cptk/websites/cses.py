@@ -41,7 +41,10 @@ class Cses(Website):
     def domain(self) -> str:
         return 'cses.fi'
 
-    def _contest_from_titlebar(self, info: 'PageInfo') -> 'Optional[CsesContest]':
+    def _contest_from_titlebar(
+        self,
+        info: 'PageInfo',
+    ) -> 'Optional[CsesContest]':
         titlebar_soup = info.data.find('div', {'class': 'title-block'})
 
         url = urlparse(info.url)
@@ -118,38 +121,28 @@ class Cses(Website):
 
         time_limit_soup = constrains_soup.find('li')
         time_limit = next(
-            float(word) for word in time_limit_soup.find(text=True, recursive=False)
+            float(word) for word
+            in time_limit_soup.find(text=True, recursive=False)
             if word.strip().isnumeric()
         )
 
         memory_limit_soup = time_limit_soup.find_next_sibling('li')
         memory_limit = next(
-            float(word) for word in memory_limit_soup.find(text=True, recursive=False).split()
+            float(word) for word
+            in memory_limit_soup.find(text=True, recursive=False).split()
             if word.strip().isnumeric()
         )
 
-        if level is not None:
-            return CsesContestProblem(
-                website=self,
-                _uid=[contest._uid, uid],
-                name=name,
-                url=info.url,
-                tests=self._parse_tests(info),
-                contest=contest,
-                mark=level,
-                time_limit=time_limit,
-                memory_limit=memory_limit,
-            )
+        kwargs = {
+            'website': self,
+            '_uid': [contest._uid, uid],
+            'name': name,
+            'url': info.url,
+            'tests': self._parse_tests(info),
+            'contest': contest,
+            'time_limit': time_limit,
+            'memory_limit': memory_limit,
+        }
 
-        else:
-            return CsesProblemsetProblem(
-                website=self,
-                _uid=[contest._uid, uid],
-                name=name,
-                url=info.url,
-                tests=self._parse_tests(info),
-                contest=contest,
-                section=section,
-                time_limit=time_limit,
-                memory_limit=memory_limit,
-            )
+        if level is not None: return CsesContestProblem(**kwargs, mark=level)
+        else: return CsesProblemsetProblem(**kwargs, section=section)

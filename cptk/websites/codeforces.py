@@ -102,13 +102,15 @@ class Codeforces(Website):
 
         time_limit_soup = header_soup.find('div', {'class': 'time-limit'})
         time_limit = next(
-            float(word) for word in time_limit_soup.find(text=True, recursive=False).split()
+            float(word) for word
+            in time_limit_soup.find(text=True, recursive=False).split()
             if word.strip().isnumeric()
         )
 
         memory_limit_soup = header_soup.find('div', {'class': 'memory-limit'})
         memory_limit = next(
-            float(word) for word in memory_limit_soup.find(text=True, recursive=False).split()
+            float(word) for word
+            in memory_limit_soup.find(text=True, recursive=False).split()
             if word.strip().isnumeric()
         )
 
@@ -132,7 +134,10 @@ class Codeforces(Website):
 
         return CodeforecsProblem(**kwargs)
 
-    def _group_from_sidebar(self, info: 'PageInfo') -> 'Optional[CodeforecsGroup]':
+    def _group_from_sidebar(
+        self,
+        info: 'PageInfo',
+    ) -> 'Optional[CodeforecsGroup]':
 
         tables = info.data.find_all('table', {'class': 'rtable'})
         links = [table.find('a', href=True) for table in tables]
@@ -143,8 +148,8 @@ class Codeforces(Website):
                 link
                 for link in links
                 if link is not None
-                and link['href'].count('/') == 2
-                and link['href'].split('/')[1] == 'group'
+                if link['href'].count('/') == 2
+                if link['href'].split('/')[1] == 'group'
             )
 
         except StopIteration:
@@ -157,10 +162,13 @@ class Codeforces(Website):
             url=parse.urljoin(info.url, link['href']),
         )
 
-    def _contest_from_sidebar(self, info: 'PageInfo') -> 'Optional[CodeforcesContest]':
-        """ Tries to pull information about the current contest using the sidebar
-        information that is displayed on every page that is related to a contest.
-        If fails to locate the sidebar, returns None. """
+    def _contest_from_sidebar(
+        self,
+        info: 'PageInfo',
+    ) -> 'Optional[CodeforcesContest]':
+        """ Tries to pull information about the current contest using the
+        sidebar information that is displayed on every page that is related to
+        a contest. If fails to locate the sidebar, returns None. """
 
         tables = info.data.find_all('table', {'class': 'rtable'})
         links = [table.find('a', href=True) for table in tables]
@@ -168,8 +176,7 @@ class Codeforces(Website):
         try:
             link = next(
                 link for link in links
-                if 'contest' in link['href'].split('/')
-                or 'gym' in link['href'].split('/')
+                if not {'contest', 'gym'}.isdisjoint(link['href'].split('/'))
             )
         except StopIteration:
             return None

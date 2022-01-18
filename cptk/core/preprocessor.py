@@ -26,7 +26,11 @@ class Preprocessor:
             return PREPROCESSOR_INVALID
 
     @classmethod
-    def _parse_count_string(cls, string: str, globals: dict) -> Tuple[str, int]:
+    def _parse_count_string(
+        cls,
+        string: str,
+        globals: dict,
+    ) -> Tuple[str, int]:
         """ Parses the string and in addition returns the number of replacements
         it has preformed. """
         return re.subn(

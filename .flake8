@@ -1,0 +1,4 @@
+[flake8]
+ignore =
+    E731,   # lambda functions
+    E701,   # multiple statments in one line

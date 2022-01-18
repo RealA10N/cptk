@@ -30,9 +30,9 @@ class System:
             verbose: bool = None,
             ) -> subprocess.CompletedProcess:
         """ Runs the given command in the terminal. If 'errormsg' is provided,
-        asserts that the returncode from the process is zero, and if not, raises
-        an SystemRunError with the given message. If 'verbose' is provided, it
-        overwrites the classes verbosity setting. """
+        asserts that the returncode from the process is zero, and if not,
+        raises an SystemRunError with the given message. If 'verbose' is
+        provided, it overwrites the classes verbosity setting. """
 
         if verbose is None:
             verbose = cls._verbose

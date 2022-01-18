@@ -82,7 +82,7 @@ class LocalProblem:
     def tests(self) -> List[Test]:
         base = os.path.join(self.location, DEFAULT_TESTS_FOLDER)
 
-        l = list()
+        res = list()
         inputs = glob(os.path.join(base, '*'), recursive=True)
         for inp in inputs:
             base, name = os.path.split(inp)
@@ -107,6 +107,6 @@ class LocalProblem:
             except FileNotFoundError:
                 out_data = None
 
-            l.append(Test(inp_data, out_data))
+            res.append(Test(inp_data, out_data))
 
-        return l
+        return res

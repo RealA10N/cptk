@@ -14,4 +14,8 @@ PREPROCESSOR_PATTERN = r'\${{([^}]*)}}'
 PREPROCESSOR_INVALID = '?'
 DEFAULT_PREPROCESS = '.cptk/preprocess.py'
 
-DEFAULT_CLONE_PATH = "${{ slugify(website.name) }}/${{ slugify(contest.name) }}/${{ slugify(problem.name) }}"
+DEFAULT_CLONE_PATH = '/'.join((
+    '${{ slugify(website.name) }}',
+    '${{ slugify(contest.name) }}',
+    '${{ slugify(problem.name) }}',
+))
