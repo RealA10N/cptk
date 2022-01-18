@@ -71,7 +71,7 @@ class TestConfiguration:
     def test_value_errors(self, tempdir, yaml) -> None:
         path = tempdir.create(yaml, 'pet.yaml')
 
-        with pytest.raises(ConfigFileValueError) as err:
+        with pytest.raises(ConfigFileValueError):
             Pet.load(path)
 
     @pytest.mark.parametrize('yaml', (

@@ -22,7 +22,7 @@ UID_TO_TEMPLATE = {t.uid: t for t in DEFAULT_TEMPLATES}
 class TestProjectInit:
 
     def test_default_init(self, tempdir: EasyDirectory):
-        """ Tests expected behavior for init command with default arguments. """
+        """ Tests expected behavior for init command with default args. """
 
         # Assert that there is no other project that can break the test
         assert not LocalProject.is_project(tempdir.path)
@@ -51,7 +51,7 @@ class TestProjectInit:
         tempdir: EasyDirectory,
         old_template_uid: str,
         new_template_uid: str,
-    ) -> None:
+    ):
         """ Tests for expected behavior if user tries to initialize a cptk
         project inside an already initialized one. """
 
@@ -77,7 +77,7 @@ class TestProjectInit:
         assert not res.left_only and not res.right_only and not res.diff_files
 
     @requires('git')
-    def test_git(self, tempdir: EasyDirectory) -> None:
+    def test_git(self, tempdir: EasyDirectory):
         """ Tests that a git repository is actually created as expected. """
         proj = LocalProject.init(location=tempdir.path, git=True)
 
@@ -90,7 +90,7 @@ class TestProjectInit:
         self,
         tempdir: EasyDirectory,
         create_with_git: bool,
-    ) -> None:
+    ):
         """ Test that everything is ok if user tries to initialize a cptk
         project inside a git repository. """
 
@@ -105,7 +105,7 @@ class TestProjectInit:
         reason="chmod doesn't work property on Windows."
     )
     @requires('git')
-    def test_git_fail(self, tempdir: EasyDirectory) -> None:
+    def test_git_fail(self, tempdir: EasyDirectory):
         """ Tests that the currect errors are raised if the creating of a git
         repository fails. """
 
@@ -120,7 +120,7 @@ class TestProjectInit:
         # Change permissions back to normal, avoid warnings and errors
         os.chmod(tempdir.path, mode)
 
-    def test_default_preprocess_creation(self, tempdir: 'EasyDirectory') -> None:
+    def test_default_preprocess_creation(self, tempdir: 'EasyDirectory'):
         proj = LocalProject.init(tempdir.path)
         assert proj.config.clone.preprocess == DEFAULT_PREPROCESS
         assert os.path.isfile(tempdir.join(DEFAULT_PREPROCESS))

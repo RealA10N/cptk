@@ -29,8 +29,6 @@ jobs:
       - name: Test 🎯
         run: make test-ci
 
-      # TODO: add flake8 test
-
   coverage:
     name: 📝 Coverage
     runs-on: ubuntu-latest

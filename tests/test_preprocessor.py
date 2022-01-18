@@ -122,7 +122,12 @@ class TestPreprocessor:
             }
         )
     ))
-    def test_load_file(self, tempdir: 'EasyDirectory', source: str, expected: dict) -> None:
+    def test_load_file(
+        self,
+        tempdir: 'EasyDirectory',
+        source: str,
+        expected: dict,
+    ):
         path = tempdir.create(dedent(source), 'script.py')
 
         data = {
@@ -133,7 +138,7 @@ class TestPreprocessor:
 
         assert data == expected
 
-    def test_load_file_new_objects(self, tempdir: 'EasyDirectory') -> None:
+    def test_load_file_new_objects(self, tempdir: 'EasyDirectory'):
 
         source = """
             from dataclasses import dataclass

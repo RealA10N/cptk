@@ -7,10 +7,12 @@ with open("README.md", mode="r", encoding="utf8") as f:
 with open("requirements.txt", mode="r", encoding="utf8") as f:
     DEPENDENCIES = f.read().splitlines()
 
+DESC = "Your personal assistant for everything competitive-programming-related"
+
 setup(
     name="cptk",
     version="0.1.0",
-    description="Your personal assistant for everything competitive programming related.",
+    description=DESC,
 
     python_requires=">=3.6,<4",
     install_requires=DEPENDENCIES,
