@@ -5,6 +5,7 @@ from urllib import parse
 
 from cptk.scrape import Contest
 from cptk.scrape import Problem
+from cptk.scrape import Scraped
 from cptk.scrape import Test
 from cptk.scrape import Website
 
@@ -23,6 +24,19 @@ class CodeforecsProblem(Problem):
 @dataclass(unsafe_hash=True)
 class CodeforcesContest(Contest):
     pass
+
+
+@dataclass(unsafe_hash=True)
+class CodeforecsGroup(Scraped):
+    pass
+
+
+@dataclass(unsafe_hash=True)
+class CodeforcesGroupProblem(CodeforecsProblem):
+    """ A problem that is a part of a contest that is organized by a Codeforecs
+    group, and is not official. """
+
+    group: CodeforecsGroup = None
 
 
 class Codeforces(Website):
@@ -98,17 +112,49 @@ class Codeforces(Website):
             if word.strip().isnumeric()
         )
 
-        return CodeforecsProblem(
-            _uid=[contest._uid, mark],
+        group = self._group_from_sidebar(info)
+
+        kwargs = {
+            '_uid': [contest._uid, mark],
+            'website': self,
+            'name': name,
+            'mark': mark,
+            'gym': gym,
+            'url': info.url,
+            'contest': contest,
+            'tests': self._parse_tests(info),
+            'time_limit': time_limit,
+            'memory_limit': memory_limit,
+        }
+
+        if group:
+            return CodeforcesGroupProblem(**kwargs, group=group)
+
+        return CodeforecsProblem(**kwargs)
+
+    def _group_from_sidebar(self, info: 'PageInfo') -> 'Optional[CodeforecsGroup]':
+
+        tables = info.data.find_all('table', {'class': 'rtable'})
+        links = [table.find('a', href=True) for table in tables]
+
+        try:
+            # Searching for a that looks like: '/group/abc123/'
+            link = next(
+                link
+                for link in links
+                if link is not None
+                and link['href'].count('/') == 2
+                and link['href'].split('/')[1] == 'group'
+            )
+
+        except StopIteration:
+            return None
+
+        return CodeforecsGroup(
+            _uid=link['href'].split('/')[-1],
             website=self,
-            name=name,
-            mark=mark,
-            gym=gym,
-            url=info.url,
-            contest=contest,
-            tests=self._parse_tests(info),
-            time_limit=time_limit,
-            memory_limit=memory_limit,
+            name=link.text.strip(),
+            url=parse.urljoin(info.url, link['href']),
         )
 
     def _contest_from_sidebar(self, info: 'PageInfo') -> 'Optional[CodeforcesContest]':
@@ -120,9 +166,11 @@ class Codeforces(Website):
         links = [table.find('a', href=True) for table in tables]
 
         try:
-            link = next(link for link in links
-                        if 'contest' or 'gym'
-                        in link['href'].split('/'))
+            link = next(
+                link for link in links
+                if 'contest' in link['href'].split('/')
+                or 'gym' in link['href'].split('/')
+            )
         except StopIteration:
             return None
 

@@ -1,0 +1,40 @@
+{
+    "info": {
+        "url": "https://codeforces.com/group/yg7WhsFsAp/contest/355496/problem/P35",
+        "data": "group355496p35.html"
+    },
+    "expected": {
+        "_uid": [
+            355496,
+            "P35"
+        ],
+        "website": "Codeforces",
+        "url": "https://codeforces.com/group/yg7WhsFsAp/contest/355496/problem/P35",
+        "name": "Minutes Before the New Year",
+        "mark": "P35",
+        "gym": false,
+        "time_limit": 1,
+        "memory_limit": 256,
+        "group": {
+            "_uid": "yg7WhsFsAp",
+            "website": "Codeforces",
+            "url": "https://codeforces.com/group/yg7WhsFsAp",
+            "name": "100 Easy Problems (Bootcamp)"
+        },
+        "contest": {
+            "_uid": 355496,
+            "website": "Codeforces",
+            "url": "https://codeforces.com/group/yg7WhsFsAp/contest/355496",
+            "name": "Day 4 - Math I",
+            "active": null,
+            "start_time": null,
+            "end_time": null
+        },
+        "tests": [
+            {
+                "input": "5\n23 55\n23 0\n0 1\n4 20\n23 59\n",
+                "expected": "5\n60\n1439\n1180\n1\n"
+            }
+        ]
+    }
+}

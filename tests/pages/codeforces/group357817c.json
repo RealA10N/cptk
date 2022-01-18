@@ -1,0 +1,44 @@
+{
+    "info": {
+        "url": "https://codeforces.com/group/wwRwtBit8d/contest/357817/problem/C",
+        "data": "group357817c.html"
+    },
+    "expected": {
+        "_uid": [
+            357817,
+            "C"
+        ],
+        "website": "Codeforces",
+        "url": "https://codeforces.com/group/wwRwtBit8d/contest/357817/problem/C",
+        "name": "Ice Skating",
+        "mark": "C",
+        "gym": false,
+        "time_limit": 2,
+        "memory_limit": 256,
+        "group": {
+            "_uid": "wwRwtBit8d",
+            "website": "Codeforces",
+            "url": "https://codeforces.com/group/wwRwtBit8d",
+            "name": "Haifa ICPC 2021"
+        },
+        "contest": {
+            "_uid": 357817,
+            "website": "Codeforces",
+            "url": "https://codeforces.com/group/wwRwtBit8d/contest/357817",
+            "name": "train 3.12",
+            "active": null,
+            "start_time": null,
+            "end_time": null
+        },
+        "tests": [
+            {
+                "input": "2\n2 1\n1 2\n",
+                "expected": "1\n"
+            },
+            {
+                "input": "2\n2 1\n4 1\n",
+                "expected": "0\n"
+            }
+        ]
+    }
+}
