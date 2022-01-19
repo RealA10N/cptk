@@ -2,43 +2,21 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
-import pytest
 from slugify import slugify
 
-from cptk import scrape
+import cptk.scrape
 from cptk.constants import DEFAULT_TESTS_FOLDER
 from cptk.local import LocalProject
 from cptk.local.problem import LocalProblem
-from cptk.websites import Codeforces
 
 if TYPE_CHECKING:
-    from .utils import EasyDirectory
-
-
-WEBSITE = Codeforces()
-PROBLEM = scrape.Problem(
-    _uid=1,
-    website=WEBSITE,
-    url='https://codeforces.com/problemset/problem/1/A',
-    name='Test Problem',
-    tests=[scrape.Test('1 2', '1 2\n'), scrape.Test('1 4')],
-    contest=scrape.Contest(
-        _uid=1,
-        website=WEBSITE,
-        url='https://codeforces.com/problemset',
-        name='Test Contest',
-    ),
-)
+    from .utils import EasyDirectory, Dummy
 
 
 class TestProblemClone:
 
-    @pytest.mark.parametrize('problem', (PROBLEM,))
-    def test_add_custom_test(
-        self,
-        tempdir: 'EasyDirectory',
-        problem: 'scrape.Problem',
-    ):
+    def test_add_custom_test(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
+        problem = dummy.get_dummy_problem()
 
         proj = LocalProject.init(tempdir.path, template='g++')
         prob = proj.clone_problem(problem)
@@ -59,14 +37,10 @@ class TestProblemClone:
 
         prob = LocalProblem(prob.location)
         assert len(prob.tests) == tests + 1
-        assert scrape.Test('hello!') in prob.tests
+        assert cptk.scrape.Test('hello!') in prob.tests
 
-    @pytest.mark.parametrize('problem', (PROBLEM,))
-    def test_clone_preprocess(
-        self,
-        tempdir: 'EasyDirectory',
-        problem: 'scrape.Problem',
-    ):
+    def test_clone_preprocess(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
+        problem = dummy.get_dummy_problem()
 
         proj = LocalProject.init(tempdir.path, template='g++')
         proj.config.clone.preprocess = tempdir.create(

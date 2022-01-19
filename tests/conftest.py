@@ -1,6 +1,7 @@
 import pytest
 from slugify import slugify
 
+from .utils import Dummy
 from .utils import EasyDirectory
 
 
@@ -8,3 +9,8 @@ from .utils import EasyDirectory
 def tempdir(request, tmpdir_factory):
     name = slugify(request.node.nodeid)
     return EasyDirectory(tmpdir_factory.mktemp(name))
+
+
+@pytest.fixture
+def dummy():
+    return Dummy()

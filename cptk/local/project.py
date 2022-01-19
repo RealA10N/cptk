@@ -183,7 +183,7 @@ class LocalProject:
         return path
 
     def clone_url(self, url: str) -> LocalProblem:
-        """ Clones the given URL as a probelm and stores as a local problem
+        """ Clones the given URL as a problem and stores as a local problem
         inside the current cptk project. """
 
         page = self.fetcher.to_page(url)
@@ -213,7 +213,9 @@ class LocalProject:
         copytree(src, dst)
         Preprocessor.parse_directory(dst, globals)
 
-        return LocalProblem.init(dst, problem)
+        locprob = LocalProblem.init(dst, problem)
+        self.last = locprob.location
+        return locprob
 
     @property
     def last(self) -> Optional[str]:
