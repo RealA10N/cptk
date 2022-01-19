@@ -75,11 +75,12 @@ class Kattis(Website):
         return res
 
     def _parse_date(self, text: str) -> datetime.datetime:
-        items = text.split()
-        _ = items.pop()  # timezone
-        time = datetime.time.fromisoformat(items.pop())
-        date = (datetime.date.today() if not items
-                else datetime.date.fromisoformat(items.pop()))
+        items = text.split()[:-1]  # last element is the timezone
+        time = datetime.datetime.strptime(items.pop(), '%H:%M').time()
+        date = (
+            datetime.date.today() if not items
+            else datetime.datetime.strptime(items.pop(), '%Y-%m-%d').date()
+        )
         return datetime.datetime.combine(date, time)
 
     def _parse_contest(self, info: 'PageInfo') -> 'Optional[KattisContest]':
@@ -99,6 +100,10 @@ class Kattis(Website):
         url = parse.urlparse(info.url)
         uid = url.path.split('/')[2]
 
+        active = info.data.find(
+            'div', {'class': 'contest-progress session-finished'}
+        ) is None
+
         return KattisContest(
             _uid=uid,
             url=parse.urljoin(info.url, f'/contests/{uid}'),
@@ -106,7 +111,7 @@ class Kattis(Website):
             name=name,
             start_time=st,
             end_time=et,
-            active=st <= datetime.datetime.now() <= et,
+            active=active,
         )
 
     def _parse_sidebar_field(self, info: 'PageInfo', field: str) -> str:
