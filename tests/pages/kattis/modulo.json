@@ -8,6 +8,7 @@
         "website": "Kattis",
         "url": "https://open.kattis.com/problems/modulo",
         "name": "Modulo",
+        "difficulty": 1.5,
         "time_limit": 1,
         "memory_limit": 1024,
         "contest": null,

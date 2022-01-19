@@ -8,6 +8,7 @@
         "website": "Kattis",
         "url": "https://open.kattis.com/problems/hello",
         "name": "Hello World!",
+        "difficulty": 1.1,
         "time_limit": 5,
         "memory_limit": 1024,
         "contest": null,

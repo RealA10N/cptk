@@ -22,6 +22,11 @@ class KattisProblem(Problem):
 
 
 @dataclass(unsafe_hash=True)
+class KattisArchiveProblem(KattisProblem):
+    difficulty: float = field(compare=True, default=None)
+
+
+@dataclass(unsafe_hash=True)
 class KattisContestProblem(KattisProblem):
     mark: str = field(compare=False, default=None)
 
@@ -104,38 +109,29 @@ class Kattis(Website):
             active=st <= datetime.datetime.now() <= et,
         )
 
-    def to_problem(self, info: 'PageInfo') -> KattisProblem:
-
+    def _parse_sidebar_field(self, info: 'PageInfo', field: str) -> str:
         sidebar = info.data.find(
             'div',
             {'class': 'problem-sidebar sidebar-info'}
         )
 
+        metadatas = sidebar.find_all('p')
+        field_soup = next(
+            soup for soup in metadatas
+            if field in soup.text
+        )
+
+        return field_soup.text.split(':')[-1].strip()
+
+    def to_problem(self, info: 'PageInfo') -> KattisProblem:
+
         title = info.data.find('div', {'class': 'headline-wrapper'}).find('h1')
         br = title.find('br')
         name = br.next_sibling.text if br else title.text
 
-        metadatas = sidebar.find_all('p')
-
-        uid_soup = next(
-            soup for soup in metadatas
-            if 'Problem ID' in soup.text
-        )
-
-        _, uid = uid_soup.text.split(':')
-
-        time_limit_soup = next(
-            soup for soup in metadatas
-            if 'CPU Time limit' in soup.text
-        )
-
-        _, time_limit = time_limit_soup.text.split(':')
-
-        memory_limit_soup = next(
-            soup for soup in metadatas
-            if 'Memory limit' in soup.text
-        )
-        _, memory_limit = memory_limit_soup.text.split(':')
+        uid = self._parse_sidebar_field(info, 'Problem ID')
+        time_limit = self._parse_sidebar_field(info, 'CPU Time limit')
+        memory_limit = self._parse_sidebar_field(info, 'Memory limit')
 
         kwargs = {
             '_uid': uid.strip(),
@@ -159,4 +155,6 @@ class Kattis(Website):
                 mark=mark.strip(),
             )
 
-        return KattisProblem(**kwargs)
+        else:
+            diff = float(self._parse_sidebar_field(info, 'Difficulty'))
+            return KattisArchiveProblem(**kwargs, difficulty=diff)
