@@ -9,12 +9,9 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from cptk.constants import DEFAULT_CLONE_PATH
-from cptk.constants import DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_DEST
-from cptk.constants import DEFAULT_TEMPLATE_FOLDER
-from cptk.constants import PROJECT_FILE
+from cptk import constants
 from cptk.core import Configuration
-from cptk.core import DEFAULT_PREPROCESS
+from cptk.core import DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_SRC
 from cptk.core import Fetcher
 from cptk.core import System
 from cptk.core.preprocessor import Preprocessor
@@ -37,8 +34,8 @@ class ProjectNotFound(cptkException):
 
 class CloneSettings(BaseModel):
     template: str
-    path: str = DEFAULT_CLONE_PATH
-    preprocess: Optional[str] = DEFAULT_PREPROCESS_DEST
+    path: str = constants.DEFAULT_CLONE_PATH
+    preprocess: Optional[str] = constants.DEFAULT_PREPROCESS
 
     def dict(self, **kwargs) -> dict:
         kwargs.update({"exclude_unset": False})
@@ -63,7 +60,7 @@ class LocalProject:
     def is_project(cls, location: str) -> bool:
         """ Returns True if the given location is the root of a valid cptk
         project. """
-        return os.path.isfile(os.path.join(location, PROJECT_FILE))
+        return os.path.isfile(os.path.join(location, constants.PROJECT_FILE))
 
     @classmethod
     def find(cls: 'Type[T]', location: str) -> 'T':
@@ -126,34 +123,34 @@ class LocalProject:
             kwargs['verbose'] = verbose
 
         if template is None:
-            template = DEFAULT_TEMPLATE_FOLDER
+            template = constants.DEFAULT_TEMPLATE_FOLDER
 
         # If the given template is actually one of the predefined template
         # names
         temp_obj = {t.uid: t for t in DEFAULT_TEMPLATES}.get(template)
         if temp_obj is not None:
-            dst = os.path.join(location, DEFAULT_TEMPLATE_FOLDER)
+            dst = os.path.join(location, constants.DEFAULT_TEMPLATE_FOLDER)
             cls._copy_template(temp_obj, dst)
-            template = DEFAULT_TEMPLATE_FOLDER
+            template = constants.DEFAULT_TEMPLATE_FOLDER
 
         # Now 'template' actually has the path to the template folder.
         # Create the template folder if it doesn't exist yet
         os.makedirs(os.path.join(location, template), exist_ok=True)
 
         # Copy default preprocess into project
-        copyfile(DEFAULT_PREPROCESS, os.path.join(
-            location, DEFAULT_PREPROCESS_DEST))
+        copyfile(DEFAULT_PREPROCESS_SRC, os.path.join(
+            location, constants.DEFAULT_PREPROCESS))
 
         # Create default clone settings
         kwargs['clone'] = CloneSettings(
             template=template,
-            preprocess=DEFAULT_PREPROCESS_DEST,
+            preprocess=constants.DEFAULT_PREPROCESS,
         )
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.
         config = ProjectConfig(**kwargs)
-        config_path = os.path.join(location, PROJECT_FILE)
+        config_path = os.path.join(location, constants.PROJECT_FILE)
         config.dump(config_path)
 
         # We have created and initialized everything that is required for a
@@ -162,7 +159,7 @@ class LocalProject:
 
     @cached_property
     def config(self) -> ProjectConfig:
-        p = os.path.join(self.location, PROJECT_FILE)
+        p = os.path.join(self.location, constants.PROJECT_FILE)
         return ProjectConfig.load(p)
 
     def load_preprocess_globals(self, problem: 'Problem') -> dict:
@@ -217,3 +214,17 @@ class LocalProject:
         Preprocessor.parse_directory(dst, globals)
 
         return LocalProblem.init(dst, problem)
+
+    @property
+    def last(self) -> Optional[str]:
+        try:
+            with open(self.relative(constants.LAST_FILE), 'r') as file:
+                return file.read()
+        except FileNotFoundError:
+            return None
+
+    @last.setter
+    def last(self, val: str) -> None:
+        path = self.relative(constants.LAST_FILE)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w') as file: file.write(val)

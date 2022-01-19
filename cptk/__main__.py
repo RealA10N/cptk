@@ -103,7 +103,7 @@ def init(location: str,
     required=True,
 )
 def show(url: str):
-    """ Show information about a specific problem or contest. """
+    """ Show information about a specific problem. """
     raise NotImplementedError  # TODO: implement cli show function
 
 
@@ -118,7 +118,16 @@ def clone(url: str):
     """ Clone a problem into a local cptk project. """
     proj = LocalProject.find(getcwd())
     prob = proj.clone_url(url)
+    proj.last = prob.location
     click.echo(prob.location)
+
+
+@cli.command('last')
+def last():
+    """ Print the location of the last problem cptk interacted with. """
+    proj = LocalProject.find(getcwd())
+    last = proj.last
+    if last: click.echo(last)
 
 
 def main():
