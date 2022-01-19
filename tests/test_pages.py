@@ -1,6 +1,7 @@
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import is_dataclass
+from datetime import datetime
 from glob import glob
 from json import load
 from os import path
@@ -98,6 +99,8 @@ class TestPages:
             elif isinstance(obj[key], Website):
                 website: Website = obj[key]
                 assert expected[key] == website.name
+            elif isinstance(obj[key], datetime):
+                assert expected[key] == obj[key].strftime('%Y-%m-%d %H:%M')
             else:
                 assert expected[key] == obj[key]
 

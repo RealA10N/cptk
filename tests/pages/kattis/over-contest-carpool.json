@@ -1,0 +1,30 @@
+{
+    "info": {
+        "url": "https://open.kattis.com/contests/vw4uz9/problems/carpool",
+        "data": "over-contest-carpool.html"
+    },
+    "expected": {
+        "_uid": "carpool",
+        "website": "Kattis",
+        "url": "https://open.kattis.com/contests/vw4uz9/problems/carpool",
+        "name": "Carpool",
+        "mark": "A",
+        "time_limit": 1,
+        "memory_limit": 1024,
+        "contest": {
+            "_uid": "vw4uz9",
+            "name": "testt",
+            "website": "Kattis",
+            "url": "https://open.kattis.com/contests/vw4uz9",
+            "active": false,
+            "start_time": "2022-01-12 07:20",
+            "end_time": "2022-01-12 09:00"
+        },
+        "tests": [
+            {
+                "input": "1 2\n0 1 15\n1 2 10\n",
+                "expected": "30\n"
+            }
+        ]
+    }
+}

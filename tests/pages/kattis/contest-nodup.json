@@ -1,0 +1,38 @@
+{
+    "info": {
+        "url": "https://open.kattis.com/contests/n6yhcd/problems/nodup",
+        "data": "contest-nodup.html"
+    },
+    "expected": {
+        "_uid": "nodup",
+        "website": "Kattis",
+        "url": "https://open.kattis.com/contests/n6yhcd/problems/nodup",
+        "name": "No Duplicates",
+        "mark": "A",
+        "time_limit": 1,
+        "memory_limit": 1024,
+        "contest": {
+            "_uid": "n6yhcd",
+            "name": "UKSPC22 Additional Practice",
+            "website": "Kattis",
+            "url": "https://open.kattis.com/contests/n6yhcd",
+            "active": true,
+            "start_time": "2022-01-13 19:00",
+            "end_time": "2022-01-19 19:00"
+        },
+        "tests": [
+            {
+                "input": "THE RAIN IN SPAIN\n",
+                "expected": "yes\n"
+            },
+            {
+                "input": "IN THE RAIN AND THE SNOW\n",
+                "expected": "no\n"
+            },
+            {
+                "input": "THE RAIN IN SPAIN IN THE PLAIN\n",
+                "expected": "no\n"
+            }
+        ]
+    }
+}
