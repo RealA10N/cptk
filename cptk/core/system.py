@@ -73,7 +73,9 @@ class System:
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
 
-        msg = cls._expection_to_msg(error)
+        title = type(error).__name__
+        desc = cls._expection_to_msg(error)
+        msg = title if not desc else f'{title}: {desc}'
         echo(cls.ERROR(' UNEXPECTED ERROR ') + ' ' + msg)
 
         tb = error.__traceback__
