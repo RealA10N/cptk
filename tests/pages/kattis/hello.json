@@ -1,0 +1,16 @@
+{
+    "info": {
+        "url": "https://open.kattis.com/problems/hello",
+        "data": "hello.html"
+    },
+    "expected": {
+        "_uid": "hello",
+        "website": "Kattis",
+        "url": "https://open.kattis.com/problems/hello",
+        "name": "Hello World!",
+        "time_limit": 5,
+        "memory_limit": 1024,
+        "contest": null,
+        "tests": []
+    }
+}
