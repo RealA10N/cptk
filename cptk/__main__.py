@@ -28,7 +28,7 @@ class CatchAllExceptions(click.Group):
             System.error(err)
             sys.exit(2)
 
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception as err:
             System.unexpected_error(err)
             sys.exit(3)
 

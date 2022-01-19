@@ -77,7 +77,6 @@ class Configuration(BaseModel):
             raise ConfigFileNotFound(path)
 
         except YAMLError as err:
-            # pylint: disable=no-member
             mark = err.problem_mark
             pos = (mark.line + 1, mark.column + 1)
             raise ConfigFileParsingError(path, err.problem, pos)

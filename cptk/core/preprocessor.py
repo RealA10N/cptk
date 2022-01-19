@@ -7,9 +7,6 @@ from typing import Tuple
 from cptk.constants import PREPROCESSOR_INVALID
 from cptk.constants import PREPROCESSOR_PATTERN
 
-# for readability, we redefine the global 'globals' variable
-# pylint: disable=redefined-builtin
-
 HERE = os.path.dirname(__file__)
 DEFAULTS = os.path.join(HERE, '..', 'defaults')
 DEFAULT_PREPROCESS = os.path.join(DEFAULTS, 'preprocess', 'preprocess.py')
@@ -21,8 +18,8 @@ class Preprocessor:
     def _replace_match(cls, match: Match, globals: dict) -> str:
         code = match.group(1).strip()
         try:
-            return eval(code, globals)  # pylint: disable=eval-used
-        except Exception:  # pylint: disable=broad-except
+            return eval(code, globals)
+        except Exception:
             return PREPROCESSOR_INVALID
 
     @classmethod
@@ -83,8 +80,8 @@ class Preprocessor:
             code = file.read()
 
         try:
-            exec(code, globals)  # pylint: disable=exec-used
-        except Exception:  # pylint: disable=broad-except
+            exec(code, globals)
+        except Exception:
             pass  # TODO: print a warning
 
         if '__all__' in globals:
