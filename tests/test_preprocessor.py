@@ -39,8 +39,6 @@ class TestPreprocessor:
         path = tempdir.create(inp, 'file.txt')
         Preprocessor.parse_file_contents(path, data)
 
-        print(path)
-
         with open(path, 'r', encoding='utf8') as file:
             res = file.read()
 
