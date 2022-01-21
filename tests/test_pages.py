@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 from bs4 import BeautifulSoup
+from dateutil.parser import parse as parse_date
+from freezegun import freeze_time
 
 from cptk.scrape import Website
 if TYPE_CHECKING:
@@ -36,6 +38,7 @@ PAGES_BASEPATH = path.join(HERE, "pages")
 @dataclass
 class PageTestCase:
     website: 'Website'
+    time: datetime
     info: PageInfo
     expected: dict
     configfile: str
@@ -65,9 +68,15 @@ def cases_generator() -> 'Iterator[PageTestCase]':
                 BeautifulSoup(data, 'lxml'),
             )
 
+            timestr = case['info'].get('time')
+            time = parse_date(timestr) if timestr else None
+
             yield PageTestCase(
-                website=website_ins, info=info,
-                expected=case['expected'], configfile=case_config
+                website=website_ins,
+                time=time,
+                info=info,
+                expected=case['expected'],
+                configfile=case_config,
             )
 
 
@@ -83,10 +92,16 @@ class TestPages:
         ),
     )
     def test_to_problem(self, case: PageTestCase):
-        self._compare(
-            asdict(case.website.to_problem(case.info)),
-            case.expected
-        )
+        def do():
+            self._compare(
+                asdict(case.website.to_problem(case.info)),
+                case.expected
+            )
+
+        if case.time is not None:
+            with freeze_time(case.time): do()
+        else:
+            do()
 
     @classmethod
     def _compare(cls, obj: dict, expected: dict):
@@ -100,7 +115,7 @@ class TestPages:
                 website: Website = obj[key]
                 assert expected[key] == website.name
             elif isinstance(obj[key], datetime):
-                assert expected[key] == obj[key].strftime('%Y-%m-%d %H:%M')
+                assert parse_date(expected[key]) == obj[key]
             else:
                 assert expected[key] == obj[key]
 

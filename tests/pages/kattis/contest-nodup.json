@@ -1,7 +1,8 @@
 {
     "info": {
         "url": "https://open.kattis.com/contests/n6yhcd/problems/nodup",
-        "data": "contest-nodup.html"
+        "data": "contest-nodup.html",
+        "time": "2022-01-19 15:00"
     },
     "expected": {
         "_uid": "nodup",
