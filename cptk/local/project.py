@@ -14,6 +14,7 @@ from cptk.core import Configuration
 from cptk.core import DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_SRC
 from cptk.core import Fetcher
 from cptk.core import System
+from cptk.core.config import ConfigFileParsingError
 from cptk.core.preprocessor import Preprocessor
 from cptk.local.problem import LocalProblem
 from cptk.templates import DEFAULT_TEMPLATES
@@ -162,7 +163,7 @@ class LocalProject:
         p = os.path.join(self.location, constants.PROJECT_FILE)
         return ProjectConfig.load(p)
 
-    def load_preprocess_globals(self, problem: 'Problem') -> dict:
+    def _load_preprocess_globals(self, problem: 'Problem') -> dict:
         """ Executes the project's preprocessor and returns the avaliable
         globals dictionary. """
 
@@ -173,6 +174,35 @@ class LocalProject:
             globals.update(Preprocessor.load_file(preprocess, globals))
 
         return globals
+
+    def _load_moves(self) -> dict:
+        """ Loads information from the local moves file and returns the
+        replacements directory. """
+
+        moves_path = self.relative(constants.MOVE_FILE)
+
+        try:
+            with open(moves_path, 'r') as file:
+                lines = file.read().splitlines(keepends=False)
+        except FileNotFoundError:
+            return dict()
+
+        moves = dict()
+        for lineno, line in enumerate(lines, start=1):
+            parts = line.split(constants.MOVE_FILE_SEPERATOR)
+
+            if len(parts) == 2:
+                moves[parts[0]] = parts[1]
+
+            else:
+                raise ConfigFileParsingError(
+                    path=moves_path,
+                    error=f'Seperator {constants.MOVE_FILE_SEPERATOR!r}'
+                    ' not found',
+                    position=(lineno, 0),
+                )
+
+        return moves
 
     def relative(self, path: str) -> str:
         """ If the given path is not absolute, returns the absolute path relative
@@ -194,7 +224,7 @@ class LocalProject:
         """ Clones the given problem instance and stores a local problem inside
         the current cptk project. """
 
-        globals = self.load_preprocess_globals(problem)
+        globals = self._load_preprocess_globals(problem)
 
         src = self.relative(self.config.clone.template)
         dst = self.relative(Preprocessor.parse_string(
