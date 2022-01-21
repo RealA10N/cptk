@@ -23,7 +23,7 @@ setup(
     author="Alon Krymgand Osovsky",
     author_email="downtown2u@gmail.com",
 
-    packages=find_packages('cptk'),
+    packages=find_packages(include=['cptk*']),
     package_dir={'cptk': 'cptk'},
     package_data={'cptk': ['defaults/*']},
 
