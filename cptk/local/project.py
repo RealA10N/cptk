@@ -1,9 +1,13 @@
 import os
+import shutil
 from dataclasses import dataclass
 from dataclasses import field
 from shutil import copytree
 from shutil import rmtree
+from glob import iglob
+from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -12,6 +16,7 @@ from cptk import constants
 from cptk.core import Configuration
 from cptk.core import Fetcher
 from cptk.core import System
+from cptk.core.config import ConfigFileParsingError
 from cptk.core.preprocessor import Preprocessor
 from cptk.local.problem import LocalProblem
 from cptk.templates import DEFAULT_TEMPLATES
@@ -28,6 +33,22 @@ if TYPE_CHECKING:
 class ProjectNotFound(cptkException):
     def __init__(self) -> None:
         super().__init__("Couldn't find a cptk project recursively")
+
+
+class InvalidMovePath(cptkException):
+    def __init__(self, path: str, msg: str) -> None:
+        self.path = path
+        super().__init__(msg)
+
+
+class InvalidMoveSource(InvalidMovePath):
+    def __init__(self, path: str) -> None:
+        super().__init__(path, f"Can't move {path!r}")
+
+
+class InvalidMoveDest(InvalidMovePath):
+    def __init__(self, path: str) -> None:
+        super().__init__(path, f"Can't move to {path!r}")
 
 
 class CloneSettings(BaseModel):
@@ -79,8 +100,8 @@ class LocalProject:
         """ Copies the given template to the destination path. """
 
         if os.path.exists(dst):
-            rmtree(dst)
-        copytree(src=template.path, dst=dst)
+            shutil.rmtree(dst)
+        shutil.copytree(src=template.path, dst=dst)
 
     @staticmethod
     def _init_git(location: str) -> None:
@@ -155,6 +176,64 @@ class LocalProject:
         p = os.path.join(self.location, constants.PROJECT_FILE)
         return ProjectConfig.load(p)
 
+    def _load_moves(self) -> List[Tuple[str, str]]:
+        """ Loads information from the local moves file and returns the
+        replacements directory. """
+
+        moves_path = self.relative(constants.MOVE_FILE)
+
+        try:
+            with open(moves_path, 'r') as file:
+                lines = file.read().splitlines(keepends=False)
+        except FileNotFoundError:
+            return list()
+
+        moves = list()
+        for lineno, line in enumerate(lines, start=1):
+            parts = line.split(constants.MOVE_FILE_SEPERATOR)
+
+            if len(parts) == 2:
+                moves.append((parts[0], parts[1],))
+
+            else:
+                raise ConfigFileParsingError(
+                    path=moves_path,
+                    error=f'Seperator {constants.MOVE_FILE_SEPERATOR!r}'
+                    ' not found',
+                    position=(lineno, 0),
+                )
+
+        return moves
+
+    @staticmethod
+    def _is_subpath(parent: str, sub: str) -> bool:
+        parent = os.path.abspath(parent)
+        sub = os.path.abspath(sub)
+        return os.path.commonpath([parent, sub]) == parent
+
+    def _single_move(self, path: str, src: str, dst: str) -> str:
+        """ If the given path shares a prefix with the move source, updates
+        the path with by replacing the prefix with the destination prefix
+        accordingly. If a prefix isn't shared, returns the original path
+        without modifications. """
+
+        if not self._is_subpath(src, path): return path
+        rel = os.path.relpath(path, src)
+        return os.path.normpath(os.path.join(dst, rel))
+
+    def move_relative(self, path: str) -> str:
+        """ Applies all registered move transformations to the given path, and
+        returns the new path, as an abs path. """
+
+        path = self.relative(path)
+        for src, dst in self._load_moves():
+            path = self._single_move(
+                path,
+                self.relative(src),
+                self.relative(dst),
+            )
+        return path
+
     def relative(self, path: str) -> str:
         """ If the given path is not absolute, returns the absolute path relative
         to the project location. """
@@ -188,7 +267,7 @@ class LocalProject:
             )
 
             if not ans: System.abort()
-            rmtree(dst)
+            shutil.rmtree(dst)
 
         copytree(src, dst)
         processor.parse_directory(dst)
@@ -210,3 +289,47 @@ class LocalProject:
         path = self.relative(constants.LAST_FILE)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as file: file.write(val)
+
+    def move(self, src: str, dst: str) -> None:
+        """ Validates that the given source and destination directories are
+        can be moved, and if so, moves source to destination and record the
+        move. After the move, new problem that share a prefix with the source
+        will be created in the given destination with the matching suffix. """
+
+        # normalize paths to their unique absolute representation
+        src = os.path.normpath(self.relative(src))
+        dst = os.path.normpath(self.relative(dst))
+
+        if not self._is_subpath(self.location, src) or not os.path.isdir(src):
+            raise InvalidMoveSource(src)
+
+        if not self._is_subpath(self.location, dst):
+            raise InvalidMoveDest(dst)
+
+        for pat in constants.MOVE_SAFES:
+            # This is an ugly solution. I have tries to use fnmatch but
+            # it has some strange behavior and doesn't match directories
+            # if their name doesn't end with an '/'. I should rewrite this
+            # piece of code, but as long as it works and preforms ok-ish,
+            # I'm fine with it. (:
+
+            matches = (
+                os.path.normpath(g)
+                for g in iglob(self.relative(pat), recursive=True)
+            )
+            if os.path.normpath(src) in matches:
+                raise InvalidMoveSource(src)
+
+        shutil.move(src, dst)
+        self._register_move(src, dst)
+
+    def _register_move(self, src: str, dst: str) -> None:
+        """ Registers the given (src, dst) pair as a project move. It is then
+        used by the 'move_relative' method to parse and generate the moved
+        paths. """
+
+        src = os.path.relpath(src, self.location)
+        dst = os.path.relpath(dst, self.location)
+
+        with open(self.relative(constants.MOVE_FILE), 'a') as file:
+            file.write(f'{src}{constants.MOVE_FILE_SEPERATOR}{dst}\n')

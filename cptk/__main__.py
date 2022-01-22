@@ -1,5 +1,5 @@
+import os
 import sys
-from os import getcwd
 from typing import Optional
 
 import click
@@ -14,6 +14,10 @@ from cptk.utils import valid_url
 
 class CatchAllExceptions(click.Group):
 
+    EX_OK = 0
+    EX_DATAERR = 65
+    EX_SOFTWARE = 70
+
     def __call__(self, *args, **kwargs):
         """ The main function safely executes the click cli command group.
         If any errors are thrown, they will be converted into system messages
@@ -26,14 +30,14 @@ class CatchAllExceptions(click.Group):
 
         except cptkException as err:
             System.error(err)
-            sys.exit(2)
+            sys.exit(self.EX_DATAERR)
 
         except Exception as err:
             System.unexpected_error(err)
-            sys.exit(3)
+            sys.exit(self.EX_SOFTWARE)
 
         else:
-            sys.exit(0)
+            sys.exit(self.EX_OK)
 
 
 @click.group(cls=CatchAllExceptions)
@@ -45,7 +49,7 @@ class CatchAllExceptions(click.Group):
 def cli(verbose: bool = None):
     if verbose is None:
         try:
-            verbose = LocalProject.find(getcwd()).config.verbose
+            verbose = LocalProject.find(os.getcwd()).config.verbose
         except ProjectNotFound:
             pass
 
@@ -116,7 +120,7 @@ def show(url: str):
 )
 def clone(url: str):
     """ Clone a problem into a local cptk project. """
-    proj = LocalProject.find(getcwd())
+    proj = LocalProject.find(os.getcwd())
     prob = proj.clone_url(url)
     proj.last = prob.location
     click.echo(prob.location)
@@ -125,9 +129,30 @@ def clone(url: str):
 @cli.command('last')
 def last():
     """ Print the location of the last problem cptk interacted with. """
-    proj = LocalProject.find(getcwd())
+    proj = LocalProject.find(os.getcwd())
     last = proj.last
     if last: click.echo(last)
+
+
+@cli.command('move')
+@click.argument(
+    'src',
+    type=click.Path(
+        exists=True, file_okay=False, dir_okay=True,
+        writable=True, readable=True, resolve_path=True,
+    ),
+)
+@click.argument(
+    'dst',
+    type=click.Path(
+        file_okay=False, dir_okay=True,
+        writable=True, readable=True, resolve_path=True,
+    ),
+)
+def move(src: str, dst: str):
+    """ Moves a cloned problem to a new location. """
+    proj = LocalProject.find(os.getcwd())
+    proj.move(src, dst)
 
 
 def main():
