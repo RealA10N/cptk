@@ -53,7 +53,7 @@ class TestMove:
 
         MOVES = [
             ('clone', 'yes'),
-            ('yes', 'hello/there'),
+            ('yes', os.path.join('hello', 'there')),
         ]
 
         for src, dst in MOVES:
