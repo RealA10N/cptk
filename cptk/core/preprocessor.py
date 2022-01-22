@@ -18,7 +18,11 @@ class Preprocessor:
         self._env.globals['now'] = datetime.now()
 
     def parse_string(self, string: str) -> str:
-        return self._env.from_string(string).render()
+        try:
+            return self._env.from_string(string).render()
+        except Exception:
+            # TODO: add warning
+            return str()
 
     def parse_file_contents(self, path: str) -> None:
         with open(path, 'r', encoding='utf8') as file:
