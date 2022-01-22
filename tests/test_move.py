@@ -62,7 +62,8 @@ class TestMove:
             proj.move(src, dst)
 
         assert proj._load_moves() == MOVES
-        assert proj.move_relative('clone') == proj.relative('hello/there')
+        assert os.path.normpath(proj.move_relative(
+            'clone')) == os.path.normpath(proj.relative('hello/there'))
 
     def test_move_outside_project(
         self,
