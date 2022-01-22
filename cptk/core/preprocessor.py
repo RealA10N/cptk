@@ -1,94 +1,41 @@
 import os
-import re
-from copy import copy
-from typing import Match
-from typing import Tuple
+from datetime import datetime
+from typing import TYPE_CHECKING
 
-from cptk.constants import PREPROCESSOR_INVALID
-from cptk.constants import PREPROCESSOR_PATTERN
-
-HERE = os.path.dirname(__file__)
-DEFAULTS = os.path.join(HERE, '..', 'defaults')
-DEFAULT_PREPROCESS = os.path.join(DEFAULTS, 'preprocess', 'preprocess.py')
+import jinja2
+from slugify import slugify
+if TYPE_CHECKING:
+    from cptk.scrape import Problem
 
 
 class Preprocessor:
 
-    @classmethod
-    def _replace_match(cls, match: Match, globals: dict) -> str:
-        code = match.group(1).strip()
-        try:
-            return eval(code, globals)
-        except Exception:
-            return PREPROCESSOR_INVALID
+    def __init__(self, problem: 'Problem') -> None:
+        self._env = jinja2.Environment()
+        self._env.globals['problem'] = problem
+        self._env.filters['slug'] = slugify
+        self._env.globals['user'] = os.getlogin()
+        self._env.globals['now'] = datetime.now()
 
-    @classmethod
-    def _parse_count_string(
-        cls,
-        string: str,
-        globals: dict,
-    ) -> Tuple[str, int]:
-        """ Parses the string and in addition returns the number of replacements
-        it has preformed. """
-        return re.subn(
-            PREPROCESSOR_PATTERN,
-            string=string,
-            repl=lambda m: cls._replace_match(m, globals),
-        )
+    def parse_string(self, string: str) -> str:
+        return self._env.from_string(string).render()
 
-    @classmethod
-    def parse_string(cls, string: str, globals: dict) -> str:
-        return cls._parse_count_string(string, globals)[0]
-
-    @classmethod
-    def parse_file_contents(cls, path: str, globals: dict) -> None:
+    def parse_file_contents(self, path: str) -> None:
         with open(path, 'r', encoding='utf8') as file:
             data = file.read()
 
-        new, count = cls._parse_count_string(data, globals)
+        new = self.parse_string(data)
+        with open(path, 'w', encoding='utf8') as file:
+            file.write(new)
 
-        if count > 0:
-            with open(path, 'w', encoding='utf8') as file:
-                file.write(new)
-
-    @classmethod
-    def parse_directory(cls, path: str, globals: dict) -> None:
+    def parse_directory(self, path: str) -> None:
         for item in os.listdir(path):
             old = os.path.join(path, item)
-            new = os.path.join(path, cls.parse_string(item, globals))
+            new = os.path.join(path, self.parse_string(item))
             os.rename(src=old, dst=new)
 
             if os.path.isdir(new):
-                cls.parse_directory(new, globals)
+                self.parse_directory(new)
 
             elif os.path.isfile(new):
-                cls.parse_file_contents(new, globals)
-
-    @classmethod
-    def load_file(cls, path: str, globals: dict = None) -> dict:
-        """ Recives a path to a Python file, excutes it and returns its globals.
-        If globals are given, the file is executed with the given globals
-        pre-defined. If the given file contains a '__all__' list, only objects
-        from the list will be returned. """
-
-        if globals is None:
-            globals = dict()
-
-        globals = copy(globals)
-
-        with open(path, 'r', encoding='utf8') as file:
-            code = file.read()
-
-        try:
-            exec(code, globals)
-        except Exception:
-            pass  # TODO: print a warning
-
-        if '__all__' in globals:
-            return {
-                name: g
-                for name, g in globals.items()
-                if name in globals['__all__']
-            }
-
-        return globals
+                self.parse_file_contents(new)

@@ -1,5 +1,4 @@
 import os
-from textwrap import dedent
 from typing import TYPE_CHECKING
 
 from slugify import slugify
@@ -43,21 +42,13 @@ class TestProblemClone:
         problem = dummy.get_dummy_problem()
 
         proj = LocalProject.init(tempdir.path, template='g++')
-        proj.config.clone.preprocess = tempdir.create(
-            dedent(
-                """
-                from slugify import slugify
-                name = slugify(problem.name)
-                __all__ = ['name']
-                """
-            ),
-            'preprocess.py'
-        )
-
-        proj.config.clone.path = '${{problem.website.name}}/${{problem.name}}'
+        proj.config.clone.path = '{{problem.website.name}}/{{problem.name}}'
 
         proj.config.clone.template = tempdir.join('template')
-        tempdir.create('${{name}}\n${{problem.name}}', 'template', 'temp.txt')
+        tempdir.create(
+            '{{problem.website.name|slug}}\n{{problem.name}}',
+            'template', 'temp.txt',
+        )
 
         prob = proj.clone_problem(problem)
 
@@ -68,4 +59,4 @@ class TestProblemClone:
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)
         with open(res, 'r') as file: data = file.read()
-        assert data == f'{slugify(problem.name)}\n{problem.name}'
+        assert data == f'{slugify(problem.website.name)}\n{problem.name}'
