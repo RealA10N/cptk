@@ -14,8 +14,12 @@ class Preprocessor:
         self._env = jinja2.Environment()
         self._env.globals['problem'] = problem
         self._env.filters['slug'] = slugify
-        self._env.globals['user'] = os.getlogin()
         self._env.globals['now'] = datetime.now()
+
+        try:
+            self._env.globals['user'] = os.getlogin()
+        except OSError:
+            pass  # Some machines (and CI dockers) doesn't provide a login.
 
     def parse_string(self, string: str) -> str:
         try:
