@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from glob import iglob
 from shutil import copytree
-from shutil import rmtree
 from typing import List
 from typing import Optional
 from typing import Tuple
