@@ -38,7 +38,7 @@ class TestPerformance:
         tempdir: 'EasyDirectory',
         dummy: 'Dummy',
     ) -> None:
-        with time_limit(0.5):
+        with time_limit(1):
             proj = LocalProject.init(tempdir.path)
             proj.config.clone.path = 'clone0/${{problem.name}}'
 
