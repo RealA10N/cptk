@@ -130,6 +130,27 @@ def last():
     if last: click.echo(last)
 
 
+@cli.command('move')
+@click.argument(
+    'src',
+    type=click.Path(
+        exists=True, file_okay=False, dir_okay=True,
+        writable=True, readable=True, resolve_path=True,
+    ),
+)
+@click.argument(
+    'dst',
+    type=click.Path(
+        file_okay=False, dir_okay=True,
+        writable=True, readable=True, resolve_path=True,
+    ),
+)
+def move(src: str, dst: str):
+    """ Moves a cloned problem to a new location. """
+    proj = LocalProject.find(getcwd())
+    proj.move(src, dst)
+
+
 def main():
     cli()
 
