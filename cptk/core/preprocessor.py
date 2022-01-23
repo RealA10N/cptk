@@ -1,94 +1,120 @@
 import os
-import re
-from copy import copy
-from typing import Match
-from typing import Tuple
+from abc import ABC
+from abc import abstractmethod
+from datetime import datetime
+from typing import TYPE_CHECKING
 
-from cptk.constants import PREPROCESSOR_INVALID
-from cptk.constants import PREPROCESSOR_PATTERN
+import jinja2
+from slugify import slugify
 
-HERE = os.path.dirname(__file__)
-DEFAULTS = os.path.join(HERE, '..', 'defaults')
-DEFAULT_PREPROCESS = os.path.join(DEFAULTS, 'preprocess', 'preprocess.py')
+if TYPE_CHECKING:
+    from cptk.scrape import Problem
+    from typing import Type, TypeVar
+    T = TypeVar('T')
+
+from cptk.utils import cptkException
+
+
+class PreprocessError(cptkException, ABC):
+
+    def __init__(self, error: Exception) -> None:
+        self.jinja_error = error
+        super().__init__(self._generate_error_message())
+
+    @abstractmethod
+    def _generate_error_message(self,) -> str:
+        pass
+
+
+class PreprocessStringError(PreprocessError):
+    def _generate_error_message(self) -> str:
+        return ', '.join(self.jinja_error.args)
+
+
+class PreprocessFileError(PreprocessError):
+    def __init__(self, error: Exception, path: str) -> None:
+        self.path = path
+        super().__init__(error)
+
+    def _generate_error_message(self) -> str:
+        return f'In {self.path}: ' + ', '.join(self.jinja_error.args)
+
+    @classmethod
+    def from_string_err(
+        cls: 'Type[T]',
+        path: str,
+        err: PreprocessStringError,
+    ) -> 'T':
+        return cls(err.jinja_error, path)
+
+
+class PreprocessNameError(PreprocessError):
+    def __init__(self, error: Exception, name: str) -> None:
+        self.name = name
+        super().__init__(error)
+
+    def _generate_error_message(self) -> str:
+        return f'In {self.name}: ' + ', '.join(self.jinja_error.args)
+
+    @classmethod
+    def from_string_err(
+        cls: 'Type[T]',
+        name: str,
+        err: PreprocessStringError,
+    ) -> 'T':
+        return cls(err.jinja_error, name)
 
 
 class Preprocessor:
 
-    @classmethod
-    def _replace_match(cls, match: Match, globals: dict) -> str:
-        code = match.group(1).strip()
+    def __init__(self, problem: 'Problem') -> None:
+        self._env = jinja2.Environment(undefined=jinja2.StrictUndefined)
+        self._env.globals.update({
+            'problem': problem,
+            'now': datetime.now(),
+            'slug': slugify,
+        })
+
+        # Slug is a global to allow the "slug(...)" syntax,
+        # and a filter to allow the "... | slug" syntax.
+        self._env.filters['slug'] = slugify
+
         try:
-            return eval(code, globals)
-        except Exception:
-            return PREPROCESSOR_INVALID
+            self._env.globals['user'] = os.getlogin()
+        except OSError:
+            pass  # Some machines (and CI dockers) doesn't provide a login.
 
-    @classmethod
-    def _parse_count_string(
-        cls,
-        string: str,
-        globals: dict,
-    ) -> Tuple[str, int]:
-        """ Parses the string and in addition returns the number of replacements
-        it has preformed. """
-        return re.subn(
-            PREPROCESSOR_PATTERN,
-            string=string,
-            repl=lambda m: cls._replace_match(m, globals),
-        )
+    def parse_string(self, string: str) -> str:
+        try:
+            return self._env.from_string(string).render()
+        except Exception as err:
+            raise PreprocessStringError(err)
 
-    @classmethod
-    def parse_string(cls, string: str, globals: dict) -> str:
-        return cls._parse_count_string(string, globals)[0]
-
-    @classmethod
-    def parse_file_contents(cls, path: str, globals: dict) -> None:
+    def parse_file_contents(self, path: str) -> None:
         with open(path, 'r', encoding='utf8') as file:
             data = file.read()
 
-        new, count = cls._parse_count_string(data, globals)
+        try:
+            new = self.parse_string(data)
+        except PreprocessStringError as err:
+            raise PreprocessFileError.from_string_err(path, err)
 
-        if count > 0:
-            with open(path, 'w', encoding='utf8') as file:
-                file.write(new)
+        with open(path, 'w', encoding='utf8') as file:
+            file.write(new)
 
-    @classmethod
-    def parse_directory(cls, path: str, globals: dict) -> None:
+    def parse_directory(self, path: str) -> None:
         for item in os.listdir(path):
             old = os.path.join(path, item)
-            new = os.path.join(path, cls.parse_string(item, globals))
+
+            try:
+                new = os.path.join(path, self.parse_string(item))
+            except PreprocessStringError as err:
+                raise PreprocessNameError.from_string_err(old, err)
+
             os.rename(src=old, dst=new)
 
             if os.path.isdir(new):
-                cls.parse_directory(new, globals)
+                self.parse_directory(new)
 
             elif os.path.isfile(new):
-                cls.parse_file_contents(new, globals)
-
-    @classmethod
-    def load_file(cls, path: str, globals: dict = None) -> dict:
-        """ Recives a path to a Python file, excutes it and returns its globals.
-        If globals are given, the file is executed with the given globals
-        pre-defined. If the given file contains a '__all__' list, only objects
-        from the list will be returned. """
-
-        if globals is None:
-            globals = dict()
-
-        globals = copy(globals)
-
-        with open(path, 'r', encoding='utf8') as file:
-            code = file.read()
-
-        try:
-            exec(code, globals)
-        except Exception:
-            pass  # TODO: print a warning
-
-        if '__all__' in globals:
-            return {
-                name: g
-                for name, g in globals.items()
-                if name in globals['__all__']
-            }
-
-        return globals
+                self.parse_file_contents(new)

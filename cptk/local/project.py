@@ -3,6 +3,7 @@ import shutil
 from dataclasses import dataclass
 from dataclasses import field
 from glob import iglob
+from shutil import copytree
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -12,7 +13,6 @@ from pydantic import BaseModel
 
 from cptk import constants
 from cptk.core import Configuration
-from cptk.core import DEFAULT_PREPROCESS as DEFAULT_PREPROCESS_SRC
 from cptk.core import Fetcher
 from cptk.core import System
 from cptk.core.config import ConfigFileParsingError
@@ -53,7 +53,6 @@ class InvalidMoveDest(InvalidMovePath):
 class CloneSettings(BaseModel):
     template: str
     path: str = constants.DEFAULT_CLONE_PATH
-    preprocess: Optional[str] = constants.DEFAULT_PREPROCESS
 
     def dict(self, **kwargs) -> dict:
         kwargs.update({"exclude_unset": False})
@@ -155,10 +154,6 @@ class LocalProject:
         # Create the template folder if it doesn't exist yet
         os.makedirs(os.path.join(location, template), exist_ok=True)
 
-        # Copy default preprocess into project
-        shutil.copyfile(DEFAULT_PREPROCESS_SRC, os.path.join(
-            location, constants.DEFAULT_PREPROCESS))
-
         # Create default clone settings
         kwargs['clone'] = CloneSettings(
             template=template,
@@ -179,18 +174,6 @@ class LocalProject:
     def config(self) -> ProjectConfig:
         p = os.path.join(self.location, constants.PROJECT_FILE)
         return ProjectConfig.load(p)
-
-    def _load_preprocess_globals(self, problem: 'Problem') -> dict:
-        """ Executes the project's preprocessor and returns the avaliable
-        globals dictionary. """
-
-        globals = {'problem': problem}
-        preprocess = self.relative(self.config.clone.preprocess)
-
-        if preprocess is not None:
-            globals.update(Preprocessor.load_file(preprocess, globals))
-
-        return globals
 
     def _load_moves(self) -> List[Tuple[str, str]]:
         """ Loads information from the local moves file and returns the
@@ -270,11 +253,10 @@ class LocalProject:
         """ Clones the given problem instance and stores a local problem inside
         the current cptk project. """
 
-        globals = self._load_preprocess_globals(problem)
+        processor = Preprocessor(problem)
 
         src = self.relative(self.config.clone.template)
-        dst = self.move_relative(Preprocessor.parse_string(
-            self.config.clone.path, globals))
+        dst = self.relative(processor.parse_string(self.config.clone.path))
 
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
@@ -286,8 +268,8 @@ class LocalProject:
             if not ans: System.abort()
             shutil.rmtree(dst)
 
-        shutil.copytree(src, dst)
-        Preprocessor.parse_directory(dst, globals)
+        copytree(src, dst)
+        processor.parse_directory(dst)
 
         locprob = LocalProblem.init(dst, problem)
         self.last = locprob.location

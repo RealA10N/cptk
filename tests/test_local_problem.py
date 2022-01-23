@@ -1,18 +1,33 @@
 import os
-from textwrap import dedent
 from typing import TYPE_CHECKING
-
-from slugify import slugify
-
-import cptk.scrape
-from cptk.constants import DEFAULT_TESTS_FOLDER
-from cptk.local import LocalProject
-from cptk.local.problem import LocalProblem
+from unittest import mock
 
 if TYPE_CHECKING:
     from .utils import EasyDirectory, Dummy
 
+import pytest
+from slugify import slugify
+from freezegun import freeze_time
+from filecmp import dircmp
 
+import cptk.scrape
+from cptk.constants import DEFAULT_TESTS_FOLDER
+from cptk.local import LocalProject
+from cptk.local import LocalProblem
+from cptk.templates import DEFAULT_TEMPLATES
+from cptk.templates import Template
+
+
+HERE = os.path.dirname(__file__)
+CLONES_DIR = os.path.join(HERE, 'clones')
+EXPECTED_CLONES = {
+    name: os.path.join(CLONES_DIR, name)
+    for name in os.listdir(CLONES_DIR)
+}
+
+
+@mock.patch('os.getlogin', lambda: 'User')
+@freeze_time('2022-01-01')
 class TestProblemClone:
 
     def test_add_custom_test(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
@@ -43,21 +58,13 @@ class TestProblemClone:
         problem = dummy.get_dummy_problem()
 
         proj = LocalProject.init(tempdir.path, template='g++')
-        proj.config.clone.preprocess = tempdir.create(
-            dedent(
-                """
-                from slugify import slugify
-                name = slugify(problem.name)
-                __all__ = ['name']
-                """
-            ),
-            'preprocess.py'
-        )
-
-        proj.config.clone.path = '${{problem.website.name}}/${{problem.name}}'
+        proj.config.clone.path = '{{problem.website.name}}/{{problem.name}}'
 
         proj.config.clone.template = tempdir.join('template')
-        tempdir.create('${{name}}\n${{problem.name}}', 'template', 'temp.txt')
+        tempdir.create(
+            '{{problem.website.name|slug}}\n{{problem.name}}',
+            'template', 'temp.txt',
+        )
 
         prob = proj.clone_problem(problem)
 
@@ -68,4 +75,26 @@ class TestProblemClone:
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)
         with open(res, 'r') as file: data = file.read()
-        assert data == f'{slugify(problem.name)}\n{problem.name}'
+        assert data == f'{slugify(problem.website.name)}\n{problem.name}'
+
+    @classmethod
+    def _assert_equal_dirs(cls, src: str, dst: str) -> None:
+        res = dircmp(src, dst)
+        assert not res.left_only and not res.right_only and not res.diff_files
+        for common in res.common_dirs:
+            cls._assert_equal_dirs(os.path.join(
+                src, common), os.path.join(dst, common))
+
+    @pytest.mark.parametrize('template', DEFAULT_TEMPLATES)
+    def test_default_templates(
+        self,
+        tempdir: 'EasyDirectory',
+        template: 'Template',
+        dummy: 'Dummy',
+    ):
+        name = template.uid
+        expected = EXPECTED_CLONES[name]
+        proj = LocalProject.init(tempdir.path, template=name)
+        proj.config.clone.path = 'clone'
+        proj.clone_problem(dummy.get_dummy_problem())
+        self._assert_equal_dirs(tempdir.join('clone'), expected)

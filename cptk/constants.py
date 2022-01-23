@@ -15,12 +15,13 @@ TEST_INPUT_FILE_STRUCTURE = 'in{name}.txt'
 TEST_OUTPUT_FILE_STRUCTURE = 'out{name}.txt'
 TEST_SAMPLE_NAME_STRUCTURE = r'{num:02}'
 
-PREPROCESSOR_PATTERN = r'\${{([^}]*)}}'
-PREPROCESSOR_INVALID = '?'
 DEFAULT_PREPROCESS = '.cptk/preprocess.py'
 
 DEFAULT_CLONE_PATH = '/'.join((
-    '${{ slugify(website.name) }}',
-    '${{ slugify(contest.name) }}',
-    '${{ slugify(problem.name) }}',
+    '{{ problem.website.name | slug }}',
+    '{% if problem.contest is defined %}'
+    '{% if problem.contest.name is defined %}'
+    '{{ problem.contest.name | slug }}'
+    '{% endif %}{% endif %}',
+    '{{ problem.name | slug }}',
 ))

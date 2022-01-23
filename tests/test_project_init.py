@@ -7,7 +7,6 @@ import pytest
 from .utils import EasyDirectory
 from .utils import requires
 from .utils import run
-from cptk.constants import DEFAULT_PREPROCESS
 from cptk.constants import DEFAULT_TEMPLATE_FOLDER
 from cptk.constants import PROJECT_FILE
 from cptk.exceptions import ProjectNotFound
@@ -119,8 +118,3 @@ class TestProjectInit:
 
         # Change permissions back to normal, avoid warnings and errors
         os.chmod(tempdir.path, mode)
-
-    def test_default_preprocess_creation(self, tempdir: 'EasyDirectory'):
-        proj = LocalProject.init(tempdir.path)
-        assert proj.config.clone.preprocess == DEFAULT_PREPROCESS
-        assert os.path.isfile(tempdir.join(DEFAULT_PREPROCESS))
