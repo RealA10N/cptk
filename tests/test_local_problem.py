@@ -11,6 +11,7 @@ from freezegun import freeze_time
 from filecmp import dircmp
 
 import cptk.scrape
+import cptk.constants
 from cptk.constants import DEFAULT_TESTS_FOLDER
 from cptk.local import LocalProject
 from cptk.local import LocalProblem
@@ -95,6 +96,17 @@ class TestProblemClone:
             cls._assert_equal_dirs(os.path.join(
                 src, common), os.path.join(dst, common))
 
+    def _assert_valid_problem(self, path: str) -> None:
+        """ Checks that given path and asserts that the path contains a
+        well-defined problem. """
+
+        assert LocalProblem.is_problem(path)
+        recipe_path = os.path.join(path, cptk.constants.RECIPE_FILE)
+        assert os.path.isfile(recipe_path)
+
+        prob = LocalProblem(path)
+        assert prob.recipe.dict()['solution']['serve']
+
     @mock.patch('platform.system', lambda: 'Linux')
     @pytest.mark.parametrize('template', (
         pytest.param(template, id=template.uid)
@@ -112,7 +124,7 @@ class TestProblemClone:
         proj.config.clone.path = 'clone'
         prob = proj.clone_problem(dummy.get_dummy_problem())
         self._assert_equal_dirs(tempdir.join('clone'), expected)
-        assert LocalProblem.is_problem(prob.location)
+        self._assert_valid_problem(prob.location)
 
     @mock.patch('platform.system', lambda: 'Windows')
     @pytest.mark.parametrize('template', (
@@ -131,4 +143,4 @@ class TestProblemClone:
         proj.config.clone.path = 'clone'
         prob = proj.clone_problem(dummy.get_dummy_problem())
         self._assert_equal_dirs(tempdir.join('clone'), expected)
-        assert LocalProblem.is_problem(prob.location)
+        self._assert_valid_problem(prob.location)
