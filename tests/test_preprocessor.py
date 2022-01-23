@@ -24,11 +24,13 @@ class TestPreprocessor:
 
     @pytest.mark.parametrize('template, expected', (
         ('{{invalid}}', ''),
+        ('{{ "Hello There!" | slug }}', 'hello-there'),
+        ('{{ slug("Hello There!") }}', 'hello-there'),
         ('{{invalid|slug}}', ''),
         ('{{invalid|invalid}}', ''),
         ('{{problem.name}}', 'name'),
     ))
-    def test_invalid_input(
+    def test_valid_strings(
         self,
         template: str,
         expected: str,

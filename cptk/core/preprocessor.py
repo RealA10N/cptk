@@ -13,8 +13,12 @@ class Preprocessor:
     def __init__(self, problem: 'Problem') -> None:
         self._env = jinja2.Environment()
         self._env.globals['problem'] = problem
-        self._env.filters['slug'] = slugify
         self._env.globals['now'] = datetime.now()
+
+        # Slug is a global to allow the "slug(...)" syntax,
+        # and a filter to allow the "... | slug" syntax.
+        self._env.globals['slug'] = slugify
+        self._env.filters['slug'] = slugify
 
         try:
             self._env.globals['user'] = os.getlogin()
