@@ -75,16 +75,12 @@ class Preprocessor:
             'now': datetime.now(),
             'slug': slugify,
             'system': platform.system(),
+            'user': os.getlogin(),
         })
 
         # Slug is a global to allow the "slug(...)" syntax,
         # and a filter to allow the "... | slug" syntax.
-        self._env.filters['slug'] = slugify
-
-        try:
-            self._env.globals['user'] = os.getlogin()
-        except OSError:
-            pass  # Some machines (and CI dockers) doesn't provide a login.
+        self._env.filters.update({'slug': slugify, })
 
     def parse_string(self, string: str) -> str:
         try:

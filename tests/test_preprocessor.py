@@ -28,6 +28,9 @@ class TestPreprocessor:
         ('{{problem.name}}', 'Test Problem'),
         ('{{user}}', 'User'),
         ('{{now.ctime()}}', 'Sat Jan  1 00:00:00 2022'),
+        ('ab{{invalid|default}}cd', 'abcd'),
+        ('{{invalid|default("hi")}}', 'hi'),
+        ('{{user|default("hi")}}', 'User'),
     ))
     def test_valid_strings(
         self,
