@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from .utils import Dummy
 from .utils import EasyDirectory
 from cptk.core import Preprocessor
+from cptk.exceptions import PreprocessError
 from cptk.local import LocalProject
 from cptk.templates import DEFAULT_TEMPLATES
 from cptk.templates import Template
@@ -20,15 +21,14 @@ EXPECTED_CLONES = {
 }
 
 
+@mock.patch('os.getlogin', lambda: 'User')
+@freeze_time('2022-01-01')
 class TestPreprocessor:
 
     @pytest.mark.parametrize('template, expected', (
-        ('{{invalid}}', ''),
         ('{{ "Hello There!" | slug }}', 'hello-there'),
         ('{{ slug("Hello There!") }}', 'hello-there'),
-        ('{{invalid|slug}}', ''),
-        ('{{invalid|invalid}}', ''),
-        ('{{problem.name}}', 'name'),
+        ('{{problem.name}}', 'Test Problem'),
     ))
     def test_valid_strings(
         self,
@@ -36,11 +36,17 @@ class TestPreprocessor:
         expected: str,
         dummy: 'Dummy',
     ):
-        prob = dummy.get_dummy_problem()
-        prob.name = 'name'
-
-        pre = Preprocessor(prob)
+        pre = Preprocessor(dummy.get_dummy_problem())
         assert pre.parse_string(template) == expected
+
+    @pytest.mark.parametrize('string', (
+        '{{invalid}}',
+        '{{problem.name|invalid}}',
+    ))
+    def test_undefined_raises(self, string: str, dummy: 'Dummy'):
+        pre = Preprocessor(dummy.get_dummy_problem())
+        with pytest.raises(PreprocessError):
+            pre.parse_string(string)
 
     @classmethod
     def _assert_equal_dirs(cls, src: str, dst: str) -> None:
@@ -51,8 +57,6 @@ class TestPreprocessor:
                 src, common), os.path.join(dst, common))
 
     @pytest.mark.parametrize('template', DEFAULT_TEMPLATES)
-    @mock.patch('os.getlogin', lambda: 'User')
-    @freeze_time('2022-01-01')
     def test_default_templates(
         self,
         tempdir: 'EasyDirectory',
