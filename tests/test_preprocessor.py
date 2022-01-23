@@ -1,24 +1,11 @@
-import os
-from filecmp import dircmp
 from unittest import mock
 
 import pytest
 from freezegun import freeze_time
 
 from .utils import Dummy
-from .utils import EasyDirectory
 from cptk.core import Preprocessor
 from cptk.exceptions import PreprocessError
-from cptk.local import LocalProject
-from cptk.templates import DEFAULT_TEMPLATES
-from cptk.templates import Template
-
-HERE = os.path.dirname(__file__)
-CLONES_DIR = os.path.join(HERE, 'clones')
-EXPECTED_CLONES = {
-    name: os.path.join(CLONES_DIR, name)
-    for name in os.listdir(CLONES_DIR)
-}
 
 
 @mock.patch('os.getlogin', lambda: 'User')
@@ -27,8 +14,11 @@ class TestPreprocessor:
 
     @pytest.mark.parametrize('template, expected', (
         ('{{ "Hello There!" | slug }}', 'hello-there'),
+        ('x-{{ "hi~" | slug }}-y', 'x-hi-y'),
         ('{{ slug("Hello There!") }}', 'hello-there'),
         ('{{problem.name}}', 'Test Problem'),
+        ('{{user}}', 'User'),
+        ('{{now.ctime()}}', 'Sat Jan  1 00:00:00 2022'),
     ))
     def test_valid_strings(
         self,
@@ -47,25 +37,3 @@ class TestPreprocessor:
         pre = Preprocessor(dummy.get_dummy_problem())
         with pytest.raises(PreprocessError):
             pre.parse_string(string)
-
-    @classmethod
-    def _assert_equal_dirs(cls, src: str, dst: str) -> None:
-        res = dircmp(src, dst)
-        assert not res.left_only and not res.right_only and not res.diff_files
-        for common in res.common_dirs:
-            cls._assert_equal_dirs(os.path.join(
-                src, common), os.path.join(dst, common))
-
-    @pytest.mark.parametrize('template', DEFAULT_TEMPLATES)
-    def test_default_templates(
-        self,
-        tempdir: 'EasyDirectory',
-        template: 'Template',
-        dummy: 'Dummy',
-    ):
-        name = template.uid
-        expected = EXPECTED_CLONES[name]
-        proj = LocalProject.init(tempdir.path, template=name)
-        proj.config.clone.path = 'clone'
-        proj.clone_problem(dummy.get_dummy_problem())
-        self._assert_equal_dirs(tempdir.join('clone'), expected)
