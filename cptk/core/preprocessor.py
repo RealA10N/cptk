@@ -1,4 +1,5 @@
 import os
+import platform
 from abc import ABC
 from abc import abstractmethod
 from datetime import datetime
@@ -73,6 +74,7 @@ class Preprocessor:
             'problem': problem,
             'now': datetime.now(),
             'slug': slugify,
+            'system': platform.system(),
         })
 
         # Slug is a global to allow the "slug(...)" syntax,

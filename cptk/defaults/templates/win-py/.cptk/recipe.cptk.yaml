@@ -1,3 +1,0 @@
-solution:
-  serve: |
-    py {{problem.name|slug}}.py

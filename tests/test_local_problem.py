@@ -20,10 +20,6 @@ from cptk.templates import Template
 
 HERE = os.path.dirname(__file__)
 CLONES_DIR = os.path.join(HERE, 'clones')
-EXPECTED_CLONES = {
-    name: os.path.join(CLONES_DIR, name)
-    for name in os.listdir(CLONES_DIR)
-}
 
 
 @mock.patch('os.getlogin', lambda: 'User')
@@ -78,14 +74,32 @@ class TestProblemClone:
         assert data == f'{slugify(problem.website.name)}\n{problem.name}'
 
     @classmethod
+    def _compare_files(cls, src: str, dst: str) -> None:
+        with open(src, 'r') as file:
+            src_data = file.read()
+        with open(dst, 'r') as file:
+            dst_data = file.read()
+        assert src_data == dst_data
+
+    @classmethod
     def _assert_equal_dirs(cls, src: str, dst: str) -> None:
         res = dircmp(src, dst)
-        assert not res.left_only and not res.right_only and not res.diff_files
+        assert not res.left_only and not res.right_only
+        for filename in res.diff_files:
+            # For a detailed message error, we compare the files ourselves.
+            cls._compare_files(
+                os.path.join(src, filename),
+                os.path.join(dst, filename),
+            )
         for common in res.common_dirs:
             cls._assert_equal_dirs(os.path.join(
                 src, common), os.path.join(dst, common))
 
-    @pytest.mark.parametrize('template', DEFAULT_TEMPLATES)
+    @mock.patch('platform.system', lambda: 'Linux')
+    @pytest.mark.parametrize('template', (
+        pytest.param(template, id=template.uid)
+        for template in DEFAULT_TEMPLATES
+    ))
     def test_default_templates(
         self,
         tempdir: 'EasyDirectory',
@@ -93,7 +107,26 @@ class TestProblemClone:
         dummy: 'Dummy',
     ):
         name = template.uid
-        expected = EXPECTED_CLONES[name]
+        expected = os.path.join(CLONES_DIR, name)
+        proj = LocalProject.init(tempdir.path, template=name)
+        proj.config.clone.path = 'clone'
+        prob = proj.clone_problem(dummy.get_dummy_problem())
+        self._assert_equal_dirs(tempdir.join('clone'), expected)
+        assert LocalProblem.is_problem(prob.location)
+
+    @mock.patch('platform.system', lambda: 'Windows')
+    @pytest.mark.parametrize('template', (
+        pytest.param(template, id=template.uid)
+        for template in DEFAULT_TEMPLATES
+    ))
+    def test_default_templates_win(
+        self,
+        tempdir: 'EasyDirectory',
+        template: 'Template',
+        dummy: 'Dummy',
+    ):
+        name = template.uid
+        expected = os.path.join(CLONES_DIR, f'win-{name}')
         proj = LocalProject.init(tempdir.path, template=name)
         proj.config.clone.path = 'clone'
         prob = proj.clone_problem(dummy.get_dummy_problem())

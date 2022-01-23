@@ -1,6 +1,11 @@
+{% if system == 'Windows' -%}
+{% set bin = slug(problem.name) ~ '.exe' -%}
+{% else -%}
+{% set bin = slug(problem.name) -%}
+{% endif -%}
 solution:
   bake: |
-    g++ {{problem.name|slug}}.cpp -DLOCAL -O2 -o {{problem.name|slug}}
+    g++ {{problem.name|slug}}.cpp -DLOCAL -O2 -o {{bin}}
 
   serve: |
-    ./{{problem.name|slug}}
+    ./{{bin}}

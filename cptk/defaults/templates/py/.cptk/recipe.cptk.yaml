@@ -1,3 +1,8 @@
+{% if system == 'Windows' -%}
+{% set PY = 'py' -%}
+{% else -%}
+{% set PY = 'python3' -%}
+{% endif -%}
 solution:
   serve: |
-    python3 {{problem.name|slug}}.py
+    {{ PY }} {{problem.name|slug}}.py
