@@ -71,16 +71,26 @@ class Preprocessor:
     def __init__(self, problem: 'Problem') -> None:
         self._env = jinja2.Environment(undefined=jinja2.StrictUndefined)
         self._env.globals.update({
-            'problem': problem,
-            'now': datetime.now(),
-            'slug': slugify,
-            'system': platform.system(),
-            'user': os.getlogin(),
+            key: val
+            for key, val in {
+                'problem': problem,
+                'now': datetime.now(),
+                'slug': slugify,
+                'system': platform.system(),
+                'user': self.__try(os.getlogin),
+            }.items() if val is not None
         })
 
         # Slug is a global to allow the "slug(...)" syntax,
         # and a filter to allow the "... | slug" syntax.
         self._env.filters.update({'slug': slugify, })
+
+    @staticmethod
+    def __try(fun, default=None):
+        try:
+            return fun()
+        except Exception:
+            return default
 
     def parse_string(self, string: str) -> str:
         try:
