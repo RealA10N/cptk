@@ -96,5 +96,6 @@ class TestProblemClone:
         expected = EXPECTED_CLONES[name]
         proj = LocalProject.init(tempdir.path, template=name)
         proj.config.clone.path = 'clone'
-        proj.clone_problem(dummy.get_dummy_problem())
+        prob = proj.clone_problem(dummy.get_dummy_problem())
         self._assert_equal_dirs(tempdir.join('clone'), expected)
+        assert LocalProblem.is_problem(prob.location)

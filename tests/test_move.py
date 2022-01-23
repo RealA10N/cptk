@@ -114,3 +114,18 @@ class TestMove:
 
         with pytest.raises(InvalidMoveSource):
             proj.move(src, dst)
+
+    def test_move_direct_problem(
+        self,
+        tempdir: 'EasyDirectory',
+        dummy: 'Dummy',
+    ):
+        proj = LocalProject.init(tempdir.join('project'), template='g++')
+        proj.config.clone.path = 'clone'
+        moves = proj._load_moves()
+
+        prob = proj.clone_problem(dummy.get_dummy_problem())
+        proj.move(prob.location, tempdir.join('project', 'new'))
+
+        # A direct move should not register a move
+        assert proj._load_moves() == moves

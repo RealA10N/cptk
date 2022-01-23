@@ -44,6 +44,11 @@ class RecipeConfig(Configuration):
 class LocalProblem:
     location: str = field(compare=True)
 
+    @staticmethod
+    def is_problem(path: str) -> bool:
+        """ Returns True if the given path represents a local problem. """
+        return os.path.exists(os.path.join(path, RECIPE_FILE))
+
     @classmethod
     def init(cls: 'Type[T]', path: str, problem: 'Problem') -> 'T':
         cls._init_tests(

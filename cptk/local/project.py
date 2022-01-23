@@ -320,7 +320,10 @@ class LocalProject:
                 raise InvalidMoveSource(src)
 
         shutil.move(src, dst)
-        self._register_move(src, dst)
+        if not LocalProblem.is_problem(dst):
+            # We do not register moves of pure problems,
+            # since there is no point in that!
+            self._register_move(src, dst)
 
     def _register_move(self, src: str, dst: str) -> None:
         """ Registers the given (src, dst) pair as a project move. It is then
