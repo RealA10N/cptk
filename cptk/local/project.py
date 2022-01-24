@@ -256,7 +256,7 @@ class LocalProject:
         processor = Preprocessor(problem)
 
         src = self.relative(self.config.clone.template)
-        dst = self.relative(processor.parse_string(self.config.clone.path))
+        dst = self.move_relative(processor.parse_string(self.config.clone.path))
 
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
