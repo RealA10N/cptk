@@ -126,17 +126,18 @@ class TestProblemClone:
         self._assert_equal_dirs(tempdir.join('clone'), expected)
         self._assert_valid_problem(prob.location)
 
-    @mock.patch('platform.system', lambda: 'Windows')
     @pytest.mark.parametrize('template', (
         pytest.param(template, id=template.uid)
         for template in DEFAULT_TEMPLATES
     ))
     def test_default_templates_win(
         self,
+        mocker,
         tempdir: 'EasyDirectory',
         template: 'Template',
         dummy: 'Dummy',
     ):
+        mocker.patch('platform.system', lambda: 'Windows')
         name = template.uid
         expected = os.path.join(CLONES_DIR, f'win-{name}')
         proj = LocalProject.init(tempdir.path, template=name)
