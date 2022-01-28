@@ -14,7 +14,7 @@ setup(
     version="0.1.0",
     description=DESC,
 
-    python_requires=">=3.6,<4",
+    python_requires=">=3.7,<4",
     install_requires=DEPENDENCIES,
 
     long_description=README,
