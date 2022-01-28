@@ -73,8 +73,8 @@ class Runner:
 
         return RunnerResult(
             runner=self,
-            outs=proc.stdout.read().decode('utf8'),
-            errs=proc.stderr.read().decode('utf8'),
+            outs=proc.stdout.read(),
+            errs=proc.stderr.read(),
             code=proc.returncode,
             timed_out=timed_out,
         )
