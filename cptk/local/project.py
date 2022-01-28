@@ -71,7 +71,10 @@ class LocalProject:
 
     def __init__(self, location: str) -> None:
         self.location = location
-        self.fetcher = Fetcher()
+
+    @cached_property
+    def fetcher(self) -> Fetcher:
+        return Fetcher()
 
     @classmethod
     def is_project(cls, location: str) -> bool:
