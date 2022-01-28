@@ -6,7 +6,6 @@ if TYPE_CHECKING:
 
 
 import os
-import shlex
 import subprocess
 from threading import Timer
 from dataclasses import dataclass
@@ -46,7 +45,7 @@ class Runner:
         terminated after the provided amount of seconds. """
 
         proc = subprocess.Popen(
-            shlex.split(cmd),
+            cmd.split(),
             env=self.env,
             encoding='utf8',
             stdin=subprocess.PIPE,
