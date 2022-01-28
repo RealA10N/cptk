@@ -1,4 +1,8 @@
 [flake8]
+
+# a little over 80 to avoid annoying cases
+max-line-length = 83
+
 ignore =
     E731,   # lambda functions
     E701,   # multiple statments in one line
