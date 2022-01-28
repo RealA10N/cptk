@@ -1,3 +1,4 @@
+from .chef import Chef
 from .config import Configuration
 from .fetcher import Fetcher
 from .preprocessor import Preprocessor
@@ -8,4 +9,5 @@ __all__ = [
     'Fetcher',
     'Preprocessor',
     'System',
+    'Chef',
 ]
