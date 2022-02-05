@@ -11,7 +11,15 @@
         "difficulty": 1.5,
         "time_limit": 1,
         "memory_limit": 1024,
-        "contest": null,
+        "contest": {
+            "_uid": "problems",
+            "name": "Problems",
+            "website": "Kattis",
+            "url": "https://open.kattis.com/problems",
+            "active": null,
+            "start_time": null,
+            "end_time": null
+        },
         "tests": [
             {
                 "input": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n",
