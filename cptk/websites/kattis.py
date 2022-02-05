@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 @dataclass(unsafe_hash=True)
 class KattisProblem(Problem):
-    # TODO: add difficulty, author and source attributes.
+    # TODO: add author and source attributes.
     pass
 
 
@@ -33,6 +33,11 @@ class KattisContestProblem(KattisProblem):
 
 @dataclass(unsafe_hash=True)
 class KattisContest(Contest):
+    pass
+
+
+@dataclass(unsafe_hash=True)
+class KattisArchive(Contest):
     pass
 
 
@@ -114,6 +119,16 @@ class Kattis(Website):
             active=active,
         )
 
+    def _parse_archive(self, info: 'PageInfo') -> 'KattisArchive':
+        url = parse.urlparse(info.url)
+        uid = url.path.split('/')[1]
+        return KattisArchive(
+            uid,
+            website=self,
+            name=uid.title(),
+            url=parse.urljoin(info.url, f'/{uid}'),
+        )
+
     def _parse_sidebar_field(self, info: 'PageInfo', field: str) -> str:
         sidebar = info.data.find(
             'div',
@@ -153,7 +168,6 @@ class Kattis(Website):
         if contest:
             problem_title = next(title.children)
             mark = problem_title.text.split()[-1]
-
             return KattisContestProblem(
                 **kwargs,
                 contest=contest,
@@ -161,5 +175,10 @@ class Kattis(Website):
             )
 
         else:
+            archive = self._parse_archive(info)
             diff = float(self._parse_sidebar_field(info, 'Difficulty'))
-            return KattisArchiveProblem(**kwargs, difficulty=diff)
+            return KattisArchiveProblem(
+                **kwargs,
+                contest=archive,
+                difficulty=diff,
+            )
