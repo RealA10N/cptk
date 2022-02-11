@@ -61,7 +61,6 @@ class CloneSettings(BaseModel):
 
 class ProjectConfig(Configuration):
     clone: CloneSettings
-    git: Optional[bool] = False
     verbose: Optional[bool] = False
 
 
@@ -105,24 +104,10 @@ class LocalProject:
             shutil.rmtree(dst)
         shutil.copytree(src=template.path, dst=dst)
 
-    @staticmethod
-    def _init_git(location: str) -> None:
-        """ Initialized a new git repository in the given location. """
-
-        # According to the git documentation (https://tinyurl.com/y3njm4n8):
-        # "running 'git init' in an existing repository is safe", and thus,
-        # we call it anyway!
-
-        System.run(
-            f'git init {location}',
-            errormsg="Couldn't initialize git repository."
-        )
-
     @classmethod
     def init(cls: 'Type[T]',
              location: str,
              template: str = None,
-             git: bool = None,
              verbose: bool = None,
              ) -> 'T':
         """ Initialize an empty local project in the given location with the
@@ -133,11 +118,6 @@ class LocalProject:
 
         # Create the directory if it doesn't exist
         os.makedirs(location, exist_ok=True)
-
-        if git is not None:
-            kwargs['git'] = git
-            if git:
-                cls._init_git(location)
 
         if verbose is not None:
             kwargs['verbose'] = verbose

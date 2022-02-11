@@ -81,20 +81,12 @@ def validate_url(_, __, value):
     help='Initialize the project with a predefined template matching the '
     'selected language and platfrom.',
 )
-@click.option(
-    '--git/--no-git', is_flag=True, default=None,
-    help='Initialize the project with a git repository.',
-)
-def init(location: str,
-         template: Optional[str],
-         git: Optional[bool],
-         ) -> None:
+def init(location: str, template: Optional[str]) -> None:
     """ Initialize a new cptk project directory. """
 
     LocalProject.init(
         location=location,
         template=template,
-        git=git,
         verbose=System.get_verbosity(),
     )
 
