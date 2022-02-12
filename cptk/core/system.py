@@ -12,13 +12,6 @@ class SystemRunError(cptkException):
     """ Raised by System.run if something goes wrong. """
 
 
-class AbortException(cptkException):
-    """ Raised by the System.abort function to indicate to the main scope that
-    the process was aborted. """
-
-    exitcode: int
-
-
 class System:
 
     CMD = colorama.Fore.YELLOW
@@ -94,11 +87,16 @@ class System:
             tb = tb.tb_next
 
     @classmethod
+    def abnormal_exit(cls) -> None:
+        cls.echo(f"{cls.ERROR} ABNORMAL EXIT {cls.RESET}")
+
+    @classmethod
     def warn(cls, msg: str) -> None:
         cls.echo(f"{cls.WARN} WARNING {cls.RESET} {msg}")
 
     @classmethod
     def ask(cls, question: str, options: dict) -> bool:
+        question = f'{question}? ({"/".join(options)}): '
         query = f"{cls.CMD}{question}{cls.RESET}"
         res = input(query).strip()
         while res not in options:
@@ -107,7 +105,7 @@ class System:
 
     @classmethod
     def abort(cls, code: int = 1) -> None:
-        raise AbortException(code)
+        raise SystemExit(code)
 
     @classmethod
     def echo(cls, msg: str) -> None:

@@ -1,15 +1,12 @@
 from typing import List
 from typing import Optional
 
+from colorama import deinit
+from colorama import init
+
 import cptk.commands
-from cptk.core.system import AbortException
 from cptk.core.system import System
 from cptk.utils import cptkException
-
-try:
-    from colorama import init, deinit
-except ImportError:
-    init, deinit = lambda: None, lambda: None
 
 
 def main(args: Optional[List[str]] = None) -> int:
@@ -20,8 +17,11 @@ def main(args: Optional[List[str]] = None) -> int:
         init()
         cptk.commands.collector.run(args)
 
-    except AbortException as err:
-        code = err.exitcode
+    except SystemExit as err:
+        # argparse throws a SystemExit if fails to parse arguments or
+        # if some arguments are invalid. The System.abort function throws an
+        # SystemExit exception too.
+        code = err.code
 
     except cptkException as err:
         System.error(err)

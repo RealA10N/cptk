@@ -244,7 +244,7 @@ class LocalProject:
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
             ans = System.ask(
-                "Are you sure you want to overwrite saved data? (y/n)",
+                "Are you sure you want to overwrite saved data",
                 {'y': True, 'n': False},
             )
 
