@@ -1,5 +1,4 @@
 import sys
-from typing import Optional
 from typing import TYPE_CHECKING
 from typing import Union
 
@@ -22,7 +21,7 @@ class System:
     WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
     RESET = colorama.Style.RESET_ALL
 
-    _verbose = None
+    _verbosity = 0
 
     @classmethod
     def run(cls,
@@ -38,7 +37,7 @@ class System:
         import subprocess
 
         if verbose is None:
-            verbose = cls._verbose
+            verbose = cls._verbosity >= 2
 
         if verbose:
             cls.echo(cls.CMD + cmd + cls.RESET)
@@ -56,13 +55,9 @@ class System:
         return res
 
     @classmethod
-    def set_verbosity(cls, v: Optional[bool]) -> None:
+    def set_verbosity(cls, level: int = 0) -> None:
         """ Verbosity can be True, False, or None (which means "defalt"). """
-        cls._verbose = v
-
-    @classmethod
-    def get_verbosity(cls) -> Optional[bool]:
-        return cls._verbose
+        cls._verbosity = level
 
     @staticmethod
     def _expection_to_msg(error: Exception) -> str:
@@ -115,3 +110,8 @@ class System:
     @classmethod
     def echo(cls, msg: str) -> None:
         print(msg)  # noqa: T001
+
+    @classmethod
+    def log(cls, msg: str) -> None:
+        if cls._verbosity >= 1:
+            cls.echo(msg)

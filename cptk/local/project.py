@@ -60,7 +60,7 @@ class CloneSettings(BaseModel):
 
 class ProjectConfig(Configuration):
     clone: CloneSettings
-    verbose: Optional[bool] = False
+    verbosity: Optional[int] = None
 
 
 @dataclass(unsafe_hash=True)
@@ -108,7 +108,7 @@ class LocalProject:
     def init(cls: 'Type[T]',
              location: str,
              template: str = None,
-             verbose: bool = None,
+             verbosity: int = None,
              ) -> 'T':
         """ Initialize an empty local project in the given location with the
         given properties and settings. Returns the newly created project as a
@@ -119,8 +119,8 @@ class LocalProject:
         # Create the directory if it doesn't exist
         os.makedirs(location, exist_ok=True)
 
-        if verbose is not None:
-            kwargs['verbose'] = verbose
+        if verbosity:
+            kwargs['verbosity'] = verbosity
 
         if template is None:
             template = cptk.constants.DEFAULT_TEMPLATE_FOLDER

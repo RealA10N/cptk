@@ -8,8 +8,7 @@ collector = CommandCollector()
 
 collector.global_argument(
     '-W', '--work-directory',
-    help='the directory in which cptk will work in, and search for a project '
-         'inside (defaults to the current working directory).',
+    help='set the working directory (defaults to cwd)',
     dest='wd',
     metavar='DIRECTORY',
     default=getcwd(),
@@ -20,6 +19,20 @@ collector.global_argument(
     )
 )
 
+collector.global_argument(
+    '-v',
+    action='count',
+    dest='verbosity',
+    help='increase the verbosity of the program',
+)
+
+
+@collector.preprocessor
+def preprocessor(namespace):
+    from cptk.core.system import System
+    System.set_verbosity(namespace.verbosity)
+    return namespace
+
 
 @collector.command(
     'initialize',
@@ -29,17 +42,16 @@ collector.global_argument(
                 'using the provided project template.',
 )
 @collector.argument('template', type=str)
-def initialize(wd: str, template: str):
+def initialize(wd: str, template: str, verbosity: int = None):
     """ Initialize a new cptk project in the given location, using the provided
     project template. """
 
     from cptk.local.project import LocalProject
-    from cptk.core.system import System
 
     LocalProject.init(
         location=wd,
         template=template,
-        verbose=System.get_verbosity(),
+        verbosity=verbosity,
     )
 
 

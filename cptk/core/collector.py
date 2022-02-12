@@ -17,6 +17,8 @@ class CommandCollector:
         self._subparsers = self._parser.add_subparsers()
         self._args: Dict[Callable, List[Tuple]] = defaultdict(list)
 
+        self._preprocessor = lambda v: v
+
         # Print the default help message if no command is provided
         self._parser.set_defaults(func=self._parser.print_help)
 
@@ -58,10 +60,20 @@ class CommandCollector:
 
         return decorator
 
+    def preprocessor(
+        self,
+        func: Callable[[argparse.Namespace], argparse.Namespace],
+    ) -> Callable[[argparse.Namespace], argparse.Namespace]:
+        self._preprocessor = func
+        return func
+
     def run(self, args: List[str] = None):
         """ Executes the appropriate subcommand using the given arguments. """
 
-        args: dict = vars(self._parser.parse_args(args))
+        args = self._parser.parse_args(args)
+        args = self._preprocessor(args)
+        args: dict = vars(args)
+
         func: Callable = args.pop('func')
         sig = inspect.signature(func)
 
