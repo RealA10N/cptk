@@ -1,18 +1,13 @@
 import os
-import stat
 from filecmp import dircmp
 
 import pytest
 
+import cptk.constants
 from .utils import EasyDirectory
-from .utils import requires
-from .utils import run
-from cptk.constants import DEFAULT_TEMPLATE_FOLDER
-from cptk.constants import PROJECT_FILE
+from cptk.core.templates import DEFAULT_TEMPLATES
 from cptk.exceptions import ProjectNotFound
-from cptk.exceptions import SystemRunError
-from cptk.local import LocalProject
-from cptk.templates import DEFAULT_TEMPLATES
+from cptk.local.project import LocalProject
 
 
 UID_TO_TEMPLATE = {t.uid: t for t in DEFAULT_TEMPLATES}
@@ -31,14 +26,14 @@ class TestProjectInit:
         proj = LocalProject.init(tempdir.path)
 
         # Assert that required files are created
-        assert os.path.isfile(tempdir.join(PROJECT_FILE))
+        assert os.path.isfile(tempdir.join(cptk.constants.PROJECT_FILE))
 
         # Assert that newly created project is identifiable by cptk itself
         assert LocalProject.is_project(tempdir.path)
         assert LocalProject.find(tempdir.path) == proj
         assert LocalProject.find(tempdir.join('a/b/c')) == proj
 
-        template = tempdir.join(DEFAULT_TEMPLATE_FOLDER)
+        template = tempdir.join(cptk.constants.DEFAULT_TEMPLATE_FOLDER)
         assert os.path.isdir(template)
         assert os.listdir(template) == []
 
@@ -68,53 +63,9 @@ class TestProjectInit:
         LocalProject.init(tempdir.path, template=old_template_uid)
         LocalProject.init(tempdir.path, template=new_template_uid)
 
-        template_loc = tempdir.join(DEFAULT_TEMPLATE_FOLDER)
+        template_loc = tempdir.join(cptk.constants.DEFAULT_TEMPLATE_FOLDER)
         template_src = new_template.path
 
         # Assert that the new template replaced the old one
         res = dircmp(template_loc, template_src)
         assert not res.left_only and not res.right_only and not res.diff_files
-
-    @requires('git')
-    def test_git(self, tempdir: EasyDirectory):
-        """ Tests that a git repository is actually created as expected. """
-        proj = LocalProject.init(location=tempdir.path, git=True)
-
-        assert proj.config.git
-        assert os.path.isdir(tempdir.join('.git'))
-
-    @requires('git')
-    @pytest.mark.parametrize('create_with_git', (True, False))
-    def test_already_git_repo(
-        self,
-        tempdir: EasyDirectory,
-        create_with_git: bool,
-    ):
-        """ Test that everything is ok if user tries to initialize a cptk
-        project inside a git repository. """
-
-        res = run(f'git init {tempdir.path}')
-        assert res.returncode == 0
-
-        proj = LocalProject.init(tempdir.path, git=create_with_git)
-        assert proj.config.git == create_with_git
-
-    @pytest.mark.skipif(
-        os.name == 'nt',
-        reason="chmod doesn't work property on Windows."
-    )
-    @requires('git')
-    def test_git_fail(self, tempdir: EasyDirectory):
-        """ Tests that the currect errors are raised if the creating of a git
-        repository fails. """
-
-        # mask out read and write owner permissions
-        mask = ~(stat.S_IWRITE | stat.S_IREAD)
-        mode = os.stat(tempdir.path).st_mode
-        os.chmod(tempdir.path, mode=mode & mask)
-
-        with pytest.raises(SystemRunError):
-            LocalProject.init(location=tempdir.path, git=True)
-
-        # Change permissions back to normal, avoid warnings and errors
-        os.chmod(tempdir.path, mode)

@@ -2,3 +2,4 @@
 # statistics. https://tinyurl.com/y4a7jtyw
 tests/** linguist-vendored
 cptk/defaults/** linguist-vendored
+.cptk/** linguist-vendored

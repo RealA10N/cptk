@@ -11,8 +11,9 @@ DESC = "Your personal assistant for everything competitive-programming-related"
 
 setup(
     name="cptk",
-    version="0.1.0",
+    version="0.1.0a0",
     description=DESC,
+    url='https://github.com/RealA10N/cptk',
 
     python_requires=">=3.7,<4",
     install_requires=DEPENDENCIES,
@@ -34,7 +35,7 @@ setup(
             "kattis=cptk.websites:Kattis",
         ],
         "console_scripts": [
-            "cptk=cptk.__main__:main",
+            "cptk=cptk.__main__",
         ]
     },
 )

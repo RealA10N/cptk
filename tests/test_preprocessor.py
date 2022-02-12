@@ -2,17 +2,16 @@ import os
 from typing import TYPE_CHECKING
 from unittest import mock
 
-from cptk.core.preprocessor import PreprocessFileError
-from cptk.core.preprocessor import PreprocessNameError
+from cptk.core.preprocessor import Preprocessor
+from cptk.exceptions import PreprocessError
+from cptk.exceptions import PreprocessFileError
+from cptk.exceptions import PreprocessNameError
 
 if TYPE_CHECKING:
     from .utils import Dummy, EasyDirectory
 
 import pytest
 from freezegun import freeze_time
-
-from cptk.core import Preprocessor
-from cptk.exceptions import PreprocessError
 
 
 @mock.patch('os.getlogin', lambda: 'User')

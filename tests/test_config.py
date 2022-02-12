@@ -3,7 +3,7 @@ from typing import Optional
 
 import pytest
 
-from cptk.core import Configuration
+from cptk.core.config import Configuration
 from cptk.exceptions import ConfigFileNotFound
 from cptk.exceptions import ConfigFileParsingError
 from cptk.exceptions import ConfigFileValueError

@@ -12,11 +12,10 @@ from filecmp import dircmp
 
 import cptk.scrape
 import cptk.constants
-from cptk.constants import DEFAULT_TESTS_FOLDER
-from cptk.local import LocalProject
-from cptk.local import LocalProblem
-from cptk.templates import DEFAULT_TEMPLATES
-from cptk.templates import Template
+from cptk.local.project import LocalProject
+from cptk.local.problem import LocalProblem
+from cptk.core.templates import DEFAULT_TEMPLATES
+from cptk.core.templates import Template
 
 
 HERE = os.path.dirname(__file__)
@@ -33,7 +32,8 @@ class TestProblemClone:
         proj = LocalProject.init(tempdir.path, template='g++')
         prob = proj.clone_problem(problem)
 
-        tests_dir = os.path.join(prob.location, DEFAULT_TESTS_FOLDER)
+        tests_dir = os.path.join(
+            prob.location, cptk.constants.DEFAULT_TESTS_FOLDER)
         test_files = os.listdir(tests_dir)
         tests = len(problem.tests)
 

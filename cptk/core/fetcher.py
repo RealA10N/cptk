@@ -67,6 +67,9 @@ class Fetcher:
         """ Makes an get http/s request to the given URL and returns the result
         as a PageInfo instance. """
 
+        if not url.startswith('http'):
+            url = f'http://{url}'
+
         res = self.session.get(url)
         data = BeautifulSoup(res.content, 'lxml')
         return PageInfo(url, data)
