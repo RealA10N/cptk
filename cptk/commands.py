@@ -1,11 +1,20 @@
 from os import getcwd
 
 import cptk.utils
+from cptk import __version__
 from cptk.core.collector import CommandCollector
 from cptk.core.system import System
 
 
 collector = CommandCollector()
+
+
+collector.global_argument(
+    '--version',
+    action='version',
+    version=f'%(prog)s {__version__}',
+    help='show version message and exit'
+)
 
 collector.global_argument(
     '-W', '--work-directory',

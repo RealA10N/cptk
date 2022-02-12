@@ -1,18 +1,18 @@
 from setuptools import find_packages
 from setuptools import setup
 
+import cptk
+
 with open("README.md", mode="r", encoding="utf8") as f:
     README = f.read()
 
 with open("requirements.txt", mode="r", encoding="utf8") as f:
     DEPENDENCIES = f.read().splitlines()
 
-DESC = "Your personal assistant for everything competitive-programming-related"
-
 setup(
     name="cptk",
-    version="0.1.0a0",
-    description=DESC,
+    version=cptk.__version__,
+    description=cptk.__description__,
     url='https://github.com/RealA10N/cptk',
 
     python_requires=">=3.7,<4",
@@ -21,8 +21,8 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
 
-    author="Alon Krymgand Osovsky",
-    author_email="downtown2u@gmail.com",
+    author=cptk.__author__,
+    author_email=cptk.__author_email__,
 
     packages=find_packages(include=['cptk*']),
     package_dir={'cptk': 'cptk'},
