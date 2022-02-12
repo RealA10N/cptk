@@ -2,6 +2,7 @@ from os import getcwd
 
 import cptk.utils
 from cptk.core.collector import CommandCollector
+from cptk.core.system import System
 
 
 collector = CommandCollector()
@@ -22,15 +23,24 @@ collector.global_argument(
 collector.global_argument(
     '-v',
     action='count',
-    dest='verbosity',
+    dest='_verbosity',
     help='increase the verbosity of the program',
+)
+
+
+collector.global_argument(
+    '-y', '--yes',
+    action='count',
+    default=0,
+    dest='_yes_count',
+    help="don't ask for confirmation, assume that it is provided",
 )
 
 
 @collector.preprocessor
 def preprocessor(namespace):
-    from cptk.core.system import System
-    System.set_verbosity(namespace.verbosity)
+    System.set_verbosity(namespace._verbosity)
+    System.set_yes(namespace._yes_count)
     return namespace
 
 

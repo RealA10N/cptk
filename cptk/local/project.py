@@ -243,11 +243,7 @@ class LocalProject:
 
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
-            ans = System.ask(
-                "Are you sure you want to overwrite saved data",
-                {'y': True, 'n': False},
-            )
-
+            ans = System.confirm("Are you sure you want to overwrite saved data")
             if not ans: System.abort(code=0)
             shutil.rmtree(dst)
 

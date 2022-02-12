@@ -22,6 +22,7 @@ class System:
     RESET = colorama.Style.RESET_ALL
 
     _verbosity = 0
+    _yes_stack = 0
 
     @classmethod
     def run(cls,
@@ -59,6 +60,17 @@ class System:
         """ Verbosity can be True, False, or None (which means "defalt"). """
         cls._verbosity = level
 
+    @classmethod
+    def set_yes(cls, amount: int = 1) -> None:
+        cls._yes_stack = amount
+
+    @classmethod
+    def pop_yes(cls) -> bool:
+        if cls._yes_stack > 0:
+            cls._yes_stack -= 1
+            return True
+        return False
+
     @staticmethod
     def _expection_to_msg(error: Exception) -> str:
         return ', '.join(str(a) for a in error.args)
@@ -95,8 +107,13 @@ class System:
         cls.echo(f"{cls.WARN} WARNING {cls.RESET} {msg}")
 
     @classmethod
+    def confirm(cls, question: str) -> bool:
+        if cls.pop_yes(): return True
+        return cls.ask(question, {'y': True, 'n': False})
+
+    @classmethod
     def ask(cls, question: str, options: dict) -> bool:
-        question = f'{question}? ({"/".join(options)}): '
+        question = f'{question}? [{"/".join(options)}]: '
         query = f"{cls.CMD}{question}{cls.RESET}"
         res = input(query).strip()
         while res not in options:
