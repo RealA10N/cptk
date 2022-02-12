@@ -3,7 +3,6 @@ import shutil
 from dataclasses import dataclass
 from dataclasses import field
 from glob import iglob
-from shutil import copytree
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -252,7 +251,7 @@ class LocalProject:
             if not ans: System.abort(code=0)
             shutil.rmtree(dst)
 
-        copytree(src, dst)
+        shutil.copytree(src, dst)
         processor.parse_directory(dst)
 
         locprob = LocalProblem.init(dst, problem)
