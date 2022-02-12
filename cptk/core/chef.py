@@ -1,30 +1,31 @@
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from cptk.local import LocalProblem
-    from typing import TypeVar
-    T = TypeVar('T')
-
-
 import os
 import subprocess
-from threading import Timer
+import sys
 from dataclasses import dataclass
+from threading import Timer
+from typing import Optional
+from typing import TypeVar
+
+from cptk.core.system import System
+from cptk.local.problem import LocalProblem
+
+T = TypeVar('T')
 
 
 @dataclass
 class RunnerResult:
     runner: 'Runner'
-    outs: str
-    errs: str
     code: int
     timed_out: bool
+    outs: Optional[str] = None
+    errs: Optional[str] = None
 
 
 class Nothing:
-    def __getattribute__(self: 'T', *_) -> 'T':
+    def __getattribute__(self: T, *_) -> T:
         return self
 
-    def __call__(self: 'T', *_, **__) -> 'T':
+    def __call__(self: T, *_, **__) -> T:
         return self
 
 
@@ -37,6 +38,8 @@ class Runner:
         cmd: str,
         input: str = None,
         timeout: float = None,
+        redirect: bool = True,
+        wd: str = None,
     ) -> RunnerResult:
         """ Executes the given command, and returns a 'RunnerResult' instance
         that describes the result of the execution.
@@ -46,11 +49,12 @@ class Runner:
 
         proc = subprocess.Popen(
             cmd.split(),
+            cwd=wd,
             env=self.env,
             encoding='utf8',
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE if redirect else sys.stdin,
+            stdout=subprocess.PIPE if redirect else sys.stdout,
+            stderr=subprocess.PIPE if redirect else sys.stderr,
         )
 
         # I used a timer thread and a Popen instance instead of the builtin
@@ -72,8 +76,8 @@ class Runner:
 
         return RunnerResult(
             runner=self,
-            outs=proc.stdout.read(),
-            errs=proc.stderr.read(),
+            outs=proc.stdout.read() if redirect else None,
+            errs=proc.stderr.read() if redirect else None,
             code=proc.returncode,
             timed_out=timed_out,
         )
@@ -82,17 +86,33 @@ class Runner:
 class Chef:
     """ Bake, serve and test local problems. """
 
-    def __init__(self, problem: 'LocalProblem') -> None:
+    def __init__(self, problem: LocalProblem) -> None:
         self._problem = problem
+        self._runner = Runner()
 
     def bake(self) -> None:
         """ Bakes (generates) the executable of the current problem solution.
         If the recipe configuration file of the current problem doesn't specify
         a 'bake' option, returns None quietly. """
 
+        location = self._problem.location
+
+        for cmd in self._problem.recipe.bake:
+            System.log(cmd)
+            self._runner.exec(cmd, wd=location, redirect=False)
+
     def serve(self) -> None:
         """ Bakes the local problem (if a baking recipe is provided), and serves
         it while piping the standard input to the executable. """
+
+        self.bake()
+
+        cmd = self._problem.recipe.serve
+        location = self._problem.location
+
+        System.log(cmd)
+        res = self._runner.exec(cmd, wd=location, redirect=False)
+        System.abort(res.code)
 
     def test(self) -> None:
         """ Bakes (if a baking recipe is provided) and serves the local tests

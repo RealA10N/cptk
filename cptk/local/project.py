@@ -19,12 +19,13 @@ from cptk.core.preprocessor import Preprocessor
 from cptk.core.system import System
 from cptk.core.templates import DEFAULT_TEMPLATES
 from cptk.local.problem import LocalProblem
+from cptk.local.problem import Recipe
 
 
 if TYPE_CHECKING:
     from typing import Type, TypeVar
     from cptk.scrape import Problem
-    from cptk.templates import Template
+    from cptk.core.templates import Template
     T = TypeVar('T')
 
 
@@ -51,7 +52,8 @@ class InvalidMoveDest(InvalidMovePath):
 
 class CloneSettings(BaseModel):
     template: str
-    path: str = cptk.constants.DEFAULT_CLONE_PATH
+    path: str
+    recipe: Recipe
 
     def dict(self, **kwargs) -> dict:
         kwargs.update({"exclude_unset": False})
@@ -60,7 +62,6 @@ class CloneSettings(BaseModel):
 
 class ProjectConfig(Configuration):
     clone: CloneSettings
-    verbosity: Optional[int] = None
 
 
 @dataclass(unsafe_hash=True)
@@ -99,58 +100,22 @@ class LocalProject:
     @staticmethod
     def _copy_template(template: 'Template', dst: str) -> None:
         """ Copies the given template to the destination path. """
-
-        if os.path.exists(dst):
-            shutil.rmtree(dst)
+        if os.path.exists(dst): shutil.rmtree(dst)
         shutil.copytree(src=template.path, dst=dst)
 
     @classmethod
-    def init(cls: 'Type[T]',
-             location: str,
-             template: str = None,
-             verbosity: int = None,
-             ) -> 'T':
-        """ Initialize an empty local project in the given location with the
-        given properties and settings. Returns the newly created project as a
-        LocalProject instance. """
+    def init(cls: 'Type[T]', location: str, template: str) -> 'T':
+        """ Initialize an empty local project in the given location using the
+        given template name. Returns the newly created project as a LocalProject
+        instance. """
 
-        kwargs = dict()
+        avaliable_templates = {t.uid: t for t in DEFAULT_TEMPLATES}
+        if template not in avaliable_templates:
+            System.error(f'Invalid template name {template!r}')
 
-        # Create the directory if it doesn't exist
-        os.makedirs(location, exist_ok=True)
+        template = avaliable_templates.get(template)
+        cls._copy_template(template, location)
 
-        if verbosity:
-            kwargs['verbosity'] = verbosity
-
-        if template is None:
-            template = cptk.constants.DEFAULT_TEMPLATE_FOLDER
-
-        # If the given template is actually one of the predefined template
-        # names
-        temp_obj = {t.uid: t for t in DEFAULT_TEMPLATES}.get(template)
-        if temp_obj is not None:
-            dst = os.path.join(location, cptk.constants.DEFAULT_TEMPLATE_FOLDER)
-            cls._copy_template(temp_obj, dst)
-            template = cptk.constants.DEFAULT_TEMPLATE_FOLDER
-
-        # Now 'template' actually has the path to the template folder.
-        # Create the template folder if it doesn't exist yet
-        os.makedirs(os.path.join(location, template), exist_ok=True)
-
-        # Create default clone settings
-        kwargs['clone'] = CloneSettings(
-            template=template,
-            preprocess=cptk.constants.DEFAULT_PREPROCESS,
-        )
-
-        # Create the project configuration instance and dump it into a YAML
-        # configuration file.
-        config = ProjectConfig(**kwargs)
-        config_path = os.path.join(location, cptk.constants.PROJECT_FILE)
-        config.dump(config_path)
-
-        # We have created and initialized everything that is required for a
-        # cptk project. Now we can create a LocalProject instance and return it
         return cls(location)
 
     @cptk.utils.cached_property
@@ -244,29 +209,33 @@ class LocalProject:
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
             ans = System.confirm("Are you sure you want to overwrite saved data")
-            if not ans: System.abort(code=0)
+            if not ans: System.abort(0)
             shutil.rmtree(dst)
 
         shutil.copytree(src, dst)
+        prob = LocalProblem.init(dst, self.config.clone.recipe)
         processor.parse_directory(dst)
 
-        locprob = LocalProblem.init(dst, problem)
-        self.last = locprob.location
-        return locprob
+        self.update_last(prob)
+        return prob
 
-    @property
-    def last(self) -> Optional[str]:
+    def last(self) -> Optional[LocalProblem]:
         try:
             with open(self.relative(cptk.constants.LAST_FILE), 'r') as file:
-                return file.read()
+                data = file.read()
         except FileNotFoundError:
             return None
 
-    @last.setter
-    def last(self, val: str) -> None:
+        location, _, name = data.partition(':')
+        return LocalProblem(location, name if name else None)
+
+    def update_last(self, prob: LocalProblem) -> None:
         path = self.relative(cptk.constants.LAST_FILE)
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'w') as file: file.write(val)
+        with open(path, 'w') as file:
+            location = prob.location
+            name = str() if prob.name is None else prob.name
+            file.write(f'{location}:{name}')
 
     def move(self, src: str, dst: str) -> None:
         """ Validates that the given source and destination directories are
