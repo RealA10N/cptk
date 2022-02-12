@@ -21,7 +21,7 @@ def cached_property(f: Callable[..., T]) -> T:
     return property(lru_cache(None)(f))
 
 
-@lru_cache
+@lru_cache(None)
 def _url_regex() -> str:
     # Cached so the regex is compiled only once,
     # and only if needed at all.
