@@ -3,12 +3,11 @@ from filecmp import dircmp
 
 import pytest
 
+import cptk.constants
 from .utils import EasyDirectory
-from cptk.constants import DEFAULT_TEMPLATE_FOLDER
-from cptk.constants import PROJECT_FILE
+from cptk.core.templates import DEFAULT_TEMPLATES
 from cptk.exceptions import ProjectNotFound
-from cptk.local import LocalProject
-from cptk.templates import DEFAULT_TEMPLATES
+from cptk.local.project import LocalProject
 
 
 UID_TO_TEMPLATE = {t.uid: t for t in DEFAULT_TEMPLATES}
@@ -27,14 +26,14 @@ class TestProjectInit:
         proj = LocalProject.init(tempdir.path)
 
         # Assert that required files are created
-        assert os.path.isfile(tempdir.join(PROJECT_FILE))
+        assert os.path.isfile(tempdir.join(cptk.constants.PROJECT_FILE))
 
         # Assert that newly created project is identifiable by cptk itself
         assert LocalProject.is_project(tempdir.path)
         assert LocalProject.find(tempdir.path) == proj
         assert LocalProject.find(tempdir.join('a/b/c')) == proj
 
-        template = tempdir.join(DEFAULT_TEMPLATE_FOLDER)
+        template = tempdir.join(cptk.constants.DEFAULT_TEMPLATE_FOLDER)
         assert os.path.isdir(template)
         assert os.listdir(template) == []
 
@@ -64,7 +63,7 @@ class TestProjectInit:
         LocalProject.init(tempdir.path, template=old_template_uid)
         LocalProject.init(tempdir.path, template=new_template_uid)
 
-        template_loc = tempdir.join(DEFAULT_TEMPLATE_FOLDER)
+        template_loc = tempdir.join(cptk.constants.DEFAULT_TEMPLATE_FOLDER)
         template_src = new_template.path
 
         # Assert that the new template replaced the old one

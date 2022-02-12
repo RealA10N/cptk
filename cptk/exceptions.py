@@ -5,6 +5,9 @@ from cptk.core.config import ConfigFileValueError
 from cptk.core.fetcher import InvalidClone
 from cptk.core.fetcher import UnknownWebsite
 from cptk.core.preprocessor import PreprocessError
+from cptk.core.preprocessor import PreprocessFileError
+from cptk.core.preprocessor import PreprocessNameError
+from cptk.core.preprocessor import PreprocessStringError
 from cptk.core.system import SystemRunError
 from cptk.local.project import InvalidMoveDest
 from cptk.local.project import InvalidMovePath
@@ -25,16 +28,21 @@ __all__ = [
 
     # cptk.core.preprocessor
     'PreprocessError',
+    'PreprocessFileError',
+    'PreprocessNameError',
+    'PreprocessStringError',
 
     # cptk.core.system
     'SystemRunError',
 
     # cptk.local.project
-    'ProjectNotFound',
-    'InvalidMovePath',
     'InvalidMoveDest',
+    'InvalidMovePath',
     'InvalidMoveSource',
+    'ProjectNotFound',
 
     # cptk.utils
     'cptkException',
+
+
 ]

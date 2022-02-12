@@ -1,7 +1,7 @@
 import os
 from typing import TYPE_CHECKING
 
-from cptk.local import LocalProject
+from cptk.local.project import LocalProject
 
 if TYPE_CHECKING:
     from .utils import EasyDirectory, Dummy
