@@ -1,7 +1,5 @@
 from time import perf_counter
 
-import pytest
-
 from .utils import run
 
 
@@ -23,7 +21,6 @@ class time_limit:
 
 class TestPerformance:
 
-    @pytest.mark.xfail
     def test_startup_time(self) -> None:
-        with time_limit(0.05):
+        with time_limit(0.3):
             run('cptk --help')
