@@ -1,11 +1,14 @@
-import subprocess
 import sys
 from typing import Optional
+from typing import TYPE_CHECKING
 from typing import Union
 
 import colorama
 
 from cptk.utils import cptkException
+
+if TYPE_CHECKING:
+    from subprocess import CompletedProcess
 
 
 class SystemRunError(cptkException):
@@ -26,11 +29,13 @@ class System:
             cmd: str,
             errormsg: str = None,
             verbose: bool = None,
-            ) -> subprocess.CompletedProcess:
+            ) -> 'CompletedProcess':
         """ Runs the given command in the terminal. If 'errormsg' is provided,
         asserts that the returncode from the process is zero, and if not,
         raises an SystemRunError with the given message. If 'verbose' is
         provided, it overwrites the classes verbosity setting. """
+
+        import subprocess
 
         if verbose is None:
             verbose = cls._verbose
