@@ -3,10 +3,7 @@ import sys
 from typing import Optional
 from typing import Union
 
-from click import Abort
-from click import echo
-from click import prompt
-from click import style
+import colorama
 
 from cptk.utils import cptkException
 
@@ -15,11 +12,19 @@ class SystemRunError(cptkException):
     """ Raised by System.run if something goes wrong. """
 
 
+class AbortException(cptkException):
+    """ Raised by the System.abort function to indicate to the main scope that
+    the process was aborted. """
+
+    exitcode: int
+
+
 class System:
 
-    CMD = lambda s: style(s, fg='yellow')
-    ERROR = lambda s: style(s, bg='red', bold=True)
-    WARN = lambda s: style(s, bg='yellow', fg='black', bold=True)
+    CMD = colorama.Fore.YELLOW
+    ERROR = colorama.Back.RED + colorama.Style.BRIGHT
+    WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
+    RESET = colorama.Style.RESET_ALL
 
     _verbose = None
 
@@ -38,10 +43,11 @@ class System:
             verbose = cls._verbose
 
         if verbose:
-            echo(cls.CMD(cmd))
+            cls.echo(cls.CMD + cmd + cls.RESET)
 
         res = subprocess.run(
             cmd.split(),
+            check=False,
             stdout=sys.stdout if verbose else subprocess.PIPE,
             stderr=sys.stderr if verbose else subprocess.PIPE,
         )
@@ -68,7 +74,8 @@ class System:
     def error(cls, error: Union[str, Exception]) -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
-        echo(cls.ERROR(' ERROR ') + ' ' + error)
+
+        cls.echo(f"{cls.ERROR} ERROR {cls.RESET} {error}")
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
@@ -76,26 +83,32 @@ class System:
         title = type(error).__name__
         desc = cls._expection_to_msg(error)
         msg = title if not desc else f'{title}: {desc}'
-        echo(cls.ERROR(' UNEXPECTED ERROR ') + ' ' + msg)
+
+        cls.echo(f"{cls.ERROR} UNEXPECTED ERROR {cls.RESET} {msg}")
 
         tb = error.__traceback__
         while tb is not None:
             file = tb.tb_frame.f_code.co_filename
             lineno = tb.tb_lineno
-            echo('Inside ' + cls.CMD(f'{file}:{lineno}'))
+            cls.echo(f'Inside {cls.CMD}{file}:{lineno}{cls.RESET}')
             tb = tb.tb_next
 
     @classmethod
     def warn(cls, msg: str) -> None:
-        echo(cls.WARN(' WARNING ') + ' ' + msg)
+        cls.echo(f"{cls.WARN} WARNING {cls.RESET} {msg}")
 
     @classmethod
     def ask(cls, question: str, options: dict) -> bool:
-        res = prompt(cls.CMD(question)).strip()
+        query = f"{cls.CMD}{question}{cls.RESET}"
+        res = input(query).strip()
         while res not in options:
-            res = prompt(cls.CMD(question)).strip()
+            res = input(query).strip()
         return options[res]
 
     @classmethod
-    def abort(cls):
-        raise Abort
+    def abort(cls, code: int = 1) -> None:
+        raise AbortException(code)
+
+    @classmethod
+    def echo(cls, msg: str) -> None:
+        print(msg)  # noqa: T001

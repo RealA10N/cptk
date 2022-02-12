@@ -2,6 +2,7 @@ from typing import List
 from typing import Optional
 
 import cptk.commands
+from cptk.core.system import AbortException
 from cptk.core.system import System
 from cptk.utils import cptkException
 
@@ -16,8 +17,11 @@ def main(args: Optional[List[str]] = None) -> int:
     code = 0  # os.EX_OK
 
     try:
-        init(autoreset=True)
+        init()
         cptk.commands.collector.run(args)
+
+    except AbortException as err:
+        code = err.exitcode
 
     except cptkException as err:
         System.error(err)

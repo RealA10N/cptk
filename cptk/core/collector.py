@@ -17,7 +17,7 @@ class CommandCollector:
         self._args: Dict[Callable, List[Tuple]] = defaultdict(list)
 
         # Print the default help message if no command is provided
-        self._parser.set_defaults(func=lambda _: self._parser.print_help())
+        self._parser.set_defaults(func=self._parser.print_help)
 
     def argument(self, *args, **kwargs) -> Callable[[F], F]:
         """ Returns a decorator that adds an argument to a command function.

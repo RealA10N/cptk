@@ -248,7 +248,7 @@ class LocalProject:
                 {'y': True, 'n': False},
             )
 
-            if not ans: System.abort()
+            if not ans: System.abort(code=0)
             shutil.rmtree(dst)
 
         copytree(src, dst)
