@@ -19,6 +19,9 @@ class CommandCollector:
         # Print the default help message if no command is provided
         self._parser.set_defaults(func=self._parser.print_help)
 
+    def global_argument(self, *args, **kwargs) -> None:
+        return self._parser.add_argument(*args, **kwargs)
+
     def argument(self, *args, **kwargs) -> Callable[[F], F]:
         """ Returns a decorator that adds an argument to a command function.
         A wrapper around the argparse.add_argument function. """
