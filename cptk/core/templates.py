@@ -10,8 +10,8 @@ class Template:
 
 
 HERE = os.path.dirname(__file__)
-SRC = os.path.join(HERE, '..')
-TEMPLATES_FOLDER = os.path.normpath(os.path.join(SRC, 'defaults', 'templates'))
+ROOT = os.path.join(HERE, '..')
+TEMPLATES_FOLDER = os.path.normpath(os.path.join(ROOT, 'defaults', 'templates'))
 
 DEFAULT_TEMPLATES = (
     Template(
@@ -25,3 +25,6 @@ DEFAULT_TEMPLATES = (
         path=os.path.join(TEMPLATES_FOLDER, 'py'),
     ),
 )
+
+
+__all__ = ['Template', 'DEFAULT_TEMPLATES']

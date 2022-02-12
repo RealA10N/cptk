@@ -15,11 +15,11 @@ from cptk.constants import TEST_INPUT_FILE_PATTERN
 from cptk.constants import TEST_INPUT_FILE_STRUCTURE
 from cptk.constants import TEST_OUTPUT_FILE_STRUCTURE
 from cptk.constants import TEST_SAMPLE_NAME_STRUCTURE
-from cptk.core import Configuration
+from cptk.core.config import Configuration
 from cptk.scrape import Test
 
 if TYPE_CHECKING:
-    from cptk.scrape import Problem
+    from cptk.scrape.problem import Problem
     from typing import TypeVar, Type
     T = TypeVar("T")
 

@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 import pytest
 
-from cptk import constants
-from cptk.local import LocalProject
+import cptk.constants
+from cptk.local.project import LocalProject
 from cptk.exceptions import InvalidMoveDest
 
 
@@ -39,7 +39,7 @@ class TestMove:
         tempdir: 'EasyDirectory',
     ):
         proj = LocalProject.init(tempdir.path)
-        tempdir.create(raw, constants.MOVE_FILE)
+        tempdir.create(raw, cptk.constants.MOVE_FILE)
         assert proj._load_moves() == expected
 
     def test_load_new_project(self, tempdir: 'EasyDirectory'):

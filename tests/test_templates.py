@@ -1,4 +1,4 @@
-from cptk.templates import DEFAULT_TEMPLATES
+from cptk.core.templates import DEFAULT_TEMPLATES
 
 
 class TestTemplates:

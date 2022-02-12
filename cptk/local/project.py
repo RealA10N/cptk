@@ -3,7 +3,6 @@ import shutil
 from dataclasses import dataclass
 from dataclasses import field
 from glob import iglob
-from shutil import copytree
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -11,16 +10,16 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from cptk import constants
-from cptk.core import Configuration
-from cptk.core import Fetcher
-from cptk.core import System
+import cptk.constants
+import cptk.utils
 from cptk.core.config import ConfigFileParsingError
+from cptk.core.config import Configuration
+from cptk.core.fetcher import Fetcher
 from cptk.core.preprocessor import Preprocessor
+from cptk.core.system import System
+from cptk.core.templates import DEFAULT_TEMPLATES
 from cptk.local.problem import LocalProblem
-from cptk.templates import DEFAULT_TEMPLATES
-from cptk.utils import cached_property
-from cptk.utils import cptkException
+
 
 if TYPE_CHECKING:
     from typing import Type, TypeVar
@@ -29,12 +28,12 @@ if TYPE_CHECKING:
     T = TypeVar('T')
 
 
-class ProjectNotFound(cptkException):
+class ProjectNotFound(cptk.utils.cptkException):
     def __init__(self) -> None:
         super().__init__("Couldn't find a cptk project recursively")
 
 
-class InvalidMovePath(cptkException):
+class InvalidMovePath(cptk.utils.cptkException):
     def __init__(self, path: str, msg: str) -> None:
         self.path = path
         super().__init__(msg)
@@ -52,7 +51,7 @@ class InvalidMoveDest(InvalidMovePath):
 
 class CloneSettings(BaseModel):
     template: str
-    path: str = constants.DEFAULT_CLONE_PATH
+    path: str = cptk.constants.DEFAULT_CLONE_PATH
 
     def dict(self, **kwargs) -> dict:
         kwargs.update({"exclude_unset": False})
@@ -61,7 +60,7 @@ class CloneSettings(BaseModel):
 
 class ProjectConfig(Configuration):
     clone: CloneSettings
-    verbose: Optional[bool] = False
+    verbosity: Optional[int] = None
 
 
 @dataclass(unsafe_hash=True)
@@ -71,7 +70,7 @@ class LocalProject:
     def __init__(self, location: str) -> None:
         self.location = location
 
-    @cached_property
+    @cptk.utils.cached_property
     def fetcher(self) -> Fetcher:
         return Fetcher()
 
@@ -79,7 +78,8 @@ class LocalProject:
     def is_project(cls, location: str) -> bool:
         """ Returns True if the given location is the root of a valid cptk
         project. """
-        return os.path.isfile(os.path.join(location, constants.PROJECT_FILE))
+        path = os.path.join(location, cptk.constants.PROJECT_FILE)
+        return os.path.isfile(os.path.join(path))
 
     @classmethod
     def find(cls: 'Type[T]', location: str) -> 'T':
@@ -108,7 +108,7 @@ class LocalProject:
     def init(cls: 'Type[T]',
              location: str,
              template: str = None,
-             verbose: bool = None,
+             verbosity: int = None,
              ) -> 'T':
         """ Initialize an empty local project in the given location with the
         given properties and settings. Returns the newly created project as a
@@ -119,19 +119,19 @@ class LocalProject:
         # Create the directory if it doesn't exist
         os.makedirs(location, exist_ok=True)
 
-        if verbose is not None:
-            kwargs['verbose'] = verbose
+        if verbosity:
+            kwargs['verbosity'] = verbosity
 
         if template is None:
-            template = constants.DEFAULT_TEMPLATE_FOLDER
+            template = cptk.constants.DEFAULT_TEMPLATE_FOLDER
 
         # If the given template is actually one of the predefined template
         # names
         temp_obj = {t.uid: t for t in DEFAULT_TEMPLATES}.get(template)
         if temp_obj is not None:
-            dst = os.path.join(location, constants.DEFAULT_TEMPLATE_FOLDER)
+            dst = os.path.join(location, cptk.constants.DEFAULT_TEMPLATE_FOLDER)
             cls._copy_template(temp_obj, dst)
-            template = constants.DEFAULT_TEMPLATE_FOLDER
+            template = cptk.constants.DEFAULT_TEMPLATE_FOLDER
 
         # Now 'template' actually has the path to the template folder.
         # Create the template folder if it doesn't exist yet
@@ -140,29 +140,29 @@ class LocalProject:
         # Create default clone settings
         kwargs['clone'] = CloneSettings(
             template=template,
-            preprocess=constants.DEFAULT_PREPROCESS,
+            preprocess=cptk.constants.DEFAULT_PREPROCESS,
         )
 
         # Create the project configuration instance and dump it into a YAML
         # configuration file.
         config = ProjectConfig(**kwargs)
-        config_path = os.path.join(location, constants.PROJECT_FILE)
+        config_path = os.path.join(location, cptk.constants.PROJECT_FILE)
         config.dump(config_path)
 
         # We have created and initialized everything that is required for a
         # cptk project. Now we can create a LocalProject instance and return it
         return cls(location)
 
-    @cached_property
+    @cptk.utils.cached_property
     def config(self) -> ProjectConfig:
-        p = os.path.join(self.location, constants.PROJECT_FILE)
+        p = os.path.join(self.location, cptk.constants.PROJECT_FILE)
         return ProjectConfig.load(p)
 
     def _load_moves(self) -> List[Tuple[str, str]]:
         """ Loads information from the local moves file and returns the
         replacements directory. """
 
-        moves_path = self.relative(constants.MOVE_FILE)
+        moves_path = self.relative(cptk.constants.MOVE_FILE)
 
         try:
             with open(moves_path, 'r') as file:
@@ -172,7 +172,7 @@ class LocalProject:
 
         moves = list()
         for lineno, line in enumerate(lines, start=1):
-            parts = line.split(constants.MOVE_FILE_SEPERATOR)
+            parts = line.split(cptk.constants.MOVE_FILE_SEPERATOR)
 
             if len(parts) == 2:
                 moves.append((parts[0], parts[1],))
@@ -180,7 +180,7 @@ class LocalProject:
             else:
                 raise ConfigFileParsingError(
                     path=moves_path,
-                    error=f'Seperator {constants.MOVE_FILE_SEPERATOR!r}'
+                    error=f'Seperator {cptk.constants.MOVE_FILE_SEPERATOR!r}'
                     ' not found',
                     position=(lineno, 0),
                 )
@@ -244,14 +244,14 @@ class LocalProject:
         if os.path.isdir(dst):
             System.warn('Problem already exists locally')
             ans = System.ask(
-                "Are you sure you want to overwrite saved data? (y/n)",
+                "Are you sure you want to overwrite saved data",
                 {'y': True, 'n': False},
             )
 
-            if not ans: System.abort()
+            if not ans: System.abort(code=0)
             shutil.rmtree(dst)
 
-        copytree(src, dst)
+        shutil.copytree(src, dst)
         processor.parse_directory(dst)
 
         locprob = LocalProblem.init(dst, problem)
@@ -261,14 +261,14 @@ class LocalProject:
     @property
     def last(self) -> Optional[str]:
         try:
-            with open(self.relative(constants.LAST_FILE), 'r') as file:
+            with open(self.relative(cptk.constants.LAST_FILE), 'r') as file:
                 return file.read()
         except FileNotFoundError:
             return None
 
     @last.setter
     def last(self, val: str) -> None:
-        path = self.relative(constants.LAST_FILE)
+        path = self.relative(cptk.constants.LAST_FILE)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as file: file.write(val)
 
@@ -288,7 +288,7 @@ class LocalProject:
         if not self._is_subpath(self.location, dst):
             raise InvalidMoveDest(dst)
 
-        for pat in constants.MOVE_SAFES:
+        for pat in cptk.constants.MOVE_SAFES:
             # This is an ugly solution. I have tries to use fnmatch but
             # it has some strange behavior and doesn't match directories
             # if their name doesn't end with an '/'. I should rewrite this
@@ -316,5 +316,5 @@ class LocalProject:
         src = os.path.relpath(src, self.location)
         dst = os.path.relpath(dst, self.location)
 
-        with open(self.relative(constants.MOVE_FILE), 'a') as file:
-            file.write(f'{src}{constants.MOVE_FILE_SEPERATOR}{dst}\n')
+        with open(self.relative(cptk.constants.MOVE_FILE), 'a') as file:
+            file.write(f'{src}{cptk.constants.MOVE_FILE_SEPERATOR}{dst}\n')
