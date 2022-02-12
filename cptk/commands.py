@@ -1,10 +1,20 @@
 from os import getcwd
 
 import cptk.utils
+from cptk import __version__
 from cptk.core.collector import CommandCollector
+from cptk.core.system import System
 
 
 collector = CommandCollector()
+
+
+collector.global_argument(
+    '--version',
+    action='version',
+    version=f'%(prog)s {__version__}',
+    help='show version message and exit'
+)
 
 collector.global_argument(
     '-W', '--work-directory',
@@ -22,15 +32,24 @@ collector.global_argument(
 collector.global_argument(
     '-v',
     action='count',
-    dest='verbosity',
+    dest='_verbosity',
     help='increase the verbosity of the program',
+)
+
+
+collector.global_argument(
+    '-y', '--yes',
+    action='count',
+    default=0,
+    dest='_yes_count',
+    help="don't ask for confirmation, assume that it is provided",
 )
 
 
 @collector.preprocessor
 def preprocessor(namespace):
-    from cptk.core.system import System
-    System.set_verbosity(namespace.verbosity)
+    System.set_verbosity(namespace._verbosity)
+    System.set_yes(namespace._yes_count)
     return namespace
 
 
@@ -66,12 +85,12 @@ def initialize(wd: str, template: str, verbosity: int = None):
     help='the problem to be cloned',
     type=cptk.utils.url_validator
 )
-def clone(url: str):
+def clone(url: str, wd: str):
 
     from cptk.local.project import LocalProject
     from cptk.core.system import System
 
-    proj = LocalProject.find(getcwd())
+    proj = LocalProject.find(wd)
     prob = proj.clone_url(url)
     proj.last = prob.location
 
@@ -84,14 +103,13 @@ def clone(url: str):
     description='Outputs the absolute location of that last problem that the '
                 'cptk CLI interacted with.',
 )
-def last():
+def last(wd: str):
     """ Print the location of the last problem cptk interacted with. """
 
-    from os import getcwd
     from cptk.local.project import LocalProject
     from cptk.core.system import System
 
-    proj = LocalProject.find(getcwd())
+    proj = LocalProject.find(wd)
     last = proj.last
     if last:
         System.echo(last)
@@ -111,11 +129,10 @@ def last():
     'dst',
     type=cptk.utils.path_validator(dir_ok=True, file_ok=False, must_exist=True),
 )
-def move(src: str, dst: str):
+def move(src: str, dst: str, wd: str):
     """ Moves a cloned problem to a new location. """
 
-    from os import getcwd
     from cptk.local.project import LocalProject
 
-    proj = LocalProject.find(getcwd())
+    proj = LocalProject.find(wd)
     proj.move(src, dst)
