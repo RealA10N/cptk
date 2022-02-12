@@ -1,14 +1,27 @@
 from os import getcwd
 
+import cptk.utils
 from cptk.core.collector import CommandCollector
+
 
 collector = CommandCollector()
 
+collector.global_argument(
+    '-W', '--work-directory',
+    dest='wd',
+    metavar='PATH',
+    default=getcwd(),
+    type=cptk.utils.path_validator(
+        dir_ok=True,
+        file_ok=False,
+        must_exist=True,
+    )
+)
+
 
 @collector.command('init')
-@collector.argument('dir', type=str)
 @collector.argument('template', type=str)
-def init(dir: str, template: str):
+def init(wd: str, template: str):
     """ Initialize a new cptk project in the given location, using the provided
     project template. """
 
@@ -16,14 +29,14 @@ def init(dir: str, template: str):
     from cptk.core.system import System
 
     LocalProject.init(
-        location=dir,
+        location=wd,
         template=template,
         verbose=System.get_verbosity(),
     )
 
 
 @collector.command('clone')
-@collector.argument('url', type=str)
+@collector.argument('url', type=cptk.utils.url_validator)
 def clone(url: str):
 
     from cptk.local.project import LocalProject
@@ -51,13 +64,19 @@ def last():
 
 
 @collector.command('move', aliases=['mv'])
-@collector.argument('dir', type=str)
-@collector.argument('dst', type=str)
-def move(dir: str, dst: str):
+@collector.argument(
+    'src',
+    type=cptk.utils.path_validator(dir_ok=True, file_ok=False, must_exist=True),
+)
+@collector.argument(
+    'dst',
+    type=cptk.utils.path_validator(dir_ok=True, file_ok=False, must_exist=True),
+)
+def move(src: str, dst: str):
     """ Moves a cloned problem to a new location. """
 
     from os import getcwd
     from cptk.local.project import LocalProject
 
     proj = LocalProject.find(getcwd())
-    proj.move(dir, dst)
+    proj.move(src, dst)

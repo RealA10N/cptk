@@ -34,7 +34,7 @@ setup(
             "kattis=cptk.websites:Kattis",
         ],
         "console_scripts": [
-            "cptk=cptk.__main__:main",
+            "cptk=cptk.__main__",
         ]
     },
 )

@@ -1,4 +1,5 @@
 import argparse
+import inspect
 from collections import defaultdict
 from typing import Callable
 from typing import Dict
@@ -61,5 +62,10 @@ class CommandCollector:
         """ Executes the appropriate subcommand using the given arguments. """
 
         args: dict = vars(self._parser.parse_args(args))
-        func = args.pop('func')
-        return func(**args)
+        func: Callable = args.pop('func')
+        sig = inspect.signature(func)
+
+        return func(**{
+            key: value for key, value in args.items()
+            if key in sig.parameters.keys()
+        })

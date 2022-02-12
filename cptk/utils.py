@@ -1,4 +1,6 @@
+import os
 import re
+from argparse import ArgumentTypeError
 from functools import lru_cache
 from typing import Callable
 from typing import TypeVar
@@ -19,8 +21,11 @@ def cached_property(f: Callable[..., T]) -> T:
     return property(lru_cache(None)(f))
 
 
-def valid_url(url) -> bool:
-    URL_REGEX = re.compile(
+@lru_cache
+def _url_regex() -> str:
+    # Cached so the regex is compiled only once,
+    # and only if needed at all.
+    return re.compile(
         r"(\w+://)?"                # protocol (optional)
         r"(\w+\.)?"                 # host (optional)
         r"((\w+)\.(\w+))"           # domain
@@ -28,4 +33,33 @@ def valid_url(url) -> bool:
         r"([\w\-\._\~/]*)*(?<!\.)"  # path, params, anchors, etc. (optional)
     )
 
-    return bool(URL_REGEX.fullmatch(url))
+
+def valid_url(url) -> bool:
+    return bool(_url_regex().fullmatch(url))
+
+
+def path_validator(
+    dir_ok=True,
+    file_ok=True,
+    must_exist=False,
+) -> Callable[[str], str]:
+    def validator(path: str) -> str:
+        path = os.path.normpath(path)
+
+        if not file_ok and os.path.isfile(path):
+            raise ArgumentTypeError(f"{path!r} is a file")
+
+        if not dir_ok and os.path.isdir(path):
+            raise ArgumentTypeError(f"{path!r} is a direcotry")
+
+        if must_exist and not os.path.exists(path):
+            raise ArgumentTypeError(f"path {path!r} doesn't exist")
+
+        return path
+    return validator
+
+
+def url_validator(url: str) -> str:
+    if not valid_url(url):
+        raise ArgumentTypeError(f'invalid url {url!r}')
+    return url
