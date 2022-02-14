@@ -225,9 +225,10 @@ class LocalProject:
             if not ans: System.abort()
 
         cptk.utils.soft_tree_copy(src, dst)
-        prob = LocalProblem.init(dst, self.config.clone.recipe)
-        processor.parse_directory(dst)
+        recipe = self.config.clone.recipe.preprocess(processor)
+        prob = LocalProblem.init(dst, recipe)
 
+        processor.parse_directory(dst)
         self.update_last(prob)
         return prob
 

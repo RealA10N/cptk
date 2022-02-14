@@ -4,6 +4,7 @@ from dataclasses import field
 from typing import List
 from typing import Optional
 from typing import Type
+from typing import TYPE_CHECKING
 from typing import TypeVar
 
 from pydantic import BaseModel
@@ -14,6 +15,8 @@ from cptk.core.config import ConfigFileError
 from cptk.core.config import ConfigFileNotFound
 from cptk.core.config import Configuration
 from cptk.core.system import System
+if TYPE_CHECKING:
+    from cptk.core.preprocessor import Preprocessor
 
 T = TypeVar('T')
 
@@ -29,6 +32,18 @@ class Recipe(BaseModel):
     def string_to_commands(cls, val) -> List[str]:
         if isinstance(val, str):
             return val.split('\n')
+        return val
+
+    def preprocess(self: T, processor: 'Preprocessor') -> Type[T]:
+        def parse_str(v):
+            if isinstance(v, str): return processor.parse_string(v)
+            else: return v
+
+        return type(self)(
+            name=parse_str(self.name),
+            bake=[parse_str(v) for v in self.bake],
+            serve=parse_str(self.serve),
+        )
 
 
 class RecipesConfig(Configuration):
