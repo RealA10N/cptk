@@ -109,16 +109,29 @@ class System:
     @classmethod
     def confirm(cls, question: str) -> bool:
         if cls.pop_yes(): return True
-        return cls.ask(question, {'y': True, 'n': False})
+        return cls.ask(question, {('Y', 'y'): True, ('n', 'N'): False})
 
     @classmethod
     def ask(cls, question: str, options: dict) -> bool:
-        question = f'{question}? [{"/".join(options)}]: '
+
+        titles = list()
+        answers = dict()
+        for option, value in options.items():
+            if isinstance(option, str):
+                titles.append(option)
+                answers[option] = value
+            else:
+                titles.append(option[0])
+                for answer in option:
+                    answers[answer] = value
+
+        question = f'{question}? [{"/".join(titles)}]: '
         query = f"{cls.CMD}{question}{cls.RESET}"
         res = input(query).strip()
-        while res not in options:
+
+        while res not in answers:
             res = input(query).strip()
-        return options[res]
+        return answers[res]
 
     @classmethod
     def abort(cls, code: int = 1) -> None:
