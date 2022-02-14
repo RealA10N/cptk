@@ -126,7 +126,7 @@ class LocalProject:
         cptk.utils.soft_tree_copy(src=template.path, dst=location)
         return cls(location)
 
-    @ cptk.utils.cached_property
+    @cptk.utils.cached_property
     def config(self) -> ProjectConfig:
         p = os.path.join(self.location, cptk.constants.PROJECT_FILE)
         return ProjectConfig.load(p)
@@ -213,14 +213,18 @@ class LocalProject:
 
         src = self.relative(self.config.clone.template)
         dst = self.move_relative(processor.parse_string(self.config.clone.path))
+        commons = cptk.utils.find_common_files(src, dst)
 
-        if os.path.isdir(dst):
-            System.warn('Problem already exists locally')
-            ans = System.confirm("Are you sure you want to overwrite saved data")
-            if not ans: System.abort(0)
-            shutil.rmtree(dst)
+        if commons:
+            System.warn('\n'.join((
+                'The following files will be overwritten:',
+                *commons,
+            )))
 
-        shutil.copytree(src, dst)
+            ans = System.confirm('Are you sure you want to continue')
+            if not ans: System.abort()
+
+        cptk.utils.soft_tree_copy(src, dst)
         prob = LocalProblem.init(dst, self.config.clone.recipe)
         processor.parse_directory(dst)
 
