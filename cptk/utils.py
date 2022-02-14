@@ -27,6 +27,8 @@ def cached_property(f: Callable[..., T]) -> T:
 def find_tree_files(dir: str) -> Generator[str, None, None]:
     """ Yields all files in the directory as absolute paths. """
 
+    if not os.path.isdir(dir): return
+
     for name in os.listdir(dir):
         path = os.path.join(dir, name)
         if os.path.isdir(path): yield from find_tree_files(path)
