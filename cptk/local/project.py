@@ -50,6 +50,10 @@ class InvalidMoveDest(InvalidMovePath):
         super().__init__(path, f"Can't move to {path!r}")
 
 
+class InvalidTemplate(cptk.utils.cptkException):
+    pass
+
+
 class CloneSettings(BaseModel):
     template: str
     path: str
@@ -97,12 +101,6 @@ class LocalProject:
 
         return cls.find(parent)
 
-    @staticmethod
-    def _copy_template(template: 'Template', dst: str) -> None:
-        """ Copies the given template to the destination path. """
-        if os.path.exists(dst): shutil.rmtree(dst)
-        shutil.copytree(src=template.path, dst=dst)
-
     @classmethod
     def init(cls: 'Type[T]', location: str, template: str) -> 'T':
         """ Initialize an empty local project in the given location using the
@@ -111,14 +109,24 @@ class LocalProject:
 
         avaliable_templates = {t.uid: t for t in DEFAULT_TEMPLATES}
         if template not in avaliable_templates:
-            System.error(f'Invalid template name {template!r}')
+            raise InvalidTemplate(f'Invalid template name {template!r}')
 
-        template = avaliable_templates.get(template)
-        cls._copy_template(template, location)
+        template: 'Template' = avaliable_templates.get(template)
+        commons = cptk.utils.find_common_files(location, template.path)
 
+        if commons:
+            System.warn('\n'.join((
+                'The following files will be overwritten:',
+                *commons,
+            )))
+
+            ans = System.confirm('Are you sure you want to continue')
+            if not ans: System.abort()
+
+        cptk.utils.soft_tree_copy(src=template.path, dst=location)
         return cls(location)
 
-    @cptk.utils.cached_property
+    @ cptk.utils.cached_property
     def config(self) -> ProjectConfig:
         p = os.path.join(self.location, cptk.constants.PROJECT_FILE)
         return ProjectConfig.load(p)

@@ -4,6 +4,9 @@ from argparse import ArgumentTypeError
 from functools import lru_cache
 from typing import Callable
 from typing import TypeVar
+from typing import Generator
+from typing import List
+import shutil
 T = TypeVar('T')
 
 
@@ -19,6 +22,43 @@ def cached_property(f: Callable[..., T]) -> T:
     Python versions. https://tinyurl.com/smhlght """
 
     return property(lru_cache(None)(f))
+
+
+def find_tree_files(dir: str) -> Generator[str, None, None]:
+    """ Yields all files in the directory as absolute paths. """
+
+    for name in os.listdir(dir):
+        path = os.path.join(dir, name)
+        if os.path.isdir(path): yield from find_tree_files(path)
+        elif os.path.isfile(path): yield path
+
+
+def find_common_files(a: str, b: str) -> List[str]:
+    """ Returns a list of files that share the same relative path in both
+    directories a and b. """
+
+    # To preserve the order of the files, we use the order of a_files
+    a_files = list(os.path.relpath(p, start=a) for p in find_tree_files(a))
+    b_files = (os.path.relpath(p, start=b) for p in find_tree_files(b))
+    commons = set(a_files).intersection(b_files)
+    return [p for p in a_files if p in commons]
+
+
+def soft_tree_copy(src: str, dst: str) -> None:
+    """ Copies all files from the source directory into the destination
+    directory, recursively. If the file already exists in the destination
+    directory, it will be overwritten. If some subdirectory src/a exists, it
+    will be created in the destintation directory, even if there are no files
+    inside it in the source directory. """
+
+    os.makedirs(dst, exist_ok=True)
+
+    for name in os.listdir(src):
+        item_src = os.path.join(src, name)
+        item_dst = os.path.join(dst, name)
+
+        if os.path.isdir(item_src): soft_tree_copy(item_src, item_dst)
+        elif os.path.isfile(item_src): shutil.copyfile(item_src, item_dst)
 
 
 @lru_cache(None)
