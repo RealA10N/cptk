@@ -1,12 +1,12 @@
 import os
 import re
+import shutil
 from argparse import ArgumentTypeError
 from functools import lru_cache
 from typing import Callable
-from typing import TypeVar
 from typing import Generator
 from typing import List
-import shutil
+from typing import TypeVar
 T = TypeVar('T')
 
 
