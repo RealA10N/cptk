@@ -12,7 +12,7 @@ test-ci:
 
 .PHONY: coverage
 coverage:
-	$(PY) -m pytest . --cov cptk/ --cov-report xml --cov-report term
+	$(PY) -m pytest -vv tests/ --cov cptk/ --cov-report xml --cov-report term
 
 
 .PHONY: install
