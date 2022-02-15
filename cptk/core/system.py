@@ -17,6 +17,7 @@ class SystemRunError(cptkException):
 class System:
 
     CMD = colorama.Fore.YELLOW
+    LOG = colorama.Fore.LIGHTBLACK_EX
     ERROR = colorama.Back.RED + colorama.Style.BRIGHT
     WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
     RESET = colorama.Style.RESET_ALL
@@ -144,4 +145,4 @@ class System:
     @classmethod
     def log(cls, msg: str) -> None:
         if cls._verbosity >= 1:
-            cls.echo(msg)
+            cls.echo(cls.LOG + msg + cls.RESET)

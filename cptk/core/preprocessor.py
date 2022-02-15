@@ -85,6 +85,18 @@ class Preprocessor:
         # and a filter to allow the "... | slug" syntax.
         self._env.filters.update({'slug': slugify, })
 
+        # Cptk considers None values as undefined.
+        # This means that scopes like {% if v is defined %} where v is None
+        # won't be executed.
+
+        def defined(v):
+            return not isinstance(v, jinja2.Undefined) and v is not None
+
+        def undefined(v):
+            return isinstance(v, jinja2.Undefined) or v is None
+
+        self._env.tests.update({'defined': defined, 'undefined': undefined})
+
     @staticmethod
     def __try(fun, default=None):
         try:

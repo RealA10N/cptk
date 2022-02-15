@@ -1,117 +1,129 @@
 import os
-import re
 from dataclasses import dataclass
 from dataclasses import field
-from glob import glob
 from typing import List
+from typing import Optional
+from typing import Type
 from typing import TYPE_CHECKING
+from typing import TypeVar
 
 from pydantic import BaseModel
 from pydantic import validator
 
-from cptk.constants import DEFAULT_TESTS_FOLDER
-from cptk.constants import RECIPE_FILE
-from cptk.constants import TEST_INPUT_FILE_PATTERN
-from cptk.constants import TEST_INPUT_FILE_STRUCTURE
-from cptk.constants import TEST_OUTPUT_FILE_STRUCTURE
-from cptk.constants import TEST_SAMPLE_NAME_STRUCTURE
+import cptk.constants
+import cptk.utils
+from cptk.core.config import ConfigFileError
+from cptk.core.config import ConfigFileNotFound
 from cptk.core.config import Configuration
-from cptk.scrape import Test
-
+from cptk.core.system import System
 if TYPE_CHECKING:
-    from cptk.scrape.problem import Problem
-    from typing import TypeVar, Type
-    T = TypeVar("T")
+    from cptk.core.preprocessor import Preprocessor
+
+T = TypeVar('T')
+
+
+class RecipeNotFoundError(cptk.utils.cptkException):
+    def __init__(self, filepath: str, msg: str) -> None:
+        self.filepath = filepath
+        super().__init__(msg)
+
+
+class RecipeNameNotFound(RecipeNotFoundError):
+    def __init__(self, filepath: str, name: str) -> None:
+        self.name = name
+        super().__init__(
+            filepath,
+            f'Recipe named {name!r} not found in recipes file {filepath!r}'
+        )
+
+
+class NoRecipesFound(RecipeNotFoundError):
+    def __init__(self, filepath: str) -> None:
+        super().__init__(
+            filepath,
+            f'No recipes found in recipes file {filepath!r}'
+        )
 
 
 class Recipe(BaseModel):
 
+    name: Optional[str] = None
     bake: List[str] = []
-    serve: List[str]
+    serve: str
 
-    @validator('*', pre=True)
+    @validator('bake', pre=True)
     @classmethod
     def string_to_commands(cls, val) -> List[str]:
         if isinstance(val, str):
             return val.split('\n')
+        return val
+
+    def preprocess(self: T, processor: 'Preprocessor') -> Type[T]:
+        def parse_str(v):
+            if isinstance(v, str): return processor.parse_string(v)
+            else: return v
+
+        kwargs = {
+            'name': parse_str(self.name),
+            'serve': parse_str(self.serve),
+        }
+
+        if self.bake: kwargs['bake'] = [parse_str(v) for v in self.bake]
+        return type(self)(**kwargs)
 
 
-class RecipeConfig(Configuration):
-    solution: Recipe
+class RecipesConfig(Configuration):
+    recipes: List[Recipe]
 
 
 @dataclass(unsafe_hash=True)
 class LocalProblem:
     location: str = field(compare=True)
-
-    @staticmethod
-    def is_problem(path: str) -> bool:
-        """ Returns True if the given path represents a local problem. """
-        return os.path.exists(os.path.join(path, RECIPE_FILE))
+    name: Optional[str] = field(compare=True, default=None)
 
     @classmethod
-    def init(cls: 'Type[T]', path: str, problem: 'Problem') -> 'T':
-        cls._init_tests(
-            path=os.path.join(path, DEFAULT_TESTS_FOLDER),
-            tests=problem.tests,
-        )
+    def init(cls: Type[T], location: str, recipe: Recipe) -> T:
+        path = os.path.join(location, cptk.constants.RECIPE_FILE)
+        config = None
 
-        return cls(os.path.abspath(path))
+        try:
+            config = RecipesConfig.load(path)
+        except ConfigFileNotFound:
+            pass  # File doesn't exists -> we will create a new one later.
+        except ConfigFileError:
+            System.warn(f'Failed to parse existing recipe file {path!r}. '
+                        'Continuing the process will overwrite the file.')
+            ans = System.confirm('Are you sure you want to continue')
+            if not ans: System.abort(0)
+
+        if config is None: config = RecipesConfig(recipes=list())
+
+        config.recipes.append(recipe)
+        config.dump(path)
+
+        return cls(location, recipe.name)
 
     @staticmethod
-    def _init_tests(path: str, tests: List[Test]) -> None:
-        for test, number in zip(tests, range(1, len(tests) + 1)):
-            name = TEST_SAMPLE_NAME_STRUCTURE.format(num=number)
+    def is_problem(location: str, name: str = None) -> bool:
+        """ Returns True if the given directory contains a recipe with the given
+        name. If a name isn't provided, returns True if a recipe file is located
+        inside the given direcotry and it contains at least one recipe.  """
 
-            inp = TEST_INPUT_FILE_STRUCTURE.format(name=name)
-            inp_path = os.path.join(path, inp)
+        path = os.path.join(location, cptk.constants.RECIPE_FILE)
 
-            out = TEST_OUTPUT_FILE_STRUCTURE.format(name=name)
-            out_path = os.path.join(path, out)
+        try: recipes = RecipesConfig.load(path)
+        except ConfigFileError: return False
 
-            os.makedirs(path, exist_ok=True)
-
-            with open(inp_path, 'w', encoding='utf8') as file:
-                file.write(test.input)
-
-            if test.expected is not None:
-                with open(out_path, 'w', encoding='utf8') as file:
-                    file.write(test.expected)
+        names = {r.name for r in recipes.recipes}
+        return len(names) > 0 if name is None else name in names
 
     @property
-    def recipe(self) -> RecipeConfig:
-        p = os.path.join(self.location, RECIPE_FILE)
-        return RecipeConfig.load(p)
+    def recipe(self) -> Recipe:
+        path = os.path.join(self.location, cptk.constants.RECIPE_FILE)
+        recipes = RecipesConfig.load(path).recipes
 
-    @property
-    def tests(self) -> List[Test]:
-        base = os.path.join(self.location, DEFAULT_TESTS_FOLDER)
+        if not recipes: raise NoRecipesFound(path)
+        if self.name is None: return recipes[0]
 
-        res = list()
-        inputs = glob(os.path.join(base, '*'), recursive=True)
-        for inp in inputs:
-            base, name = os.path.split(inp)
-
-            match = re.fullmatch(re.compile(TEST_INPUT_FILE_PATTERN), name)
-            if not match:
-                # If file doesn't match the TEST_INPUT_FILE_PATTERN regex,
-                # it is not a valid test input file and it should be ignored.
-                continue
-
-            # Load input file
-            with open(inp, 'r', encoding='utf8') as file:
-                inp_data = file.read()
-
-            # Generate the expected output file path for the current input
-            out_name = TEST_OUTPUT_FILE_STRUCTURE.format(**match.groupdict())
-            out = os.path.join(base, out_name)
-
-            try:
-                with open(out, mode='r', encoding='utf8') as file:
-                    out_data = file.read()
-            except FileNotFoundError:
-                out_data = None
-
-            res.append(Test(inp_data, out_data))
-
-        return res
+        try: return next(r for r in recipes if r.name == self.name)
+        except StopIteration: raise RecipeNameNotFound(path, self.name)

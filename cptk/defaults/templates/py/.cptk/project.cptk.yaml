@@ -1,0 +1,14 @@
+clone:
+  template: .cptk/template
+  path: "\
+    {{ problem.website.name | slug }}/\
+    {% if problem.contest is defined %}\
+    {% if problem.contest.name is defined %}\
+    {{ problem.contest.name | slug }}\
+    {% endif %}{% endif %}/\
+    {{ problem.name | slug }}/"
+  recipe:
+    name: "{{ problem.name | slug }}"
+    serve: >-
+      {% if system == 'Windows' %}py{% else %}python3{% endif %}
+      {{ problem.name | slug }}.py

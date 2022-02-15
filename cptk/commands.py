@@ -1,4 +1,4 @@
-from os import getcwd
+import os
 
 import cptk.utils
 from cptk import __version__
@@ -21,7 +21,7 @@ collector.global_argument(
     help='set the working directory (defaults to cwd)',
     dest='wd',
     metavar='DIRECTORY',
-    default=getcwd(),
+    default=os.getcwd(),
     type=cptk.utils.path_validator(
         dir_ok=True,
         file_ok=False,
@@ -33,6 +33,7 @@ collector.global_argument(
     '-v',
     action='count',
     dest='_verbosity',
+    default=0,
     help='increase the verbosity of the program',
 )
 
@@ -61,17 +62,12 @@ def preprocessor(namespace):
                 'using the provided project template.',
 )
 @collector.argument('template', type=str)
-def initialize(wd: str, template: str, verbosity: int = None):
+def initialize(wd: str, template: str):
     """ Initialize a new cptk project in the given location, using the provided
     project template. """
 
     from cptk.local.project import LocalProject
-
-    LocalProject.init(
-        location=wd,
-        template=template,
-        verbosity=verbosity,
-    )
+    LocalProject.init(location=wd, template=template)
 
 
 @collector.command(
@@ -98,24 +94,6 @@ def clone(url: str, wd: str):
 
 
 @collector.command(
-    'last',
-    help='outputs the last problem touched by cptk',
-    description='Outputs the absolute location of that last problem that the '
-                'cptk CLI interacted with.',
-)
-def last(wd: str):
-    """ Print the location of the last problem cptk interacted with. """
-
-    from cptk.local.project import LocalProject
-    from cptk.core.system import System
-
-    proj = LocalProject.find(wd)
-    last = proj.last
-    if last:
-        System.echo(last)
-
-
-@collector.command(
     'move',
     aliases=['mv'],
     help='moves a cloned problem to a new location',
@@ -136,3 +114,29 @@ def move(src: str, dst: str, wd: str):
 
     proj = LocalProject.find(wd)
     proj.move(src, dst)
+
+
+@collector.command('bake', aliases=['run'])
+@collector.argument('name', nargs='?', default=None, type=str)
+def bake(wd: str, name: str = None):
+
+    from cptk.local.project import LocalProject
+    from cptk.local.problem import LocalProblem
+    from cptk.core.chef import Chef
+
+    proj = LocalProject.find(wd)
+    prob = proj.last() if name is None else LocalProblem(wd, name)
+    Chef(prob).bake()
+
+
+@collector.command('serve', aliases=['run'])
+@collector.argument('name', nargs='?', default=None, type=str)
+def serve(wd: str, name: str = None):
+
+    from cptk.local.project import LocalProject
+    from cptk.local.problem import LocalProblem
+    from cptk.core.chef import Chef
+
+    proj = LocalProject.find(wd)
+    prob = proj.last() if name is None else LocalProblem(wd, name)
+    Chef(prob).serve()

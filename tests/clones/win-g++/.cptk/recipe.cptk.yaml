@@ -1,6 +1,0 @@
-solution:
-  bake: |
-    g++ test-problem.cpp -DLOCAL -O2 -o test-problem.exe
-
-  serve: |
-    ./test-problem.exe
