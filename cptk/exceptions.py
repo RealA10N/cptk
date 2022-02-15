@@ -10,6 +10,9 @@ from cptk.core.preprocessor import PreprocessFileError
 from cptk.core.preprocessor import PreprocessNameError
 from cptk.core.preprocessor import PreprocessStringError
 from cptk.core.system import SystemRunError
+from cptk.local.problem import NoRecipesFound
+from cptk.local.problem import RecipeNameNotFound
+from cptk.local.problem import RecipeNotFoundError
 from cptk.local.project import InvalidMoveDest
 from cptk.local.project import InvalidMovePath
 from cptk.local.project import InvalidMoveSource
@@ -38,6 +41,11 @@ __all__ = [
 
     # cptk.core.system
     'SystemRunError',
+
+    # cptk.local.problem
+    'NoRecipesFound',
+    'RecipeNameNotFound',
+    'RecipeNotFoundError',
 
     # cptk.local.project
     'InvalidMoveDest',

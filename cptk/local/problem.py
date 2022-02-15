@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from pydantic import validator
 
 import cptk.constants
+import cptk.utils
 from cptk.core.config import ConfigFileError
 from cptk.core.config import ConfigFileNotFound
 from cptk.core.config import Configuration
@@ -19,6 +20,29 @@ if TYPE_CHECKING:
     from cptk.core.preprocessor import Preprocessor
 
 T = TypeVar('T')
+
+
+class RecipeNotFoundError(cptk.utils.cptkException):
+    def __init__(self, filepath: str, msg: str) -> None:
+        self.filepath = filepath
+        super().__init__(msg)
+
+
+class RecipeNameNotFound(RecipeNotFoundError):
+    def __init__(self, filepath: str, name: str) -> None:
+        self.name = name
+        super().__init__(
+            filepath,
+            f'Recipe named {name!r} not found in recipes file {filepath!r}'
+        )
+
+
+class NoRecipesFound(RecipeNotFoundError):
+    def __init__(self, filepath: str) -> None:
+        super().__init__(
+            filepath,
+            f'No recipes found in recipes file {filepath!r}'
+        )
 
 
 class Recipe(BaseModel):
@@ -87,10 +111,8 @@ class LocalProblem:
 
         path = os.path.join(location, cptk.constants.RECIPE_FILE)
 
-        try:
-            recipes = RecipesConfig.load(path)
-        except ConfigFileError:
-            return False
+        try: recipes = RecipesConfig.load(path)
+        except ConfigFileError: return False
 
         names = {r.name for r in recipes.recipes}
         return len(names) > 0 if name is None else name in names
@@ -100,7 +122,8 @@ class LocalProblem:
         path = os.path.join(self.location, cptk.constants.RECIPE_FILE)
         recipes = RecipesConfig.load(path).recipes
 
+        if not recipes: raise NoRecipesFound(path)
         if self.name is None: return recipes[0]
-        return next(r for r in recipes if r.name == self.name)
 
-        # TODO: handle StopIteration exception
+        try: return next(r for r in recipes if r.name == self.name)
+        except StopIteration: raise RecipeNameNotFound(path, self.name)
