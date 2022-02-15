@@ -76,7 +76,7 @@ class TestRunner:
         filepath = tempdir.create(case.code, 'file.py')
         result = run.exec(
             f'{sys.executable} {filepath}',
-            input=case.input, timeout=0.1
+            input=case.input, timeout=0.5
         )
 
         assert result.code != 0
