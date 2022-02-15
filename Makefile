@@ -34,4 +34,8 @@ install-ci:
 	$(PY) -m pip install -r requirements-dev.txt
 	$(PY) -m pip install .
 
-# TODO: add 'build' and 'upload' tasks
+build: test
+	$(PY) setup.py sdist bdist_wheel
+
+upload: build
+	$(PY) -m twine upload dist/*
