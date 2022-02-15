@@ -40,10 +40,8 @@ class TestProblemClone:
         )
 
         prob = proj.clone_problem(problem)
-
-        loc = os.path.join(prob.location, prob.location)
-        assert loc == os.path.join(
-            tempdir.path, problem.website.name, problem.name)
+        assert os.path.normpath(prob.location) == os.path.normpath(os.path.join(
+            tempdir.path, problem.website.name, problem.name))
 
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)
