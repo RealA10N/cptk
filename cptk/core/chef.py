@@ -6,6 +6,7 @@ from threading import Timer
 from typing import Optional
 from typing import TypeVar
 
+import cptk.utils
 from cptk.core.system import System
 from cptk.local.problem import LocalProblem
 
@@ -27,6 +28,15 @@ class Nothing:
 
     def __call__(self: T, *_, **__) -> T:
         return self
+
+
+class BakingError(cptk.utils.cptkException):
+    def __init__(self, code: int, cmd: str) -> None:
+        self.code = code
+        self.cmd = cmd
+        super().__init__(
+            f'Execution of command resulted in exit code {code}:\n{cmd}'
+        )
 
 
 class Runner:
@@ -99,7 +109,8 @@ class Chef:
 
         for cmd in self._problem.recipe.bake:
             System.log(cmd)
-            self._runner.exec(cmd, wd=location, redirect=False)
+            res = self._runner.exec(cmd, wd=location, redirect=False)
+            if res.code: raise BakingError(res.code, cmd)
 
     def serve(self) -> None:
         """ Bakes the local problem (if a baking recipe is provided), and serves

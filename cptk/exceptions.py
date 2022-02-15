@@ -1,3 +1,4 @@
+from cptk.core.chef import BakingError
 from cptk.core.config import ConfigFileError
 from cptk.core.config import ConfigFileNotFound
 from cptk.core.config import ConfigFileParsingError
@@ -16,6 +17,9 @@ from cptk.local.project import ProjectNotFound
 from cptk.utils import cptkException
 
 __all__ = [
+    # cptk.core.chef
+    'BakingError',
+
     # cptk.core.config
     'ConfigFileError',
     'ConfigFileNotFound',
@@ -43,6 +47,4 @@ __all__ = [
 
     # cptk.utils
     'cptkException',
-
-
 ]
