@@ -239,7 +239,7 @@ class LocalProject:
         except FileNotFoundError:
             return None
 
-        location, _, name = data.partition(':')
+        location, _, name = data.partition(cptk.constants.LAST_FILE_SEPERATOR)
         return LocalProblem(location, name if name else None)
 
     def update_last(self, prob: LocalProblem) -> None:
@@ -248,7 +248,7 @@ class LocalProject:
         with open(path, 'w') as file:
             location = prob.location
             name = str() if prob.name is None else prob.name
-            file.write(f'{location}:{name}')
+            file.write(f'{location}{cptk.constants.LAST_FILE_SEPERATOR}{name}')
 
     def move(self, src: str, dst: str) -> None:
         """ Validates that the given source and destination directories are
