@@ -39,11 +39,13 @@ class Recipe(BaseModel):
             if isinstance(v, str): return processor.parse_string(v)
             else: return v
 
-        return type(self)(
-            name=parse_str(self.name),
-            bake=[parse_str(v) for v in self.bake],
-            serve=parse_str(self.serve),
-        )
+        kwargs = {
+            'name': parse_str(self.name),
+            'serve': parse_str(self.serve),
+        }
+
+        if self.bake: kwargs['bake'] = [parse_str(v) for v in self.bake]
+        return type(self)(**kwargs)
 
 
 class RecipesConfig(Configuration):

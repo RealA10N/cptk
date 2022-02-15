@@ -1,4 +1,4 @@
-RECIPE_FILE = '.cptk/recipe.cptk.yaml'
+RECIPE_FILE = 'recipes.cptk.yaml'
 PROJECT_FILE = '.cptk/project.cptk.yaml'
 LAST_FILE = '.cptk/stayaway/last.cptk.txt'
 

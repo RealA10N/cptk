@@ -1,3 +1,0 @@
-solution:
-  serve: |
-    py test-problem.py

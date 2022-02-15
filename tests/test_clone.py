@@ -20,41 +20,17 @@ from cptk.core.templates import Template
 
 HERE = os.path.dirname(__file__)
 CLONES_DIR = os.path.join(HERE, 'clones')
+TEMPLATE = DEFAULT_TEMPLATES[0].uid
 
 
 @mock.patch('os.getlogin', lambda: 'User')
 @freeze_time('2022-01-01')
 class TestProblemClone:
 
-    def test_add_custom_test(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
-        problem = dummy.get_dummy_problem()
-
-        proj = LocalProject.init(tempdir.path, template='g++')
-        prob = proj.clone_problem(problem)
-
-        tests_dir = os.path.join(
-            prob.location, cptk.constants.DEFAULT_TESTS_FOLDER)
-        test_files = os.listdir(tests_dir)
-        tests = len(problem.tests)
-
-        assert len(test_files) == tests + \
-            len([t for t in problem.tests if t.expected is not None])
-        assert set(prob.tests) == set(problem.tests)
-
-        new_test = os.path.join(tests_dir, 'in-my.txt')
-        assert not os.path.exists(new_test)
-        with open(new_test, 'w', encoding='utf8') as file:
-            file.write('hello!')
-        assert os.path.exists(new_test)
-
-        prob = LocalProblem(prob.location)
-        assert len(prob.tests) == tests + 1
-        assert cptk.scrape.Test('hello!') in prob.tests
-
     def test_clone_preprocess(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
         problem = dummy.get_dummy_problem()
 
-        proj = LocalProject.init(tempdir.path, template='g++')
+        proj = LocalProject.init(tempdir.path, TEMPLATE)
         proj.config.clone.path = '{{problem.website.name}}/{{problem.name}}'
 
         proj.config.clone.template = tempdir.join('template')
@@ -104,9 +80,6 @@ class TestProblemClone:
         recipe_path = os.path.join(path, cptk.constants.RECIPE_FILE)
         assert os.path.isfile(recipe_path)
 
-        prob = LocalProblem(path)
-        assert prob.recipe.dict()['solution']['serve']
-
     @mock.patch('platform.system', lambda: 'Linux')
     @pytest.mark.parametrize('template', (
         pytest.param(template, id=template.uid)
@@ -119,25 +92,24 @@ class TestProblemClone:
         dummy: 'Dummy',
     ):
         name = template.uid
-        expected = os.path.join(CLONES_DIR, name)
         proj = LocalProject.init(tempdir.path, template=name)
         proj.config.clone.path = 'clone'
         prob = proj.clone_problem(dummy.get_dummy_problem())
-        self._assert_equal_dirs(tempdir.join('clone'), expected)
+        self._assert_equal_dirs(tempdir.join(
+            'clone'), os.path.join(CLONES_DIR, name))
         self._assert_valid_problem(prob.location)
 
+    @mock.patch('platform.system', lambda: 'Windows')
     @pytest.mark.parametrize('template', (
         pytest.param(template, id=template.uid)
         for template in DEFAULT_TEMPLATES
     ))
     def test_default_templates_win(
         self,
-        mocker,
         tempdir: 'EasyDirectory',
         template: 'Template',
         dummy: 'Dummy',
     ):
-        mocker.patch('platform.system', lambda: 'Windows')
         name = template.uid
         expected = os.path.join(CLONES_DIR, f'win-{name}')
         proj = LocalProject.init(tempdir.path, template=name)

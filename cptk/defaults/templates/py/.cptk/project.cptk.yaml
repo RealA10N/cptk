@@ -11,4 +11,4 @@ clone:
     name: "{{ problem.name | slug }}"
     serve: >-
       {% if system == 'Windows' %}py{% else %}python3{% endif %}
-      {{ problem.name | slug }}
+      {{ problem.name | slug }}.py

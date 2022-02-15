@@ -1,0 +1,5 @@
+recipes:
+- name: test-problem
+  bake:
+  - g++ test-problem.cpp -DLOCAL -O2 -Wall -o test-problem.exe
+  serve: ./test-problem.exe
