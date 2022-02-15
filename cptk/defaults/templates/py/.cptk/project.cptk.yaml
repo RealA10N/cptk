@@ -8,7 +8,7 @@ clone:
     {% endif %}{% endif %}/\
     {{ problem.name | slug }}/"
   recipe:
-    name: {{ problem.name | slug }}
+    name: "{{ problem.name | slug }}"
     serve: >-
       {% if system == 'Windows' %}py{% else %}python3{% endif %}
       {{ problem.name | slug }}
