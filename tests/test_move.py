@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
     from .utils import EasyDirectory, Dummy
-    from typing import Dict
 
 import pytest
 
@@ -19,37 +20,39 @@ TEMPLATE = DEFAULT_TEMPLATES[0].uid
 
 class TestMove:
 
-    @pytest.mark.parametrize('raw, expected', (
-        (
-            'code-submission-evaluation-system::cses',
-            [
-                ('code-submission-evaluation-system', 'cses'),
-            ]
+    @pytest.mark.parametrize(
+        'raw, expected', (
+            (
+                'code-submission-evaluation-system::cses',
+                [
+                    ('code-submission-evaluation-system', 'cses'),
+                ],
+            ),
+            (
+                'Codeforces.com :: Codeforces\n'
+                'Cses.fi:: Cses',
+                [
+                    ('Codeforces.com ', ' Codeforces'),
+                    ('Cses.fi', ' Cses'),
+                ],
+            ),
         ),
-        (
-            'Codeforces.com :: Codeforces\n'
-            'Cses.fi:: Cses',
-            [
-                ('Codeforces.com ', ' Codeforces'),
-                ('Cses.fi', ' Cses'),
-            ],
-        )
-    ))
+    )
     def test_load_moves(
         self,
         raw: str,
-        expected: 'Dict[str, str]',
-        tempdir: 'EasyDirectory',
+        expected: dict[str, str],
+        tempdir: EasyDirectory,
     ):
         proj = LocalProject.init(tempdir.path, TEMPLATE)
         tempdir.create(raw, cptk.constants.MOVE_FILE)
         assert proj._load_moves() == expected
 
-    def test_load_new_project(self, tempdir: 'EasyDirectory'):
+    def test_load_new_project(self, tempdir: EasyDirectory):
         proj = LocalProject.init(tempdir.path, TEMPLATE)
         proj._load_moves() == []
 
-    def test_move_recorded(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
+    def test_move_recorded(self, tempdir: EasyDirectory, dummy: Dummy):
         proj = LocalProject.init(tempdir.path, TEMPLATE)
         proj.config.clone.path = 'clone'
         proj.clone_problem(dummy.get_dummy_problem())
@@ -63,13 +66,16 @@ class TestMove:
             proj.move(proj.relative(src), proj.relative(dst))
 
         assert proj._load_moves() == MOVES
-        assert os.path.normpath(proj.move_relative(
-            'clone')) == os.path.normpath(proj.relative('hello/there'))
+        assert os.path.normpath(
+            proj.move_relative(
+                'clone',
+            ),
+        ) == os.path.normpath(proj.relative('hello/there'))
 
     def test_move_outside_project(
         self,
-        tempdir: 'EasyDirectory',
-        dummy: 'Dummy',
+        tempdir: EasyDirectory,
+        dummy: Dummy,
     ):
         dst = tempdir.path
 
@@ -84,8 +90,8 @@ class TestMove:
 
     def test_move_cptk(
         self,
-        tempdir: 'EasyDirectory',
-        dummy: 'Dummy',
+        tempdir: EasyDirectory,
+        dummy: Dummy,
     ):
 
         proj = LocalProject.init(tempdir.join('project'), TEMPLATE)
@@ -101,8 +107,8 @@ class TestMove:
 
     def test_move_project_root(
         self,
-        tempdir: 'EasyDirectory',
-        dummy: 'Dummy'
+        tempdir: EasyDirectory,
+        dummy: Dummy,
     ):
 
         proj = LocalProject.init(tempdir.join('project'), TEMPLATE)

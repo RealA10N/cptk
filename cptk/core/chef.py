@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import os
 import subprocess
 import sys
 from dataclasses import dataclass
 from threading import Timer
-from typing import Optional
 from typing import TypeVar
 
 import cptk.utils
@@ -15,11 +16,11 @@ T = TypeVar('T')
 
 @dataclass
 class RunnerResult:
-    runner: 'Runner'
+    runner: Runner
     code: int
     timed_out: bool
-    outs: Optional[str] = None
-    errs: Optional[str] = None
+    outs: str | None = None
+    errs: str | None = None
 
 
 class Nothing:
@@ -35,7 +36,7 @@ class BakingError(cptk.utils.cptkException):
         self.code = code
         self.cmd = cmd
         super().__init__(
-            f'Execution of command resulted in exit code {code}:\n{cmd}'
+            f'Execution of command resulted in exit code {code}:\n{cmd}',
         )
 
 
@@ -110,7 +111,8 @@ class Chef:
         for cmd in self._problem.recipe.bake:
             System.log(cmd)
             res = self._runner.exec(cmd, wd=location, redirect=False)
-            if res.code: raise BakingError(res.code, cmd)
+            if res.code:
+                raise BakingError(res.code, cmd)
 
     def serve(self) -> None:
         """ Bakes the local problem (if a baking recipe is provided), and serves

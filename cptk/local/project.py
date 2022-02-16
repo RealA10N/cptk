@@ -1,11 +1,10 @@
+from __future__ import annotations
+
 import os
 import shutil
 from dataclasses import dataclass
 from dataclasses import field
 from glob import iglob
-from typing import List
-from typing import Optional
-from typing import Tuple
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -23,7 +22,7 @@ from cptk.local.problem import Recipe
 
 
 if TYPE_CHECKING:
-    from typing import Type, TypeVar
+    from typing import TypeVar
     from cptk.scrape import Problem
     from cptk.core.templates import Template
     T = TypeVar('T')
@@ -87,7 +86,7 @@ class LocalProject:
         return os.path.isfile(os.path.join(path))
 
     @classmethod
-    def find(cls: 'Type[T]', location: str) -> 'T':
+    def find(cls: type[T], location: str) -> T:
         """ Recursively searches if the given location is part of a cptk
         project, and if so, returns an instance of the project. If a project
         isn't found, an error is thrown. """
@@ -102,7 +101,7 @@ class LocalProject:
         return cls.find(parent)
 
     @classmethod
-    def init(cls: 'Type[T]', location: str, template: str) -> 'T':
+    def init(cls: type[T], location: str, template: str) -> T:
         """ Initialize an empty local project in the given location using the
         given template name. Returns the newly created project as a LocalProject
         instance. """
@@ -111,17 +110,20 @@ class LocalProject:
         if template not in avaliable_templates:
             raise InvalidTemplate(f'Invalid template name {template!r}')
 
-        template: 'Template' = avaliable_templates.get(template)
+        template: Template = avaliable_templates.get(template)
         commons = cptk.utils.find_common_files(location, template.path)
 
         if commons:
-            System.warn('\n'.join((
-                'The following files will be overwritten:',
-                *commons,
-            )))
+            System.warn(
+                '\n'.join((
+                    'The following files will be overwritten:',
+                    *commons,
+                )),
+            )
 
             ans = System.confirm('Are you sure you want to continue')
-            if not ans: System.abort()
+            if not ans:
+                System.abort()
 
         cptk.utils.soft_tree_copy(src=template.path, dst=location)
         return cls(location)
@@ -131,14 +133,14 @@ class LocalProject:
         p = os.path.join(self.location, cptk.constants.PROJECT_FILE)
         return ProjectConfig.load(p)
 
-    def _load_moves(self) -> List[Tuple[str, str]]:
+    def _load_moves(self) -> list[tuple[str, str]]:
         """ Loads information from the local moves file and returns the
         replacements directory. """
 
         moves_path = self.relative(cptk.constants.MOVE_FILE)
 
         try:
-            with open(moves_path, 'r') as file:
+            with open(moves_path) as file:
                 lines = file.read().splitlines(keepends=False)
         except FileNotFoundError:
             return list()
@@ -148,7 +150,7 @@ class LocalProject:
             parts = line.split(cptk.constants.MOVE_FILE_SEPERATOR)
 
             if len(parts) == 2:
-                moves.append((parts[0], parts[1],))
+                moves.append((parts[0], parts[1]))
 
             else:
                 raise ConfigFileParsingError(
@@ -172,7 +174,8 @@ class LocalProject:
         accordingly. If a prefix isn't shared, returns the original path
         without modifications. """
 
-        if not self._is_subpath(src, path): return path
+        if not self._is_subpath(src, path):
+            return path
         rel = os.path.relpath(path, src)
         return os.path.normpath(os.path.join(dst, rel))
 
@@ -205,7 +208,7 @@ class LocalProject:
         problem = self.fetcher.page_to_problem(page)
         return self.clone_problem(problem)
 
-    def clone_problem(self, problem: 'Problem') -> LocalProblem:
+    def clone_problem(self, problem: Problem) -> LocalProblem:
         """ Clones the given problem instance and stores a local problem inside
         the current cptk project. """
 
@@ -216,13 +219,16 @@ class LocalProject:
         commons = cptk.utils.find_common_files(src, dst)
 
         if commons:
-            System.warn('\n'.join((
-                'The following files will be overwritten:',
-                *commons,
-            )))
+            System.warn(
+                '\n'.join((
+                    'The following files will be overwritten:',
+                    *commons,
+                )),
+            )
 
             ans = System.confirm('Are you sure you want to continue')
-            if not ans: System.abort()
+            if not ans:
+                System.abort()
 
         cptk.utils.soft_tree_copy(src, dst)
         recipe = self.config.clone.recipe.preprocess(processor)
@@ -232,9 +238,9 @@ class LocalProject:
         self.update_last(prob)
         return prob
 
-    def last(self) -> Optional[LocalProblem]:
+    def last(self) -> LocalProblem | None:
         try:
-            with open(self.relative(cptk.constants.LAST_FILE), 'r') as file:
+            with open(self.relative(cptk.constants.LAST_FILE)) as file:
                 data = file.read()
         except FileNotFoundError:
             return None
@@ -247,7 +253,7 @@ class LocalProject:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'w') as file:
             location = prob.location
-            name = str() if prob.name is None else prob.name
+            name = '' if prob.name is None else prob.name
             file.write(f'{location}{cptk.constants.LAST_FILE_SEPERATOR}{name}')
 
     def move(self, src: str, dst: str) -> None:

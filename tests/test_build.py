@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import subprocess
 import sys
 
@@ -9,7 +11,7 @@ def test_same_version():
         [sys.executable, '-m', 'pip', 'show', 'cptk'],
         stdout=subprocess.PIPE,
         check=True,
-        encoding='utf8'
+        encoding='utf8',
     )
 
     fields = {

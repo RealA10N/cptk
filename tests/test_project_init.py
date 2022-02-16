@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from unittest import mock
 
@@ -33,9 +35,11 @@ def test_default_init(tempdir: EasyDirectory, template: str):
     assert LocalProject.find(tempdir.join('a/b/c')) == proj
 
 
-@pytest.mark.parametrize('old_template_uid, new_template_uid', (
-    ('py', 'g++'),
-))
+@pytest.mark.parametrize(
+    'old_template_uid, new_template_uid', (
+        ('py', 'g++'),
+    ),
+)
 def test_overwrite_existing_project(
     tempdir: EasyDirectory,
     old_template_uid: str,
@@ -52,13 +56,16 @@ def test_overwrite_existing_project(
 
     # Assert that there are differences between the templates
     assert set(find_tree_files(old_template.path)) != set(
-        find_tree_files(new_template.path))
+        find_tree_files(new_template.path),
+    )
 
     # Initialize first project
     LocalProject.init(tempdir.path, template=old_template_uid)
 
     # Initialize second project
-    with mock.patch('cptk.core.system.System.confirm',
-                    mock.Mock(return_value=True)) as res:
+    with mock.patch(
+        'cptk.core.system.System.confirm',
+        mock.Mock(return_value=True),
+    ) as res:
         LocalProject.init(tempdir.path, template=new_template_uid)
     res.assert_called_once()

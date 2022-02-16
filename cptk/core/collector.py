@@ -1,10 +1,9 @@
+from __future__ import annotations
+
 import argparse
 import inspect
 from collections import defaultdict
 from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Tuple
 from typing import TypeVar
 
 F = TypeVar('F')
@@ -15,7 +14,7 @@ class CommandCollector:
     def __init__(self, *args, **kwargs) -> None:
         self._parser = argparse.ArgumentParser(*args, **kwargs)
         self._subparsers = self._parser.add_subparsers()
-        self._args: Dict[Callable, List[Tuple]] = defaultdict(list)
+        self._args: dict[Callable, list[tuple]] = defaultdict(list)
 
         self._preprocessor = lambda v: v
 
@@ -67,7 +66,7 @@ class CommandCollector:
         self._preprocessor = func
         return func
 
-    def run(self, args: List[str] = None):
+    def run(self, args: list[str] = None):
         """ Executes the appropriate subcommand using the given arguments. """
 
         args = self._parser.parse_args(args)
@@ -77,7 +76,9 @@ class CommandCollector:
         func: Callable = args.pop('func')
         sig = inspect.signature(func)
 
-        return func(**{
-            key: value for key, value in args.items()
-            if key in sig.parameters.keys()
-        })
+        return func(
+            **{
+                key: value for key, value in args.items()
+                if key in sig.parameters.keys()
+            },
+        )

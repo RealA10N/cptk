@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 import shutil
@@ -5,7 +7,6 @@ from argparse import ArgumentTypeError
 from functools import lru_cache
 from typing import Callable
 from typing import Generator
-from typing import List
 from typing import TypeVar
 T = TypeVar('T')
 
@@ -27,15 +28,18 @@ def cached_property(f: Callable[..., T]) -> T:
 def find_tree_files(dir: str) -> Generator[str, None, None]:
     """ Yields all files in the directory as absolute paths. """
 
-    if not os.path.isdir(dir): return
+    if not os.path.isdir(dir):
+        return
 
     for name in os.listdir(dir):
         path = os.path.join(dir, name)
-        if os.path.isdir(path): yield from find_tree_files(path)
-        elif os.path.isfile(path): yield path
+        if os.path.isdir(path):
+            yield from find_tree_files(path)
+        elif os.path.isfile(path):
+            yield path
 
 
-def find_common_files(a: str, b: str) -> List[str]:
+def find_common_files(a: str, b: str) -> list[str]:
     """ Returns a list of files that share the same relative path in both
     directories a and b. """
 
@@ -59,8 +63,10 @@ def soft_tree_copy(src: str, dst: str) -> None:
         item_src = os.path.join(src, name)
         item_dst = os.path.join(dst, name)
 
-        if os.path.isdir(item_src): soft_tree_copy(item_src, item_dst)
-        elif os.path.isfile(item_src): shutil.copyfile(item_src, item_dst)
+        if os.path.isdir(item_src):
+            soft_tree_copy(item_src, item_dst)
+        elif os.path.isfile(item_src):
+            shutil.copyfile(item_src, item_dst)
 
 
 @lru_cache(None)
@@ -72,7 +78,7 @@ def _url_regex() -> str:
         r"(\w+\.)?"                 # host (optional)
         r"((\w+)\.(\w+))"           # domain
         r"(\.\w+)*"                 # top-level domain (optional, can have > 1)
-        r"([\w\-\._\~/]*)*(?<!\.)"  # path, params, anchors, etc. (optional)
+        r"([\w\-\._\~/]*)*(?<!\.)",  # path, params, anchors, etc. (optional)
     )
 
 

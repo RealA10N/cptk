@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 from setuptools import find_packages
 from setuptools import setup
 
 import cptk
 
-with open("README.md", mode="r", encoding="utf8") as f:
+with open("README.md", encoding="utf8") as f:
     README = f.read()
 
-with open("CHANGELOG.md", mode="r", encoding="utf8") as f:
+with open("CHANGELOG.md", encoding="utf8") as f:
     CHANGELOG = f.read()
 
-with open("requirements.txt", mode="r", encoding="utf8") as f:
+with open("requirements.txt", encoding="utf8") as f:
     DEPENDENCIES = f.read().splitlines()
 
 setup(
@@ -36,6 +38,6 @@ setup(
         ],
         "console_scripts": [
             "cptk=cptk.main:main",
-        ]
+        ],
     },
 )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import platform
 from abc import ABC
@@ -10,7 +12,7 @@ from slugify import slugify
 
 if TYPE_CHECKING:
     from cptk.scrape import Problem
-    from typing import Type, TypeVar
+    from typing import TypeVar
     T = TypeVar('T')
 
 from cptk.utils import cptkException
@@ -23,7 +25,7 @@ class PreprocessError(cptkException, ABC):
         super().__init__(self._generate_error_message())
 
     @abstractmethod
-    def _generate_error_message(self,) -> str:
+    def _generate_error_message(self) -> str:
         pass
 
 
@@ -42,10 +44,10 @@ class PreprocessFileError(PreprocessError):
 
     @classmethod
     def from_string_err(
-        cls: 'Type[T]',
+        cls: type[T],
         path: str,
         err: PreprocessStringError,
-    ) -> 'T':
+    ) -> T:
         return cls(err.jinja_error, path)
 
 
@@ -59,16 +61,16 @@ class PreprocessNameError(PreprocessError):
 
     @classmethod
     def from_string_err(
-        cls: 'Type[T]',
+        cls: type[T],
         name: str,
         err: PreprocessStringError,
-    ) -> 'T':
+    ) -> T:
         return cls(err.jinja_error, name)
 
 
 class Preprocessor:
 
-    def __init__(self, problem: 'Problem') -> None:
+    def __init__(self, problem: Problem) -> None:
         self._env = jinja2.Environment(undefined=jinja2.StrictUndefined)
         self._env.globals.update({
             key: val
@@ -83,7 +85,7 @@ class Preprocessor:
 
         # Slug is a global to allow the "slug(...)" syntax,
         # and a filter to allow the "... | slug" syntax.
-        self._env.filters.update({'slug': slugify, })
+        self._env.filters.update({'slug': slugify})
 
         # Cptk considers None values as undefined.
         # This means that scopes like {% if v is defined %} where v is None
@@ -111,7 +113,7 @@ class Preprocessor:
             raise PreprocessStringError(err)
 
     def parse_file_contents(self, path: str) -> None:
-        with open(path, 'r', encoding='utf8') as file:
+        with open(path, encoding='utf8') as file:
             data = file.read()
 
         try:

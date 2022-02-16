@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING
 from unittest import mock
@@ -27,7 +29,7 @@ TEMPLATE = DEFAULT_TEMPLATES[0].uid
 @freeze_time('2022-01-01')
 class TestProblemClone:
 
-    def test_clone_preprocess(self, tempdir: 'EasyDirectory', dummy: 'Dummy'):
+    def test_clone_preprocess(self, tempdir: EasyDirectory, dummy: Dummy):
         problem = dummy.get_dummy_problem()
 
         proj = LocalProject.init(tempdir.path, TEMPLATE)
@@ -40,19 +42,23 @@ class TestProblemClone:
         )
 
         prob = proj.clone_problem(problem)
-        assert os.path.normpath(prob.location) == os.path.normpath(os.path.join(
-            tempdir.path, problem.website.name, problem.name))
+        assert os.path.normpath(prob.location) == os.path.normpath(
+            os.path.join(
+                tempdir.path, problem.website.name, problem.name,
+            ),
+        )
 
         res = os.path.join(prob.location, 'temp.txt')
         assert os.path.isfile(res)
-        with open(res, 'r') as file: data = file.read()
+        with open(res) as file:
+            data = file.read()
         assert data == f'{slugify(problem.website.name)}\n{problem.name}'
 
     @classmethod
     def _compare_files(cls, src: str, dst: str) -> None:
-        with open(src, 'r') as file:
+        with open(src) as file:
             src_data = file.read()
-        with open(dst, 'r') as file:
+        with open(dst) as file:
             dst_data = file.read()
         assert src_data == dst_data
 
@@ -67,8 +73,11 @@ class TestProblemClone:
                 os.path.join(dst, filename),
             )
         for common in res.common_dirs:
-            cls._assert_equal_dirs(os.path.join(
-                src, common), os.path.join(dst, common))
+            cls._assert_equal_dirs(
+                os.path.join(
+                    src, common,
+                ), os.path.join(dst, common),
+            )
 
     def _assert_valid_problem(self, path: str) -> None:
         """ Checks that given path and asserts that the path contains a
@@ -79,34 +88,41 @@ class TestProblemClone:
         assert os.path.isfile(recipe_path)
 
     @mock.patch('platform.system', lambda: 'Linux')
-    @pytest.mark.parametrize('template', (
-        pytest.param(template, id=template.uid)
-        for template in DEFAULT_TEMPLATES
-    ))
+    @pytest.mark.parametrize(
+        'template', (
+            pytest.param(template, id=template.uid)
+            for template in DEFAULT_TEMPLATES
+        ),
+    )
     def test_default_templates(
         self,
-        tempdir: 'EasyDirectory',
-        template: 'Template',
-        dummy: 'Dummy',
+        tempdir: EasyDirectory,
+        template: Template,
+        dummy: Dummy,
     ):
         name = template.uid
         proj = LocalProject.init(tempdir.path, template=name)
         proj.config.clone.path = 'clone'
         prob = proj.clone_problem(dummy.get_dummy_problem())
-        self._assert_equal_dirs(tempdir.join(
-            'clone'), os.path.join(CLONES_DIR, name))
+        self._assert_equal_dirs(
+            tempdir.join(
+                'clone',
+            ), os.path.join(CLONES_DIR, name),
+        )
         self._assert_valid_problem(prob.location)
 
     @mock.patch('platform.system', lambda: 'Windows')
-    @pytest.mark.parametrize('template', (
-        pytest.param(template, id=template.uid)
-        for template in DEFAULT_TEMPLATES
-    ))
+    @pytest.mark.parametrize(
+        'template', (
+            pytest.param(template, id=template.uid)
+            for template in DEFAULT_TEMPLATES
+        ),
+    )
     def test_default_templates_win(
         self,
-        tempdir: 'EasyDirectory',
-        template: 'Template',
-        dummy: 'Dummy',
+        tempdir: EasyDirectory,
+        template: Template,
+        dummy: Dummy,
     ):
         name = template.uid
         expected = os.path.join(CLONES_DIR, f'win-{name}')

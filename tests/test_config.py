@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from typing import Optional
 
@@ -18,23 +20,25 @@ class Pet(Configuration):
 class TestConfiguration:
     """ Tests the 'load' classmethod of all Configuration models. """
 
-    @pytest.mark.parametrize('yaml, expected', (
-        (
-            """
+    @pytest.mark.parametrize(
+        'yaml, expected', (
+            (
+                """
             name: Shocko
             age: 4
             type: Dog
             """,
-            {'name': 'Shocko', 'age': 4, 'type': 'Dog'},
-        ),
-        (
-            """
+                {'name': 'Shocko', 'age': 4, 'type': 'Dog'},
+            ),
+            (
+                """
             name: Milky
             age: 8.17
             """,
-            {'name': 'Milky', 'age': 8, 'type': None},
+                {'name': 'Milky', 'age': 8, 'type': None},
+            ),
         ),
-    ))
+    )
     def test_valids(self, yaml, expected, tempdir) -> None:
         path = tempdir.create(yaml, 'pet.yaml')
 
@@ -51,45 +55,51 @@ class TestConfiguration:
 
         assert err.value.path == path
 
-    @pytest.mark.parametrize('yaml', (
-        "",
-        """
+    @pytest.mark.parametrize(
+        'yaml', (
+            "",
+            """
         name: Haribo
         type: Dog
         """,
-        """
+            """
         name: null
         age: 123
         type: Cow
         """,
-        """
+            """
         name: Mooooo
         age: NaN
         type: Cow
         """,
-    ))
+        ),
+    )
     def test_value_errors(self, tempdir, yaml) -> None:
         path = tempdir.create(yaml, 'pet.yaml')
 
         with pytest.raises(ConfigFileValueError):
             Pet.load(path)
 
-    @pytest.mark.parametrize('yaml', (
-        """
+    @pytest.mark.parametrize(
+        'yaml', (
+            """
         name: doggo
         type: -: -:
         """,
-    ))
+        ),
+    )
     def test_yaml_parse_error(self, tempdir, yaml) -> None:
         path = tempdir.create(yaml, 'broken.yaml')
 
         with pytest.raises(ConfigFileParsingError):
             Pet.load(path)
 
-    @pytest.mark.parametrize('pet', (
-        Pet(name='Boogo', age=123, type='Dog'),
-        Pet(name='Lora', age=1),
-    ))
+    @pytest.mark.parametrize(
+        'pet', (
+            Pet(name='Boogo', age=123, type='Dog'),
+            Pet(name='Lora', age=1),
+        ),
+    )
     def test_dump(self, tempdir, pet: Pet) -> None:
         path = tempdir.join('pet.yaml')
 

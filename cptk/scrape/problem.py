@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Any
+    from typing import Any
     from cptk.scrape import Website
     from datetime import datetime
 
@@ -14,8 +16,8 @@ class Scraped:
     instanaces of the 'Scraped' object, or instances of classes that inherent
     from it. """
 
-    _uid: 'Any' = field(compare=True, hash=True)
-    website: 'Website' = field(compare=True)
+    _uid: Any = field(compare=True, hash=True)
+    website: Website = field(compare=True)
     name: str = field(compare=False)
     url: str = field(compare=False)
 
@@ -26,8 +28,8 @@ class Problem(Scraped):
     own 'Problem' class which inherits from this one and can store additional
     information. """
 
-    contest: 'Contest' = field(compare=False)
-    tests: 'List[Test]' = field(default_factory=list, compare=False)
+    contest: Contest = field(compare=False)
+    tests: list[Test] = field(default_factory=list, compare=False)
     time_limit: float = field(default=None, compare=False)     # in Seconds
     memory_limit: float = field(default=None, compare=False)   # in MB
 
@@ -35,8 +37,8 @@ class Problem(Scraped):
 @dataclass(unsafe_hash=True)
 class Contest(Scraped):
     active: bool = field(default=None, compare=False)
-    start_time: 'datetime' = field(default=None, compare=False)
-    end_time: 'datetime' = field(default=None, compare=False)
+    start_time: datetime = field(default=None, compare=False)
+    end_time: datetime = field(default=None, compare=False)
 
 
 @dataclass(unsafe_hash=True)

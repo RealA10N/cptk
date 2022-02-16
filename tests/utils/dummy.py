@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import cptk.scrape
 import cptk.websites
 

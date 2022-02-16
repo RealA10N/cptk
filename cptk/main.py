@@ -1,5 +1,4 @@
-from typing import List
-from typing import Optional
+from __future__ import annotations
 
 from colorama import deinit
 from colorama import init
@@ -9,7 +8,7 @@ from cptk.core.system import System
 from cptk.utils import cptkException
 
 
-def main(args: Optional[List[str]] = None) -> int:
+def main(args: list[str] | None = None) -> int:
 
     code = 0  # os.EX_OK
 

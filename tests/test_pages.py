@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import is_dataclass
@@ -37,14 +39,14 @@ PAGES_BASEPATH = path.join(HERE, "pages")
 
 @dataclass
 class PageTestCase:
-    website: 'Website'
+    website: Website
     time: datetime
     info: PageInfo
     expected: dict
     configfile: str
 
 
-def cases_generator() -> 'Iterator[PageTestCase]':
+def cases_generator() -> Iterator[PageTestCase]:
     """ A generator that yields 'PageTestCase' instances for all avaliable page
     test cases found in the 'pages' subdirectory. """
 
@@ -54,13 +56,13 @@ def cases_generator() -> 'Iterator[PageTestCase]':
         for case_config in glob(pattern, recursive=True):
 
             # Load test case configuration from json
-            with open(case_config, mode='r', encoding='utf8') as f:
+            with open(case_config, encoding='utf8') as f:
                 case = load(f)
 
             # Load html page file that is relevant to the current case
             base_path = path.dirname(case_config)
             data_path = path.join(base_path, case['info']['data'])
-            with open(data_path, mode='r', encoding='utf8') as f:
+            with open(data_path, encoding='utf8') as f:
                 data = f.read()
 
             info = PageInfo(
@@ -87,7 +89,7 @@ class TestPages:
         (
             pytest.param(
                 case,
-                id=path.relpath(case.configfile, PAGES_BASEPATH)
+                id=path.relpath(case.configfile, PAGES_BASEPATH),
             ) for case in cases_generator()
         ),
     )
@@ -95,11 +97,12 @@ class TestPages:
         def do():
             self._compare(
                 asdict(case.website.to_problem(case.info)),
-                case.expected
+                case.expected,
             )
 
         if case.time is not None:
-            with freeze_time(case.time): do()
+            with freeze_time(case.time):
+                do()
         else:
             do()
 
@@ -124,7 +127,7 @@ class TestPages:
         (
             pytest.param(
                 case,
-                id=path.relpath(case.configfile, PAGES_BASEPATH)
+                id=path.relpath(case.configfile, PAGES_BASEPATH),
             ) for case in cases_generator()
         ),
     )

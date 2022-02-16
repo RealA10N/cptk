@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from .utils import EasyDirectory
@@ -12,11 +14,13 @@ def test_find_tree_files(tempdir: EasyDirectory):
     os.mkdir(tempdir.join('emptydir'))
 
     res = set(find_tree_files(tempdir.path))
-    assert res == {tempdir.join(a) for a in {
-        os.path.join('a', 'b', 'c.txt'),
-        os.path.join('a', 'b.txt'),
-        'a.txt'
-    }}
+    assert res == {
+        tempdir.join(a) for a in {
+            os.path.join('a', 'b', 'c.txt'),
+            os.path.join('a', 'b.txt'),
+            'a.txt',
+        }
+    }
 
 
 def test_find_common_files(tempdir: EasyDirectory):

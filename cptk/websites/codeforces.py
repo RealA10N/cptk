@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import TYPE_CHECKING
@@ -10,7 +12,6 @@ from cptk.scrape import Test
 from cptk.scrape import Website
 
 if TYPE_CHECKING:
-    from typing import List, Optional
     from cptk.scrape import PageInfo
     from bs4 import BeautifulSoup
 
@@ -50,7 +51,7 @@ class Codeforces(Website):
         return 'codeforces.com'
 
     @staticmethod
-    def _parse_code_text(soup: 'BeautifulSoup') -> None:
+    def _parse_code_text(soup: BeautifulSoup) -> None:
         text = soup.text.replace('<br>', '\n').replace('\r', '').strip()
         return '\n'.join(
             line.strip()
@@ -58,7 +59,7 @@ class Codeforces(Website):
         ) + '\n'
 
     @classmethod
-    def _parse_tests(cls, info: 'PageInfo') -> 'List[Test]':
+    def _parse_tests(cls, info: PageInfo) -> list[Test]:
         """ Assumes that the given 'PageInfo' instance describes a Problem page,
         and parses all sample test cases in the page. """
 
@@ -76,13 +77,13 @@ class Codeforces(Website):
             ) for in_soup, ex_soup in zip(inputs_soup, outputs_soup)
         ]
 
-    def is_problem(self, info: 'PageInfo') -> bool:
+    def is_problem(self, info: PageInfo) -> bool:
         """ Returns 'True' if the given 'PageInfo' instance contains a problem
         statement. """
         elem = info.data.find('div', {'class': 'problem-statement'})
         return elem is not None
 
-    def to_problem(self, info: 'PageInfo') -> 'Optional[CodeforecsProblem]':
+    def to_problem(self, info: PageInfo) -> CodeforecsProblem | None:
         """ Assumes that the given 'PageInfo' instance contains a problem
         statement and returns a 'Problem' instance that describes the problem.
         """
@@ -90,7 +91,7 @@ class Codeforces(Website):
         header_soup = info.data.find('div', {'class': 'header'})
 
         title = header_soup.find('div', {'class': 'title'}).text
-        mark, name = [i.strip() for i in title.split('.')]
+        mark, name = (i.strip() for i in title.split('.'))
 
         contest = self._contest_from_sidebar(info)
 
@@ -136,8 +137,8 @@ class Codeforces(Website):
 
     def _group_from_sidebar(
         self,
-        info: 'PageInfo',
-    ) -> 'Optional[CodeforecsGroup]':
+        info: PageInfo,
+    ) -> CodeforecsGroup | None:
 
         tables = info.data.find_all('table', {'class': 'rtable'})
         links = [table.find('a', href=True) for table in tables]
@@ -164,8 +165,8 @@ class Codeforces(Website):
 
     def _contest_from_sidebar(
         self,
-        info: 'PageInfo',
-    ) -> 'Optional[CodeforcesContest]':
+        info: PageInfo,
+    ) -> CodeforcesContest | None:
         """ Tries to pull information about the current contest using the
         sidebar information that is displayed on every page that is related to
         a contest. If fails to locate the sidebar, returns None. """

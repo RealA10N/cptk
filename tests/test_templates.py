@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cptk.core.templates import DEFAULT_TEMPLATES
 
 

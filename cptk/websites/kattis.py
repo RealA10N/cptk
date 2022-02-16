@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from dataclasses import dataclass
 from dataclasses import field
@@ -12,7 +14,6 @@ from cptk.scrape import Website
 if TYPE_CHECKING:
     from cptk.scrape import PageInfo
     from bs4 import BeautifulSoup
-    from typing import List, Optional
 
 
 @dataclass(unsafe_hash=True)
@@ -51,11 +52,11 @@ class Kattis(Website):
     def domain(self) -> str:
         return 'open.kattis.com'
 
-    def is_problem(self, info: 'PageInfo') -> bool:
+    def is_problem(self, info: PageInfo) -> bool:
         return info.data.find('div', {'class': 'problem-wrapper'}) is not None
 
     @staticmethod
-    def _parse_code_text(soup: 'BeautifulSoup') -> None:
+    def _parse_code_text(soup: BeautifulSoup) -> None:
         text = soup.text.replace('<br>', '\n').replace('\r', '').strip()
         return '\n'.join(
             line.strip()
@@ -63,7 +64,7 @@ class Kattis(Website):
         ) + '\n'
 
     @classmethod
-    def _parse_tests(cls, info: 'PageInfo') -> 'List[Test]':
+    def _parse_tests(cls, info: PageInfo) -> list[Test]:
 
         tables = info.data.find_all('table', {'class': 'sample'})
         res = list()
@@ -73,8 +74,8 @@ class Kattis(Website):
             res.append(
                 Test(
                     input=cls._parse_code_text(inp),
-                    expected=cls._parse_code_text(out)
-                )
+                    expected=cls._parse_code_text(out),
+                ),
             )
 
         return res
@@ -88,10 +89,11 @@ class Kattis(Website):
         )
         return datetime.datetime.combine(date, time)
 
-    def _parse_contest(self, info: 'PageInfo') -> 'Optional[KattisContest]':
+    def _parse_contest(self, info: PageInfo) -> KattisContest | None:
 
         section = info.data.find('div', {'class': 'info upper'})
-        if section is None: return None
+        if section is None:
+            return None
 
         name = section.find('h2', {'class': 'title'}).text.strip()
 
@@ -106,7 +108,7 @@ class Kattis(Website):
         uid = url.path.split('/')[2]
 
         active = info.data.find(
-            'div', {'class': 'contest-progress session-finished'}
+            'div', {'class': 'contest-progress session-finished'},
         ) is None
 
         return KattisContest(
@@ -119,7 +121,7 @@ class Kattis(Website):
             active=active,
         )
 
-    def _parse_archive(self, info: 'PageInfo') -> 'KattisArchive':
+    def _parse_archive(self, info: PageInfo) -> KattisArchive:
         url = parse.urlparse(info.url)
         uid = url.path.split('/')[1]
         return KattisArchive(
@@ -129,10 +131,10 @@ class Kattis(Website):
             url=parse.urljoin(info.url, f'/{uid}'),
         )
 
-    def _parse_sidebar_field(self, info: 'PageInfo', field: str) -> str:
+    def _parse_sidebar_field(self, info: PageInfo, field: str) -> str:
         sidebar = info.data.find(
             'div',
-            {'class': 'problem-sidebar sidebar-info'}
+            {'class': 'problem-sidebar sidebar-info'},
         )
 
         metadatas = sidebar.find_all('p')
@@ -143,7 +145,7 @@ class Kattis(Website):
 
         return field_soup.text.split(':')[-1].strip()
 
-    def to_problem(self, info: 'PageInfo') -> KattisProblem:
+    def to_problem(self, info: PageInfo) -> KattisProblem:
 
         title = info.data.find('div', {'class': 'headline-wrapper'}).find('h1')
         br = title.find('br')

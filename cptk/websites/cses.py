@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from dataclasses import dataclass
 from dataclasses import field
@@ -11,7 +13,6 @@ from cptk.scrape import Test
 from cptk.scrape import Website
 
 if TYPE_CHECKING:
-    from typing import Optional, List
     from cptk import PageInfo
     from bs4 import BeautifulSoup
 
@@ -43,8 +44,8 @@ class Cses(Website):
 
     def _contest_from_titlebar(
         self,
-        info: 'PageInfo',
-    ) -> 'Optional[CsesContest]':
+        info: PageInfo,
+    ) -> CsesContest | None:
         titlebar_soup = info.data.find('div', {'class': 'title-block'})
 
         url = urlparse(info.url)
@@ -71,34 +72,37 @@ class Cses(Website):
             return None
 
     @staticmethod
-    def _parse_code_text(soup: 'BeautifulSoup') -> None:
+    def _parse_code_text(soup: BeautifulSoup) -> None:
         return soup.text.replace('<br>', '\n').replace('\r', '').strip() + '\n'
 
-    def _parse_tests(self, info: 'PageInfo') -> 'List[Test]':
+    def _parse_tests(self, info: PageInfo) -> list[Test]:
         content = info.data.find('div', {'class': 'content'})
 
         titles_soup = content.find_all(
-            'b', {'id': re.compile('.*(example|esimerkki).*')})
+            'b', {'id': re.compile('.*(example|esimerkki).*')},
+        )
 
         tests = list()
         for title in titles_soup:
-            title: 'BeautifulSoup'
+            title: BeautifulSoup
 
             input_soup = title.find_next_sibling('code')
             expected_soup = input_soup.find_next_sibling('code')
 
-            tests.append(Test(
-                input=self._parse_code_text(input_soup),
-                expected=self._parse_code_text(expected_soup),
-            ))
+            tests.append(
+                Test(
+                    input=self._parse_code_text(input_soup),
+                    expected=self._parse_code_text(expected_soup),
+                ),
+            )
 
         return tests
 
-    def is_problem(self, info: 'PageInfo') -> bool:
+    def is_problem(self, info: PageInfo) -> bool:
         soup = info.data.find('ul', {'class': 'task-constraints'})
         return soup is not None
 
-    def to_problem(self, info: 'PageInfo') -> 'Optional[Problem]':
+    def to_problem(self, info: PageInfo) -> Problem | None:
         contest = self._contest_from_titlebar(info)
 
         title_soup = info.data.find('div', {'class': 'title-block'})
@@ -106,7 +110,8 @@ class Cses(Website):
         sidebar_soup = info.data.find('div', {'class': 'nav sidebar'})
         current_soup = sidebar_soup.find('a', {'class': 'current'})
         constrains_soup = content_soup.find(
-            'ul', {'class': 'task-constraints'})
+            'ul', {'class': 'task-constraints'},
+        )
 
         uid_soup = content_soup.find('input', {'name': 'task'})
         uid = int(uid_soup['value'])
@@ -144,5 +149,7 @@ class Cses(Website):
             'memory_limit': memory_limit,
         }
 
-        if level is not None: return CsesContestProblem(**kwargs, mark=level)
-        else: return CsesProblemsetProblem(**kwargs, section=section)
+        if level is not None:
+            return CsesContestProblem(**kwargs, mark=level)
+        else:
+            return CsesProblemsetProblem(**kwargs, section=section)

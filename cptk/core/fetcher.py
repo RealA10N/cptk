@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import pkg_resources
@@ -9,7 +11,6 @@ from cptk.scrape import Website
 from cptk.utils import cptkException
 
 if TYPE_CHECKING:
-    from typing import Type, List
     from cptk.scrape import Problem
 
 
@@ -37,7 +38,7 @@ class Fetcher:
         self.session = session()
         self._load_websites()
 
-    def _load_websites(self) -> 'List[Type[Website]]':
+    def _load_websites(self) -> list[type[Website]]:
         self._websites = [
             point.load()()
             for point in pkg_resources.iter_entry_points('cptk_sites')
@@ -52,7 +53,7 @@ class Fetcher:
                 for cur in domain:
                     self._domain_to_website[cur] = website
 
-    def page_to_problem(self, info: PageInfo) -> 'Problem':
+    def page_to_problem(self, info: PageInfo) -> Problem:
         """ Recives an arbitrary page info instance and tries to match it with
         a Website class that knows how to handle this specific website. If cptk
         doesn't find a way to parse the given webpage, it raises the

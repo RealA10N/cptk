@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import sys
 from typing import TYPE_CHECKING
-from typing import Union
 
 import colorama
 
@@ -26,11 +27,12 @@ class System:
     _yes_stack = 0
 
     @classmethod
-    def run(cls,
-            cmd: str,
-            errormsg: str = None,
-            verbose: bool = None,
-            ) -> 'CompletedProcess':
+    def run(
+        cls,
+        cmd: str,
+        errormsg: str = None,
+        verbose: bool = None,
+    ) -> CompletedProcess:
         """ Runs the given command in the terminal. If 'errormsg' is provided,
         asserts that the returncode from the process is zero, and if not,
         raises an SystemRunError with the given message. If 'verbose' is
@@ -77,7 +79,7 @@ class System:
         return ', '.join(str(a) for a in error.args)
 
     @classmethod
-    def error(cls, error: Union[str, Exception]) -> None:
+    def error(cls, error: str | Exception) -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
 
@@ -109,7 +111,8 @@ class System:
 
     @classmethod
     def confirm(cls, question: str) -> bool:
-        if cls.pop_yes(): return True
+        if cls.pop_yes():
+            return True
         return cls.ask(question, {('Y', 'y'): True, ('n', 'N'): False})
 
     @classmethod

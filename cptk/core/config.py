@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING
 
@@ -9,7 +11,7 @@ from yaml import YAMLError
 
 from cptk.utils import cptkException
 if TYPE_CHECKING:
-    from typing import Type, TypeVar, Tuple
+    from typing import TypeVar
 
     T = TypeVar('T')
 
@@ -44,11 +46,12 @@ class ConfigFileValueError(ConfigFileError, ValueError):
 
 
 class ConfigFileParsingError(ConfigFileError):
-    def __init__(self,
-                 path: str,
-                 error: str,
-                 position: 'Tuple[int, int]' = None,
-                 ) -> None:
+    def __init__(
+        self,
+        path: str,
+        error: str,
+        position: tuple[int, int] = None,
+    ) -> None:
         self.path = path
         self.error = error
         self.position = position
@@ -63,14 +66,14 @@ class ConfigFileParsingError(ConfigFileError):
 class Configuration(BaseModel):
 
     @classmethod
-    def load(cls: 'Type[T]', path: str) -> 'T':
+    def load(cls: type[T], path: str) -> T:
         """ Load information from a YAML configuration file and dump it into a
         pydantic model. Raises relevent expections if the given file path isn't
         found, the YAML file can't be parsed, or the data doesn't match the
         pydantic model. """
 
         try:
-            with open(path, 'r', encoding='utf8') as file:
+            with open(path, encoding='utf8') as file:
                 data = safe_load(file)
 
         except FileNotFoundError:
@@ -83,7 +86,8 @@ class Configuration(BaseModel):
 
         if not isinstance(data, dict):
             raise ConfigFileValueError(
-                path, [{'loc': (), 'msg': "file isn't in dictionary format"}])
+                path, [{'loc': (), 'msg': "file isn't in dictionary format"}],
+            )
 
         try:
             return cls(**data)

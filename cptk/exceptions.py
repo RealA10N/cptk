@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from cptk.core.chef import BakingError
 from cptk.core.config import ConfigFileError
 from cptk.core.config import ConfigFileNotFound

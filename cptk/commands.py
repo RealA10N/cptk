@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 import cptk.utils
@@ -13,7 +15,7 @@ collector.global_argument(
     '--version',
     action='version',
     version=f'%(prog)s {__version__}',
-    help='show version message and exit'
+    help='show version message and exit',
 )
 
 collector.global_argument(
@@ -26,7 +28,7 @@ collector.global_argument(
         dir_ok=True,
         file_ok=False,
         must_exist=True,
-    )
+    ),
 )
 
 collector.global_argument(
@@ -79,7 +81,7 @@ def initialize(wd: str, template: str):
 @collector.argument(
     'url',
     help='the problem to be cloned',
-    type=cptk.utils.url_validator
+    type=cptk.utils.url_validator,
 )
 def clone(url: str, wd: str):
 
