@@ -26,10 +26,7 @@ setup(
 
     author=cptk.__author__,
     author_email=cptk.__author_email__,
-
-    packages=find_packages(include=['cptk*']),
-    package_dir={'cptk': 'cptk'},
-    package_data={'cptk': ['defaults/*']},
+    packages=find_packages(include=['cptk*']),    
 
     entry_points={
         "cptk_sites": [
@@ -38,7 +35,7 @@ setup(
             "kattis=cptk.websites:Kattis",
         ],
         "console_scripts": [
-            "cptk=cptk.__main__",
+            "cptk=cptk.main:main",
         ]
     },
 )

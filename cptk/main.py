@@ -33,11 +33,10 @@ def main(args: Optional[List[str]] = None) -> int:
 
     finally:
         deinit()
-        return code
-
+        raise SystemExit(code)
 
 __all__ = ['main']
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    main()

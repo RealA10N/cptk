@@ -34,8 +34,10 @@ install-ci:
 	$(PY) -m pip install -r requirements-dev.txt
 	$(PY) -m pip install .
 
+.PHONY: build
 build: test
 	$(PY) setup.py sdist bdist_wheel
 
+.PHONY: upload
 upload: build
 	$(PY) -m twine upload dist/*
