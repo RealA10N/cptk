@@ -8,9 +8,9 @@
 
 **The Competitive Programming Tool Kit** (_cptk_ for short), is a command-line interface (CLI) that aims to be your personal assistant for everything competitive-programming-related. Some of the main features of cptk are:
 
-- Supports all large CP websites, including [codeforces.com](https://codeforces.com/), [cses.fi](https://cses.fi/) and [kattis.com](https://open.kattis.com/)
+- Supports all large competitive programming websites, including [codeforces.com](https://codeforces.com/), [cses.fi](https://cses.fi/) and [kattis.com](https://open.kattis.com/)
 - Automatically download and run example test cases
-- Manage and catalog your CP folder structure
+- Manage and catalog the solutions in your competitive programming folder
 - Full git integration: commits and pushes solutions after you submit them
 - And much more!
 
