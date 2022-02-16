@@ -35,8 +35,6 @@ def main(args: Optional[List[str]] = None) -> int:
         deinit()
         raise SystemExit(code)
 
-__all__ = ['main']
-
 
 if __name__ == '__main__':
     main()

@@ -26,6 +26,8 @@ install-dev:
 	$(PY) -m pip install --upgrade pip
 	$(PY) -m pip install -r requirements-dev.txt
 	$(PY) -m pip install -e .
+	pre-commit install
+	pre-commit run --all-files
 
 
 .PHONY: install-ci

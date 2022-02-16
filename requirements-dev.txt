@@ -8,5 +8,6 @@ python-dateutil>=2.8, <3.0  # parse date strings in test configuration files
 freezegun>=1.1, <2.0        # mock the current system time
 
 # Formatting and Linting
+pre-commit>=2.17, <3
 flake8>=4.0,<5
 flake8-print>=4.0,<5

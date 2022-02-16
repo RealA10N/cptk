@@ -26,7 +26,7 @@ setup(
 
     author=cptk.__author__,
     author_email=cptk.__author_email__,
-    packages=find_packages(include=['cptk*']),    
+    packages=find_packages(include=['cptk*']),
 
     entry_points={
         "cptk_sites": [
