@@ -3,11 +3,13 @@ PY ?= python3
 .PHONY: test
 test:
 	$(PY) -m pytest tests/
+	pre-commit run --all-files
 
 
 .PHONY: test-ci
 test-ci:
 	$(PY) -m pytest -vv tests/
+	pre-commit run --all-files
 
 
 .PHONY: coverage
@@ -36,9 +38,12 @@ install-ci:
 	$(PY) -m pip install -r requirements-dev.txt
 	$(PY) -m pip install .
 
+
 .PHONY: build
 build: test
+	rm -r dist build
 	$(PY) setup.py sdist bdist_wheel
+
 
 .PHONY: upload
 upload: build
