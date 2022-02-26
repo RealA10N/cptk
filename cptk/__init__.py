@@ -1,4 +1,4 @@
-__version__ = '0.1.0a1'
+__version__ = '0.1.0a2'
 __author__ = 'Alon Krymgand Osovsky'
 __author_email__ = 'downtown2u@gmail.com'
 __description__ = ' '.join((
