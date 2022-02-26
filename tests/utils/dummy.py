@@ -13,6 +13,7 @@ class Dummy:
             website=self._website,
             url='https://codeforces.com/problemset/problem/1/A',
             name='Test Problem',
+            time_limit=1,
             tests=[cptk.scrape.Test('1 2', '1 2\n'), cptk.scrape.Test('1 4')],
             contest=cptk.scrape.Contest(
                 _uid=1,

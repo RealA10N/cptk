@@ -118,7 +118,7 @@ def move(src: str, dst: str, wd: str):
     proj.move(src, dst)
 
 
-@collector.command('bake', aliases=['run'])
+@collector.command('bake')
 @collector.argument('name', nargs='?', default=None, type=str)
 def bake(wd: str, name: str = None):
 
@@ -142,3 +142,16 @@ def serve(wd: str, name: str = None):
     proj = LocalProject.find(wd)
     prob = proj.last() if name is None else LocalProblem(wd, name)
     Chef(prob).serve()
+
+
+@collector.command('test')
+@collector.argument('name', nargs='?', default=None, type=str)
+def test(wd: str, name: str = None):
+
+    from cptk.local.project import LocalProject
+    from cptk.local.problem import LocalProblem
+    from cptk.core.chef import Chef
+
+    proj = LocalProject.find(wd)
+    prob = proj.last() if name is None else LocalProblem(wd, name)
+    Chef(prob).test()

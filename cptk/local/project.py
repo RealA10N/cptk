@@ -217,6 +217,7 @@ class LocalProject:
         src = self.relative(self.config.clone.template)
         dst = self.move_relative(processor.parse_string(self.config.clone.path))
         commons = cptk.utils.find_common_files(src, dst)
+        # TODO: won't find common files that include preprocessing in filename
 
         if commons:
             System.warn(
@@ -231,10 +232,14 @@ class LocalProject:
                 System.abort()
 
         cptk.utils.soft_tree_copy(src, dst)
+        processor.parse_directory(dst)
+
         recipe = self.config.clone.recipe.preprocess(processor)
         prob = LocalProblem.init(dst, recipe)
 
-        processor.parse_directory(dst)
+        if recipe.test is not None:
+            prob.store_tests(recipe.test.folder, problem.tests)
+
         self.update_last(prob)
         return prob
 

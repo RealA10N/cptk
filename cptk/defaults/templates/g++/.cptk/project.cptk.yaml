@@ -13,3 +13,6 @@ clone:
       g++ {{ problem.name | slug }}.cpp -DLOCAL -O2 -Wall
       -o {{ problem.name | slug }}{% if system == 'Windows' %}.exe{% endif %}
     serve: ./{{ problem.name | slug }}{% if system == 'Windows' %}.exe{% endif %}
+    test:
+      folder: tests
+      timeout: "{{ problem.time_limit }}"

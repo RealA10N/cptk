@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from cptk.core.chef import BakingError
+from cptk.core.chef import NoTestConfigurationError
 from cptk.core.config import ConfigFileError
 from cptk.core.config import ConfigFileNotFound
 from cptk.core.config import ConfigFileParsingError
@@ -24,6 +25,7 @@ from cptk.utils import cptkException
 __all__ = [
     # cptk.core.chef
     'BakingError',
+    'NoTestConfigurationError',
 
     # cptk.core.config
     'ConfigFileError',

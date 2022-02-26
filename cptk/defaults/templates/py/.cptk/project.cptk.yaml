@@ -12,3 +12,6 @@ clone:
     serve: >-
       {% if system == 'Windows' %}py{% else %}python3{% endif %}
       {{ problem.name | slug }}.py
+    test:
+      folder: tests
+      timeout: "{{ problem.time_limit }}"

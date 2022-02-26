@@ -18,7 +18,9 @@ class SystemRunError(cptkException):
 class System:
 
     CMD = colorama.Fore.YELLOW
-    LOG = colorama.Fore.LIGHTBLACK_EX
+    TITLE = colorama.Style.BRIGHT
+    DETAILS = colorama.Fore.LIGHTBLACK_EX
+    SUCCESS = colorama.Back.GREEN + colorama.Style.BRIGHT
     ERROR = colorama.Back.RED + colorama.Style.BRIGHT
     WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
     RESET = colorama.Style.RESET_ALL
@@ -79,11 +81,15 @@ class System:
         return ', '.join(str(a) for a in error.args)
 
     @classmethod
-    def error(cls, error: str | Exception) -> None:
+    def success(cls, msg: str, title: str = 'SUCCESS') -> None:
+        cls.echo(f'{cls.SUCCESS} {title.upper()} {cls.RESET} {msg}')
+
+    @classmethod
+    def error(cls, error: str | Exception, title: str = 'ERROR') -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
 
-        cls.echo(f"{cls.ERROR} ERROR {cls.RESET} {error}")
+        cls.echo(f"{cls.ERROR} {title.upper()} {cls.RESET} {error}")
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
@@ -92,7 +98,7 @@ class System:
         desc = cls._expection_to_msg(error)
         msg = title if not desc else f'{title}: {desc}'
 
-        cls.echo(f"{cls.ERROR} UNEXPECTED ERROR {cls.RESET} {msg}")
+        cls.error(msg, title='UNEXPECTED ERROR')
 
         tb = error.__traceback__
         while tb is not None:
@@ -146,6 +152,15 @@ class System:
         print(msg)  # noqa: T001
 
     @classmethod
+    def title(cls, msg: str) -> None:
+        cls.echo(cls.TITLE + msg)
+
+    @classmethod
     def log(cls, msg: str) -> None:
         if cls._verbosity >= 1:
-            cls.echo(cls.LOG + msg + cls.RESET)
+            cls.echo(msg)
+
+    @classmethod
+    def details(cls, msg: str) -> None:
+        if cls._verbosity >= 2:
+            cls.echo(cls.DETAILS + msg + cls.RESET)
