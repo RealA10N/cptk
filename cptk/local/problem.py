@@ -46,11 +46,17 @@ class NoRecipesFound(RecipeNotFoundError):
         )
 
 
+class TestRecipe(pydantic.BaseModel):
+    folder: str
+    timeout: Optional[float] = None
+
+
 class Recipe(pydantic.BaseModel):
 
     name: Optional[str] = None
     bake: List[str] = []
     serve: str
+    test: Optional[TestRecipe] = None
 
     @pydantic.validator('bake', pre=True)
     @classmethod

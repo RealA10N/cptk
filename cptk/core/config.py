@@ -39,7 +39,7 @@ class ConfigFileValueError(ConfigFileError, ValueError):
         s = f"{er} found in {self.path!r}:"
 
         for error in self.errors:
-            path = '.'.join(error['loc']) if error['loc'] else '.'
+            path = '.'.join(str(a) for a in error['loc']) if error['loc'] else '.'
             s += f"\nUnder {path!r}: {error['msg']}"
 
         return s

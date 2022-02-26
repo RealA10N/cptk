@@ -19,6 +19,7 @@ class System:
 
     CMD = colorama.Fore.YELLOW
     LOG = colorama.Fore.LIGHTBLACK_EX
+    SUCCESS = colorama.Back.GREEN + colorama.Style.BRIGHT
     ERROR = colorama.Back.RED + colorama.Style.BRIGHT
     WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
     RESET = colorama.Style.RESET_ALL
@@ -79,11 +80,15 @@ class System:
         return ', '.join(str(a) for a in error.args)
 
     @classmethod
-    def error(cls, error: str | Exception) -> None:
+    def success(cls, msg: str, title: str = 'SUCCESS') -> None:
+        cls.echo(f'{cls.SUCCESS} {title} {cls.RESET} {msg}')
+
+    @classmethod
+    def error(cls, error: str | Exception, title: str = 'ERROR') -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
 
-        cls.echo(f"{cls.ERROR} ERROR {cls.RESET} {error}")
+        cls.echo(f"{cls.ERROR} {title} {cls.RESET} {error}")
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
