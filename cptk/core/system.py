@@ -18,7 +18,8 @@ class SystemRunError(cptkException):
 class System:
 
     CMD = colorama.Fore.YELLOW
-    LOG = colorama.Fore.LIGHTBLACK_EX
+    TITLE = colorama.Style.BRIGHT
+    DETAILS = colorama.Fore.LIGHTBLACK_EX
     SUCCESS = colorama.Back.GREEN + colorama.Style.BRIGHT
     ERROR = colorama.Back.RED + colorama.Style.BRIGHT
     WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
@@ -151,6 +152,15 @@ class System:
         print(msg)  # noqa: T001
 
     @classmethod
+    def title(cls, msg: str) -> None:
+        cls.echo(cls.TITLE + msg)
+
+    @classmethod
     def log(cls, msg: str) -> None:
         if cls._verbosity >= 1:
-            cls.echo(cls.LOG + msg + cls.RESET)
+            cls.echo(msg)
+
+    @classmethod
+    def details(cls, msg: str) -> None:
+        if cls._verbosity >= 2:
+            cls.echo(cls.DETAILS + msg + cls.RESET)

@@ -109,18 +109,30 @@ class Chef:
         self._problem = problem
         self._runner = Runner()
 
+    @property
+    def _using_string(self) -> str:
+        name = self._problem.recipe.name
+        if name is not None:
+            return f'using recipe {name!r}'
+        return 'using the default recipe'
+
     def bake(self) -> None:
         """ Bakes (generates) the executable of the current problem solution.
         If the recipe configuration file of the current problem doesn't specify
         a 'bake' option, returns None quietly. """
 
         location = self._problem.location
+        System.log(f'baking has begun! ({self._using_string})')
+        start = time.time()
 
         for cmd in self._problem.recipe.bake:
-            System.log(cmd)
+            System.details(cmd)
             res = self._runner.exec(cmd, wd=location, redirect=False)
             if res.code:
                 raise BakingError(res.code, cmd)
+
+        seconds = time.time() - start
+        System.log(f'Baking is over in {seconds:.02f} seconds')
 
     def serve(self) -> None:
         """ Bakes the local problem (if a baking recipe is provided), and serves
@@ -131,7 +143,8 @@ class Chef:
         cmd = self._problem.recipe.serve
         location = self._problem.location
 
-        System.log(cmd)
+        System.log(f'Serving solution ({self._using_string})')
+        System.details(cmd)
         res = self._runner.exec(cmd, wd=location, redirect=False)
         System.abort(res.code)
 
@@ -193,7 +206,7 @@ class Chef:
         timeout = self._problem.recipe.test.timeout
 
         tests = self._load_tests()
-        System.echo(f'Found {len(tests)} tests')
+        System.title(f'Found {len(tests)} tests')
 
         passed = 0
         start = time.time()
@@ -215,7 +228,7 @@ class Chef:
                 passed += 1
 
         seconds = time.time() - start
-        System.echo(
+        System.title(
             f'{passed} passed and {len(tests)-passed} failed'
             f' in {seconds:.2f} seconds',
         )
