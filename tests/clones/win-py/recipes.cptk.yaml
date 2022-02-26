@@ -1,3 +1,7 @@
 recipes:
 - name: test-problem
+  bake: []
   serve: py test-problem.py
+  test:
+    folder: tests
+    timeout: 1.0
