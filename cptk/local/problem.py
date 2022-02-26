@@ -108,14 +108,6 @@ class LocalProblem:
     name: str | None = field(compare=True, default=None)
 
     @staticmethod
-    def _check_valid_test_name(folder: str, name: str) -> bool:
-        inp = name + cptk.constants.INPUT_FILE_SUFFIX
-        out = name + cptk.constants.OUTPUT_FILE_SUFFIX
-        return (
-            not os.path.exists(os.path.join(folder, inp))
-        ) and (not os.path.exists(os.path.join(folder, out)))
-
-    @staticmethod
     def _store_test(folder: str, name: str, test: cptk.scrape.Test) -> None:
 
         inp = os.path.join(folder, name + cptk.constants.INPUT_FILE_SUFFIX)
@@ -135,8 +127,6 @@ class LocalProblem:
         os.makedirs(folder, exist_ok=True)
         for test in tests:
             name = next(gen)
-            while not self._check_valid_test_name(folder, name):
-                name = next(gen)
             self._store_test(folder, name, test)
 
     @classmethod
