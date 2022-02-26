@@ -20,7 +20,7 @@ run when executing `cptk test`: just add `.in` and `.out` text files to the
 problem's testing folder!
 
 For more information and a full tutorial on the `cptk test` subcommand,
-you are more then welcome to visit our [wiki page](https://github.com/RealA10N/cptk/wiki).
+you are more than welcome to visit our [wiki page](https://github.com/RealA10N/cptk/wiki).
 
 ### Added
 
