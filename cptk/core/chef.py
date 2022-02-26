@@ -121,8 +121,11 @@ class Chef:
         If the recipe configuration file of the current problem doesn't specify
         a 'bake' option, returns None quietly. """
 
+        if not self._problem.recipe.bake:
+            return
+
         location = self._problem.location
-        System.log(f'baking has begun! ({self._using_string})')
+        System.log(f'Baking has begun ({self._using_string})')
         start = time.time()
 
         for cmd in self._problem.recipe.bake:
@@ -132,7 +135,7 @@ class Chef:
                 raise BakingError(res.code, cmd)
 
         seconds = time.time() - start
-        System.log(f'Baking is over in {seconds:.02f} seconds')
+        System.log(f'Solution is baked! (took {seconds:.02f} seconds)')
 
     def serve(self) -> None:
         """ Bakes the local problem (if a baking recipe is provided), and serves
@@ -206,7 +209,9 @@ class Chef:
         timeout = self._problem.recipe.test.timeout
 
         tests = self._load_tests()
-        System.title(f'Found {len(tests)} tests')
+
+        LogFunc = System.title if tests else System.warn
+        LogFunc(f'Found {len(tests)} tests')
 
         passed = 0
         start = time.time()
@@ -228,7 +233,10 @@ class Chef:
                 passed += 1
 
         seconds = time.time() - start
+        failed = len(tests) - passed
         System.title(
-            f'{passed} passed and {len(tests)-passed} failed'
+            f'{passed} passed and {failed} failed'
             f' in {seconds:.2f} seconds',
         )
+
+        System.abort(1 if failed else 0)
