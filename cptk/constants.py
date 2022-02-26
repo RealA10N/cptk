@@ -12,3 +12,10 @@ LAST_FILE_SEPERATOR = '::'
 
 INPUT_FILE_SUFFIX = '.in'
 OUTPUT_FILE_SUFFIX = '.out'
+
+
+def TEST_NAME_GENERATOR():
+    n = 1
+    while True:
+        yield f'sample{n:02d}'
+        n += 1

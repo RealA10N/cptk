@@ -82,14 +82,14 @@ class System:
 
     @classmethod
     def success(cls, msg: str, title: str = 'SUCCESS') -> None:
-        cls.echo(f'{cls.SUCCESS} {title} {cls.RESET} {msg}')
+        cls.echo(f'{cls.SUCCESS} {title.upper()} {cls.RESET} {msg}')
 
     @classmethod
     def error(cls, error: str | Exception, title: str = 'ERROR') -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
 
-        cls.echo(f"{cls.ERROR} {title} {cls.RESET} {error}")
+        cls.echo(f"{cls.ERROR} {title.upper()} {cls.RESET} {error}")
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
@@ -98,7 +98,7 @@ class System:
         desc = cls._expection_to_msg(error)
         msg = title if not desc else f'{title}: {desc}'
 
-        cls.echo(f"{cls.ERROR} UNEXPECTED ERROR {cls.RESET} {msg}")
+        cls.error(msg, title='UNEXPECTED ERROR')
 
         tb = error.__traceback__
         while tb is not None:

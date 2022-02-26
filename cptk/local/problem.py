@@ -7,10 +7,12 @@ from typing import List
 from typing import Optional
 from typing import TYPE_CHECKING
 from typing import TypeVar
+from typing import Union
 
 import pydantic
 
 import cptk.constants
+import cptk.scrape
 import cptk.utils
 from cptk.core.config import ConfigFileError
 from cptk.core.config import ConfigFileNotFound
@@ -48,7 +50,21 @@ class NoRecipesFound(RecipeNotFoundError):
 
 class TestRecipe(pydantic.BaseModel):
     folder: str
-    timeout: Optional[float] = None
+    timeout: Union[float, str, None] = None
+
+    def preprocess(self: T, processor: Preprocessor) -> type[T]:
+        def parse_str(v):
+            if isinstance(v, str):
+                return processor.parse_string(v)
+            else:
+                return v
+
+        kwargs = {
+            'folder': parse_str(self.folder),
+            'timeout': parse_str(self.timeout),
+        }
+
+        return type(self)(**kwargs)
 
 
 class Recipe(pydantic.BaseModel):
@@ -74,11 +90,11 @@ class Recipe(pydantic.BaseModel):
 
         kwargs = {
             'name': parse_str(self.name),
+            'bake': [parse_str(v) for v in self.bake],
             'serve': parse_str(self.serve),
+            'test': self.test.preprocess(processor) if self.test else None,
         }
 
-        if self.bake:
-            kwargs['bake'] = [parse_str(v) for v in self.bake]
         return type(self)(**kwargs)
 
 
@@ -90,6 +106,38 @@ class RecipesConfig(Configuration):
 class LocalProblem:
     location: str = field(compare=True)
     name: str | None = field(compare=True, default=None)
+
+    @staticmethod
+    def _check_valid_test_name(folder: str, name: str) -> bool:
+        inp = name + cptk.constants.INPUT_FILE_SUFFIX
+        out = name + cptk.constants.OUTPUT_FILE_SUFFIX
+        return (
+            not os.path.exists(os.path.join(folder, inp))
+        ) and (not os.path.exists(os.path.join(folder, out)))
+
+    @staticmethod
+    def _store_test(folder: str, name: str, test: cptk.scrape.Test) -> None:
+
+        inp = os.path.join(folder, name + cptk.constants.INPUT_FILE_SUFFIX)
+        with open(inp, 'w', encoding='utf8') as file:
+            file.write(test.input)
+
+        out = os.path.join(folder, name + cptk.constants.OUTPUT_FILE_SUFFIX)
+        if test.expected is not None:
+            with open(out, 'w', encoding='utf8') as file:
+                file.write(test.expected)
+
+    def store_tests(self, folder: str, tests: list[cptk.scrape.Test]) -> None:
+        if not tests:
+            return
+        gen = cptk.constants.TEST_NAME_GENERATOR()
+        folder = os.path.join(self.location, folder)
+        os.makedirs(folder, exist_ok=True)
+        for test in tests:
+            name = next(gen)
+            while not self._check_valid_test_name(folder, name):
+                name = next(gen)
+            self._store_test(folder, name, test)
 
     @classmethod
     def init(cls: type[T], location: str, recipe: Recipe) -> T:
