@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0a3] - 28.2.2022
+
+### Fixed
+
+- Default configurations and project structures are now bundled with the wheel
+  release.
+  - This resolves an `UNEXPECTED ERROR` when trying to run the `cptk init`
+    subcommand for wheel installs (including onces provided by `pip` from PyPI).
+
 ## [0.1.0a2] - 26.2.2022
 
 This alpha release adds the `cptk test` subcommand to cptk! 🥳
@@ -47,6 +56,7 @@ Enjoy and have a nice day! 😃
 - Supported commands are: `cptk initialize`, `cptk clone`, `cptk move`,
   `cptk bake` and `cptk serve`.
 
+[0.1.0a3]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a3
 [0.1.0a2]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a2
 [0.1.0a1]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a1
 [0.1.0a0]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a0
