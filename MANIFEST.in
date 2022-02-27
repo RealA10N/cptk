@@ -1,1 +1,2 @@
+include README.md CHANGELOG.md
 recursive-include cptk/defaults *
