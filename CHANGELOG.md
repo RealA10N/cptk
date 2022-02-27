@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default configurations and project structures are now bundled with the wheel
   release.
   - This resolves an `UNEXPECTED ERROR` when trying to run the `cptk init`
-    subcommand for wheel installs (including onces provided by `pip` from PyPI).
+    subcommand for wheel installs (including ones provided by `pip` from PyPI).
 
 ## [0.1.0a2] - 26.2.2022
 
