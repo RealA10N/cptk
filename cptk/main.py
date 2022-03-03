@@ -22,6 +22,10 @@ def main(args: list[str] | None = None) -> int:
         # SystemExit exception too.
         code = err.code
 
+    except KeyboardInterrupt:
+        System.error('Manually interrupted')
+        code = 130
+
     except cptkException as err:
         System.error(err)
         code = 65  # os.EX_DATAERR

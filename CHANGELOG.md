@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Prints a custom error message and returns exit code `130` if user terminates
+  the process (for example, using <kbd>Ctrl</kbd>+<kbd>C</kbd>).
+
+
 ## [0.1.0a3] - 28.2.2022
 
 ### Fixed
@@ -56,6 +64,7 @@ Enjoy and have a nice day! 😃
 - Supported commands are: `cptk initialize`, `cptk clone`, `cptk move`,
   `cptk bake` and `cptk serve`.
 
+[Unreleased]: https://github.com/RealA10N/cptk/compare/v0.1.0a3...dev
 [0.1.0a3]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a3
 [0.1.0a2]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a2
 [0.1.0a1]: https://github.com/RealA10N/cptk/releases/tag/v0.1.0a1
