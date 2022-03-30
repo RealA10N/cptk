@@ -3,11 +3,11 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import colorama
+import blessings
 
 from cptk.utils import cptkException
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from subprocess import CompletedProcess
 
 
@@ -17,14 +17,7 @@ class SystemRunError(cptkException):
 
 class System:
 
-    CMD = colorama.Fore.YELLOW
-    TITLE = colorama.Style.BRIGHT
-    DETAILS = colorama.Fore.LIGHTBLACK_EX
-    SUCCESS = colorama.Back.GREEN + colorama.Style.BRIGHT
-    ERROR = colorama.Back.RED + colorama.Style.BRIGHT
-    WARN = colorama.Back.YELLOW + colorama.Fore.BLACK + colorama.Style.BRIGHT
-    RESET = colorama.Style.RESET_ALL
-
+    terminal = blessings.Terminal()
     _verbosity = 0
     _yes_stack = 0
 
@@ -46,7 +39,7 @@ class System:
             verbose = cls._verbosity >= 2
 
         if verbose:
-            cls.echo(cls.CMD + cmd + cls.RESET)
+            cls.echo(cls.terminal.bright_black(cmd))
 
         res = subprocess.run(
             cmd.split(),
@@ -82,14 +75,16 @@ class System:
 
     @classmethod
     def success(cls, msg: str, title: str = 'SUCCESS') -> None:
-        cls.echo(f'{cls.SUCCESS} {title.upper()} {cls.RESET} {msg}')
+        title = cls.terminal.bold_white_on_green(f' {title.upper()} ')
+        cls.echo(f'{title} {msg}')
 
     @classmethod
     def error(cls, error: str | Exception, title: str = 'ERROR') -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
 
-        cls.echo(f"{cls.ERROR} {title.upper()} {cls.RESET} {error}")
+        title = cls.terminal.bold_white_on_red(f' {title.upper()} ')
+        cls.echo(f"{title} {error}")
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
@@ -104,16 +99,16 @@ class System:
         while tb is not None:
             file = tb.tb_frame.f_code.co_filename
             lineno = tb.tb_lineno
-            cls.echo(f'Inside {cls.CMD}{file}:{lineno}{cls.RESET}')
+            cls.log(f'Inside {file}:{lineno}')
             tb = tb.tb_next
 
     @classmethod
     def abnormal_exit(cls) -> None:
-        cls.echo(f"{cls.ERROR} ABNORMAL EXIT {cls.RESET}")
+        cls.echo(cls.terminal.bold_white_on_red(' ABNORMAL EXIT '))
 
     @classmethod
     def warn(cls, msg: str) -> None:
-        cls.echo(f"{cls.WARN} WARNING {cls.RESET} {msg}")
+        cls.echo(cls.terminal.bold_black_on_yellow(' WARNING ') + ' ' + msg)
 
     @classmethod
     def confirm(cls, question: str) -> bool:
@@ -136,7 +131,7 @@ class System:
                     answers[answer] = value
 
         question = f'{question}? [{"/".join(titles)}]: '
-        query = f"{cls.CMD}{question}{cls.RESET}"
+        query = cls.terminal.yellow(question)
         res = input(query).strip()
 
         while res not in answers:
@@ -153,7 +148,7 @@ class System:
 
     @classmethod
     def title(cls, msg: str) -> None:
-        cls.echo(cls.TITLE + msg)
+        cls.echo(cls.terminal.bold(msg))
 
     @classmethod
     def log(cls, msg: str) -> None:
@@ -163,4 +158,4 @@ class System:
     @classmethod
     def details(cls, msg: str) -> None:
         if cls._verbosity >= 2:
-            cls.echo(cls.DETAILS + msg + cls.RESET)
+            cls.echo(cls.terminal.bright_black(msg))
