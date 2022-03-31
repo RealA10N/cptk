@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from colorama import deinit
-from colorama import init
-
 import cptk.commands
 from cptk.core.system import System
 from cptk.utils import cptkException
@@ -13,7 +10,13 @@ def main(args: list[str] | None = None) -> int:
     code = 0  # os.EX_OK
 
     try:
+        from colorama import deinit
+        from colorama import init
         init()
+    except ModuleNotFoundError:
+        pass  # Colorama is required only on windows
+
+    try:
         cptk.commands.collector.run(args)
 
     except SystemExit as err:

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the process (for example, using <kbd>Ctrl</kbd>+<kbd>C</kbd>).
 
 
+### Changed
+
+- The `colorama` module is no longer installed on non-Windows machines.
+
 ## [0.1.0a3] - 28.2.2022
 
 ### Fixed
