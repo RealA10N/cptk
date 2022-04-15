@@ -22,6 +22,7 @@ class RunnerResult:
     runner: Runner
     code: int
     timed_out: bool
+    time_took: float
     outs: str | None = None
     errs: str | None = None
 
@@ -66,6 +67,8 @@ class Runner:
         If timeout is provided, the execution of the process will get
         terminated after the provided amount of seconds. """
 
+        start = time.time()
+
         proc = subprocess.Popen(
             cmd.split(),
             cwd=wd,
@@ -99,6 +102,7 @@ class Runner:
             errs=proc.stderr.read() if redirect else None,
             code=proc.returncode,
             timed_out=timed_out,
+            time_took=time.time() - start,
         )
 
 
@@ -223,14 +227,32 @@ class Chef:
             )
 
             if res.timed_out:
-                System.error('Execution timed out', title=name)
+                left = System.error
+                leftmsg = 'Time limit exceeded'
+
             elif res.code:
-                System.error(f'Nonzero exit code {res.code}', title=name)
+                left = System.error
+                leftmsg = f'Exit code {res.code}'
+
             elif test.expected is not None and res.outs != test.expected:
-                System.error('Output differs from expectation', title=name)
+                left = System.error
+                leftmsg = 'Wrong answer'
+
             else:
-                System.success('Output matches expectations', title=name)
+                left = System.success
+                leftmsg = 'Passed'
                 passed += 1
+
+            leftf = lambda: left(f'{leftmsg} ', title=name, end='')
+            leftlen = len(f'[{name}] {leftmsg} ')
+
+            rightf = lambda: System.echo(f' {res.time_took:.2f}s')
+            rightlen = len(f' {res.time_took:.2f}s')
+
+            System.two_sided(
+                (leftf, leftlen), (rightf, rightlen),
+                pad=System.terminal.bright_black('.'),
+            )
 
         seconds = time.time() - start
         failed = len(tests) - passed

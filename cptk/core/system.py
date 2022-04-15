@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import sys
+from typing import Callable
 from typing import TYPE_CHECKING
 
 import blessings
@@ -74,17 +76,22 @@ class System:
         return ', '.join(str(a) for a in error.args)
 
     @classmethod
-    def success(cls, msg: str, title: str = 'SUCCESS') -> None:
+    def success(cls, msg: str, title: str = 'SUCCESS', *args, **kwargs) -> None:
         title = cls.terminal.bold_white_on_green(f' {title.upper()} ')
-        cls.echo(f'{title} {msg}')
+        cls.echo(f'{title} {msg}', *args, **kwargs)
 
     @classmethod
-    def error(cls, error: str | Exception, title: str = 'ERROR') -> None:
+    def error(
+            cls,
+            error: str | Exception,
+            title: str = 'ERROR',
+            *args, **kwargs,
+    ) -> None:
         if isinstance(error, Exception):
             error = cls._expection_to_msg(error)
 
         title = cls.terminal.bold_white_on_red(f' {title.upper()} ')
-        cls.echo(f"{title} {error}")
+        cls.echo(f"{title} {error}", *args, **kwargs)
 
     @classmethod
     def unexpected_error(cls, error: Exception) -> None:
@@ -107,8 +114,12 @@ class System:
         cls.echo(cls.terminal.bold_white_on_red(' ABNORMAL EXIT '))
 
     @classmethod
-    def warn(cls, msg: str) -> None:
-        cls.echo(cls.terminal.bold_black_on_yellow(' WARNING ') + ' ' + msg)
+    def warn(cls, msg: str, *args, **kwargs) -> None:
+        cls.echo(
+            cls.terminal.bold_black_on_yellow(
+                ' WARNING ',
+            ) + ' ' + msg, *args, **kwargs,
+        )
 
     @classmethod
     def confirm(cls, question: str) -> bool:
@@ -143,19 +154,46 @@ class System:
         raise SystemExit(code)
 
     @classmethod
-    def echo(cls, msg: str) -> None:
-        print(msg)  # noqa: T001
+    def echo(cls, msg: str, *args, **kwargs) -> None:
+        print(msg, *args, **kwargs)  # noqa: T001
 
     @classmethod
-    def title(cls, msg: str) -> None:
-        cls.echo(cls.terminal.bold(msg))
+    def title(cls, msg: str, *args, **kwargs) -> None:
+        cls.echo(cls.terminal.bold(msg), *args, **kwargs)
 
     @classmethod
-    def log(cls, msg: str) -> None:
+    def log(cls, msg: str, *args, **kwargs) -> None:
         if cls._verbosity >= 1:
-            cls.echo(msg)
+            cls.echo(cls.terminal.bold_bright_black(msg), *args, **kwargs)
 
     @classmethod
-    def details(cls, msg: str) -> None:
+    def details(cls, msg: str, *args, **kwargs) -> None:
         if cls._verbosity >= 2:
-            cls.echo(cls.terminal.bright_black(msg))
+            cls.echo(cls.terminal.bright_black(msg), *args, **kwargs)
+
+    @classmethod
+    def two_sided(
+            cls,
+            left: tuple[Callable[[], None], int],
+            right: tuple[Callable[[], None], int],
+            pad: str = ' ', width=None,
+    ) -> None:
+        """ Recives two printing functions and the sizes of the strings that they
+        will print, and calls them in such a way that will print them in the same
+        line padded to different sides of the terminal window. """
+
+        width = width or os.get_terminal_size().columns
+
+        leftf, lenleft = left
+        rightf, lenright = right
+
+        leftf()
+
+        if lenleft + lenright > width:
+            right_pad = max(width - lenright, 0)
+            cls.echo('\n' + right_pad * pad, end='')
+        else:
+            mid_pad = width - lenleft - lenright
+            cls.echo(mid_pad * pad, end='')
+
+        rightf()
