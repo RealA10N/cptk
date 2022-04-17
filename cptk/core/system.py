@@ -102,12 +102,28 @@ class System:
 
         cls.error(msg, title='UNEXPECTED ERROR')
 
-        tb = error.__traceback__
-        while tb is not None:
-            file = tb.tb_frame.f_code.co_filename
-            lineno = tb.tb_lineno
-            cls.log(f'Inside {file}:{lineno}')
-            tb = tb.tb_next
+        import traceback
+        import platform
+        import cptk
+        # import cptt
+
+        cls.details(
+            ''.join(
+                traceback.format_exception(
+                    type(error), error, error.__traceback__,
+                ),
+            ),
+        )
+
+        cls.log(
+            f'Python {platform.python_version()}, '
+            f'cptk {cptk.__version__}',
+            # f'cptt {cptt.__version__}',
+            # TODO: uncomment when cptt is used by cptk!
+        )
+
+        if not cls._verbosity:
+            cls.title('Use -v or -vv to get more details')
 
     @classmethod
     def abnormal_exit(cls) -> None:
